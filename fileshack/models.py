@@ -25,7 +25,7 @@ class Store(Model):
         
     def get_absolute_url(self):
         url = reverse("fileshack:index", kwargs=dict(store_path=self.path))
-        if url == "//": url = "/" # Ugly hack.
+        if url.endswith("//"): url = url[:-1] # Ugly hack.
         return url
         
     def total(self):
