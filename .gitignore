@@ -2,4 +2,5 @@
 *.komodoproject
 .komodotools
 *~
+db/fileshack.sqlite
 
