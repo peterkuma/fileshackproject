@@ -2,5 +2,7 @@
 *.komodoproject
 .komodotools
 *~
-db/fileshack.sqlite
+/static/
+/media/
+/django
 
