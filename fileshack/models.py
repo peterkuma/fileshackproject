@@ -54,7 +54,8 @@ class Item(Model):
     
     def delete(self):
         dir = os.path.dirname(os.path.join(settings.MEDIA_ROOT, self.fileobject.name))
-        self.fileobject.delete()
+        try: self.fileobject.delete()
+        except OSError: pass
         try: os.rmdir(dir)
         except OSError: pass
         return Model.delete(self)
