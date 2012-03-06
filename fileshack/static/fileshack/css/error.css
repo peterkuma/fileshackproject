@@ -1,0 +1,25 @@
+#error {
+    text-align: left;
+    width: 600px;
+    height: 162px;
+    position: relative;
+    top: -40px;
+    left: 20px;
+    clear: both;
+    background: url(../img/error.png) no-repeat;
+}
+
+#error .label {
+    font-size: 23pt;
+    padding: 52px 0 2px 30px;
+}
+
+#error .message {
+    font-size: 19pt;
+    color: #fdeeee;
+    padding: 0 0 15px 30px;
+}
+
+#error a {
+    color: inherit;
+}

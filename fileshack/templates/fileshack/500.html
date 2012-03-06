@@ -1,0 +1,21 @@
+{% load staticfiles %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Fileshack</title>
+        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "fileshack/css/error.css" %}" />
+    </head>
+    <body>
+        <div id="container">
+            <h1>Welcome to fileshack, <span>drop your items</span></h1>
+	    <div id="error">
+		<div class="label">{% trans "Request could not be served" %}</div>
+		<div class="message">
+		    {% trans "An error occurred in the application" %}
+		</div>
+	    </div>
+	</div>
+    </body>
+</html>

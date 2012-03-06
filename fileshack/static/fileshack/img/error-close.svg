@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="24"
+   height="25"
+   id="svg2882"
+   version="1.1"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="error-wide.svg">
+  <defs
+     id="defs2884">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective2890" />
+    <inkscape:perspective
+       id="perspective2867"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2950"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:collect="always"
+       id="filter54265-8"
+       x="-0.027544783"
+       width="1.0550896"
+       y="-0.10712623"
+       height="1.2142525">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="5.7652139"
+         id="feGaussianBlur54267-4" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:collect="always"
+       id="filter54381-5">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.78067067"
+         id="feGaussianBlur54383-0" />
+    </filter>
+    <inkscape:perspective
+       id="perspective3014"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.959798"
+     inkscape:cx="-3.4372776"
+     inkscape:cy="25.157765"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1648"
+     inkscape:window-height="1023"
+     inkscape:window-x="32"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata2887">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-44.896364,-426.79296)">
+    <path
+       style="fill:#a40000;stroke:#b60000;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 65.031402,430.76707 47.948797,447.92424"
+       id="path54407"
+       inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-close.png"
+       inkscape:export-xdpi="105.57107"
+       inkscape:export-ydpi="105.57107" />
+    <path
+       id="path54411"
+       d="m 47.948797,430.76707 17.082605,17.15717"
+       style="fill:#a40000;stroke:#b60000;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-close.png"
+       inkscape:export-xdpi="105.57107"
+       inkscape:export-ydpi="105.57107" />
+    <path
+       id="path54413"
+       d="M 65.896364,431.63579 48.813759,448.79296"
+       style="fill:#a40000;stroke:#b60000;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-close.png"
+       inkscape:export-xdpi="105.57107"
+       inkscape:export-ydpi="105.57107" />
+    <path
+       style="fill:#a40000;stroke:#b60000;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 48.813759,431.63579 17.082605,17.15717"
+       id="path54415"
+       inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-close.png"
+       inkscape:export-xdpi="105.57107"
+       inkscape:export-ydpi="105.57107" />
+    <path
+       style="fill:#a40000;stroke:#ffcece;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 64.978969,429.79296 47.896364,446.95013"
+       id="path54421"
+       inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-close.png"
+       inkscape:export-xdpi="105.57107"
+       inkscape:export-ydpi="105.57107" />
+    <path
+       id="path54423"
+       d="m 47.896364,429.79296 17.082605,17.15717"
+       style="fill:#a40000;stroke:#ffcece;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-close.png"
+       inkscape:export-xdpi="105.57107"
+       inkscape:export-ydpi="105.57107" />
+  </g>
+</svg>

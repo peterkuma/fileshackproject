@@ -1,0 +1,37 @@
+{% load staticfiles %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Fileshack</title>
+        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "fileshack/css/404.css" %}" />
+    </head>
+    <body>
+        <div id="container">
+            <h1>Welcome to fileshack, <span>drop your items</span></h1>
+	    <div id="error">
+		<div class="label">
+		    {% if stores_number > 0 %}
+			{% trans "There is no such page" %}
+		    {% else %}
+			{% trans "There is nothing at all!" %}
+		    {% endif %}
+		</div>
+		<div class="message">
+		    {% if store %}
+			{% blocktrans with url=store.get_absolute_url %}
+			    Are you looking for <a href="{{ url }}">this store</a>?
+			{% endblocktrans %}
+		    {% elif stores_number > 0 %}
+			{% trans "Have you typed the correct URL?" %}
+		    {% else %}
+			{% blocktrans with url=admin_url %}
+			    Use the <a href="{{ url }}">admin interface</a> to add stores
+			{% endblocktrans %}
+		    {% endif %}
+		</div>
+	    </div>
+	</div>
+    </body>
+</html>

@@ -1,0 +1,79 @@
+{% load staticfiles %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Fileshack</title>
+        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
+        <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
+        <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
+        <script type="text/javascript">
+            var CSRF_TOKEN = '{{ csrf_token }}';
+            var CHUNK_SIZE = 512*1024; // 512 KiB.
+	    var CHUNK_UPLOAD_HIGH = 30;
+	    var CHUNK_UPLOAD_LOW = 10;
+            var ITEM_SIZE_LIMIT = {{ item_size_limit }}*1024*1024;
+            var ITEM_SIZE_LIMIT_ERROR_LABEL = '{% trans "Upload failed" %}';
+            var ITEM_SIZE_LIMIT_ERROR_MESSAGE = '{% blocktrans %}Item size is limited to {{ item_size_limit }} MB{% endblocktrans %}';
+        </script>
+	<script type="text/javascript" src="{% static "fileshack/js/misc.js" %}"></script>
+	<script type="text/javascript" src="{% static "fileshack/js/models.js" %}"></script>
+	<script type="text/javascript" src="{% static "fileshack/js/collections.js" %}"></script>
+	<script type="text/javascript" src="{% static "fileshack/js/views.js" %}"></script>
+        <script type="text/javascript" src="{% static "fileshack/js/fileshack.js" %}"></script>
+    </head>
+    <body>
+        <div id="container">
+            <h1>Welcome to fileshack, <span>drop your items</span></h1>
+            <div id="subcontainer">
+		<iframe src="iframe/" id="iframe" style="display: none"></iframe>
+                <form id="dropbox" action="/upload/" method="post" enctype="multipart/form-data">
+                    <span id="dropbox-text">Drop your item in here or click</span>
+		    <div id="dropbox-file">
+			<span id="dropbox-text-alt">Upload </span>
+			<input id="dropbox-input" type="file" name="file" multiple="multiple" />
+		    </div>
+		    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+                </form>
+                <div id="list">
+		    <div id="bootstrap" style="display: none">
+			{{ items_json|escape }}
+		    </div>
+		    <div id="templates" style="display: none">
+			<div id="item-template" class="item">
+			    <a class="box" href="">
+				<div class="buttons">
+				    <!--<button class="pausebtn">Pause</button>-->
+				    <button class="cancelbtn">Cancel</button>
+				</div>
+				<div class="size">0 KB</div>
+				<button class="deletebtn">Delete</button>
+				<div class="progress_container">
+				    <div class="progress">0 %x</div>
+				    <div class="progress_size">0 MB / 0 MB</div>
+				</div>
+				<div class="name">undefined</div>
+				<progress class="progressbar" value="0" max="100"></progress>
+				<div class="desc">Dropped on <strong class="uploaded">undefined</strong></div>
+			    </a>
+			    <div class="error" style="display: none">
+				<div class="error_label">Application Error</div>
+				<div class="error_message">Unknown error occurred.</div>
+				<a class="error_details" style="display: none">Details</a>
+				<button class="error_close"></button>
+			    </div>
+			</div>
+		    </div>
+		</div>
+            </div>
+            <div id="controls">
+                <form action="logout/">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+	    <div id="preload-1"></div>
+	    <div id="preload-2"></div>
+	    <div id="preload-3"></div>
+        </div>
+    </body>
+</html>
