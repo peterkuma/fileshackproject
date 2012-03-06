@@ -186,10 +186,12 @@ var Item = new Class({
 	var body = '--' + boundary + '\r\n';
 	body += 'Content-Disposition: form-data; name="file"; filename="' + encodeURIComponent(this.name) + '"\r\n';
 	body += 'Content-Type: application/octet-stream\r\n';
-	body += 'Content-Transfer-Encoding: base64\r\n';
+	// Do not advertise base64 encoding because of a bug in django prior to 1.4.
+	// base64 encoding is always assumed.
+	//body += 'Content-Transfer-Encoding: base64\r\n';
 	body += '\r\n';
 	// Padding to ensure 4-byte alignment of base64 encoded chunk.
-	while (body.length % 4 != 0) body += ' ';
+	while (body.length % 3 != 0) body += ' ';
 	body += window.btoa(chunk) + '\r\n';
 	//body += chunk + '\r\n'; 
 	//body += '--' + boundary + '\r\n';

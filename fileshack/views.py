@@ -18,6 +18,7 @@ import json
 import urllib
 import mimetypes
 import time
+import base64
 
 from models import *
 
@@ -224,7 +225,7 @@ def upload(request, store, id):
                 return HttpResponseServerError(JSONEncoder().encode(data))
         
             else:
-                f2.write(chunk)
+                f2.write(base64.b64decode(chunk))
         
         item.size = f2.tell()
         f2.close()
