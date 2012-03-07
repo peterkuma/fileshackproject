@@ -157,7 +157,7 @@ def upload(request, store, id):
         
         try:
             try: id = int(id)
-            except ValueError: id = None
+            except ValueError: raise Item.DoesNotExist
             item = Item.objects.get(pk=id)
             
             #if item.status() != "UPLOADING" and item.status() != "STALE":
