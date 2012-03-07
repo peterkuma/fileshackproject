@@ -74,13 +74,8 @@ var ItemView = new Class({
 	this.progress.set('text', percentage + ' %');    
 	if (this.model.type == 'stale') this.progress.set('text', 'stale');
 	
-	if (this.model.type == 'complete') {
-	    this.box.href = this.model.url;
-	} else if (this.model.type == 'unfinished') {
-	    this.box.href = 'download/' + this.model.id + '/';
-	} else {
-	    this.box.href = 'javascript: return false';
-	}
+	if (this.model.url) this.box.href = this.model.url;
+	else this.box.href = 'javascript: return false';
 	
 	this.el.removeClass('complete');
 	this.el.removeClass('pending');

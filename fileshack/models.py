@@ -72,10 +72,15 @@ class Item(Model):
         return self.fileobject and default_storage.exists(self.fileobject.path)
 
     def get_absolute_url(self):
-        if self.fileobject:
+        if self.status() == "READY":
             return self.fileobject.url
+        elif self.status() == "UPLOADING":
+            return reverse("fileshack:download",  kwargs={
+                "store_path": "" if self.store.path == "" else self.store.path+"/",
+                "item_id": self.id,
+            })
         else:
-            return None
+            return ""
 
     def name(self):
         try:
