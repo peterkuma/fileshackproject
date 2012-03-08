@@ -190,8 +190,6 @@ var Item = new Class({
 	// base64 encoding is always assumed.
 	//body += 'Content-Transfer-Encoding: base64\r\n';
 	body += '\r\n';
-	// Padding to ensure 4-byte alignment of base64 encoded chunk.
-	while (body.length % 3 != 0) body += ' ';
 	body += window.btoa(chunk) + '\r\n';
 	//body += chunk + '\r\n'; 
 	//body += '--' + boundary + '\r\n';
