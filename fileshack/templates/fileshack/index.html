@@ -11,7 +11,7 @@
             var CSRF_TOKEN = '{{ csrf_token }}';
             var CHUNK_SIZE = 512*1024; // 512 KiB.
 	    var CHUNK_UPLOAD_HIGH = 30;
-	    var CHUNK_UPLOAD_LOW = 10;
+	    var CHUNK_UPLOAD_LOW = 0;
             var ITEM_SIZE_LIMIT = {{ item_size_limit }}*1024*1024;
             var ITEM_SIZE_LIMIT_ERROR_LABEL = '{% trans "Upload failed" %}';
             var ITEM_SIZE_LIMIT_ERROR_MESSAGE = '{% blocktrans %}Item size is limited to {{ item_size_limit }} MB{% endblocktrans %}';

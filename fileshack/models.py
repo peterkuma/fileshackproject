@@ -9,6 +9,8 @@ from random import choice
 from datetime import datetime as dt
 from datetime import timedelta
 
+from google.appengine.ext import blobstore
+
 class Store(Model):
     path = CharField(_("path"), help_text=_("Path relative to the base URL under which the store is accessible. Leave empty if not sure."), unique=True, blank=True, max_length=200)
     media = CharField(_("media"), help_text=_("Directiory under MEDIA_PATH into which files will be uploaded. Leave empty if not sure."), blank=True, max_length=200)
@@ -45,7 +47,7 @@ def item_upload_to(instance, filename):
 
 class Item(Model):
     store = ForeignKey(Store, verbose_name=_("store"))
-    fileobject = FileField(_("file"), upload_to=item_upload_to)
+    fileobject = CharField(max_length=100, blank=True)
     created = DateTimeField(_("created"), auto_now_add=True)
     uploaded = DateTimeField(_("uploaded"), auto_now_add=True)
     modified = DateTimeField(_("modified"), auto_now=True)
@@ -53,11 +55,7 @@ class Item(Model):
     size = IntegerField(_("size"), default=0)
     
     def delete(self):
-        dir = os.path.dirname(os.path.join(settings.MEDIA_ROOT, self.fileobject.name))
-        try: self.fileobject.delete()
-        except OSError: pass
-        try: os.rmdir(dir)
-        except OSError: pass
+        blobstore.BlobInfo.get(self.fileobject).delete()
         return Model.delete(self)
 
     def status(self):   
@@ -73,20 +71,16 @@ class Item(Model):
 
     def get_absolute_url(self):
         if self.status() == "READY":
-            return self.fileobject.url
-        elif self.status() == "UPLOADING":
             return reverse("fileshack:download",  kwargs={
                 "store_path": "" if self.store.path == "" else self.store.path+"/",
                 "item_id": self.id,
             })
         else:
             return ""
-
+    
     def name(self):
-        try:
-            return os.path.basename(self.fileobject.name)
-        except (OSError,ValueError):
-            return None
+        if (self.fileobject == ""): return ""
+        return os.path.basename(blobstore.BlobInfo.get(self.fileobject).filename)
     
     def size_human(self):
         size = self.size()

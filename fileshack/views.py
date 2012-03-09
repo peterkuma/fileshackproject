@@ -19,6 +19,9 @@ import urllib
 import mimetypes
 import time
 
+from google.appengine.api import files
+from google.appengine.ext import blobstore
+
 from models import *
 
 class JSONEncoder(json.JSONEncoder):
@@ -168,15 +171,14 @@ def upload(request, store, id):
             #    }
             #    return HttpResponseServerError(json.dumps(data, default=json_handler))
 
-            if item.fileobject.size < offset:
+            size = blobstore.BlobInfo.get(item.fileobject).size
+            if size < offset:
                 time.sleep(0.5)
-                path = default_storage.path(item.fileobject.path)
-                size =  item.fileobject.size
-                newsize = os.path.getsize(path)
+                newsize = blobstore.BlobInfo.get(item.fileobject).size
                 while newsize != size:
                     time.sleep(0.5)
                     size = newsize
-                    newsize = os.path.getsize(path)
+                    newsize = blobstore.BlobInfo.get(item.fileobject).size
                 
                 if size < offset:
                     data = {
@@ -187,8 +189,14 @@ def upload(request, store, id):
                     }
                     return HttpResponseServerError(JSONEncoder().encode(data))
 
-            f2 = default_storage.open(item.fileobject.path, "ab")
-            #f2.truncate(offset)
+            f2 = blobstore.BlobInfo.get(item.fileobject).open()
+            data = f2.read()
+            f2.close()
+            blobstore.BlobInfo.get(item.fileobject).delete()
+            file_name = files.blobstore.create('application/octet-stream', urllib.unquote(f.name))
+            f2 = files.open(file_name, "a")
+            f2.write(data)
+            del data            
             
         except Item.DoesNotExist:
             if offset != 0:
@@ -201,12 +209,11 @@ def upload(request, store, id):
                 return HttpResponseServerError(JSONEncoder().encode(data))
             item = Item()
             item.store = store
-            item.fileobject.save(urllib.unquote(f.name), ContentFile(""))
-            item.fileobject.close()
+            file_name = files.blobstore.create('application/octet-stream', urllib.unquote(f.name))
             try: item.size_total = int(request.META["HTTP_X_FILE_SIZE"])
             except (ValueError, KeyError): item.size_total = 0
             item.save()
-            f2 = default_storage.open(item.fileobject.path, "wb")
+            f2 = files.open(file_name, "a")
         
         chunks = f.chunks().__iter__()
         while True:
@@ -225,14 +232,17 @@ def upload(request, store, id):
             else:
                 f2.write(chunk.decode("base64"))
         
-        item.size = f2.tell()
         f2.close()
+        files.finalize(file_name)
+        
+        item.fileobject = files.blobstore.get_blob_key(file_name)
+        item.size = blobstore.BlobInfo.get(item.fileobject).size
         
         if item.size >= item.size_total:
             item.uploaded = dt.now()
         
-        if item.size_total < item.size:
-            item.size_total = item.size
+        #if item.size_total < item.size:
+        #    item.size_total = item.size
         
         item.save()
         data = {
@@ -336,14 +346,10 @@ class ItemFileWrapper(FileWrapper):
 def download(request, store, item_id):
     item = get_object_or_404(Item, pk=item_id)
     
-    if item.status() == "READY":
-        return HttpResponseRedirect(item.get_absolute_url())
-
-    f = default_storage.open(item.fileobject.path, "rb")
-    wrapper = ItemFileWrapper(item, f)
-    response = HttpResponse(wrapper, content_type=mimetypes.guess_type(item.fileobject.name))
-    response["Content-Length"] = "%d" % item.size_total
-    response["Content-Disposition"] = 'attachment; name="file"; filename="%s"' % urllib.quote(item.name())
+    response = HttpResponse()
+    response[blobstore.BLOB_KEY_HEADER] = blobstore.BlobInfo.get(item.fileobject).key()
+    response["Content-Type"] = "application/octet-stream"
+    response["Content-Disposition"] =  'form-data; name="file"; filename="%s"' % blobstore.BlobInfo.get(item.fileobject).filename
     return response
 
 

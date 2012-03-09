@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls.defaults import *
 
 urlpatterns = patterns('fileshack.views',
     url(r'^(?P<store_path>.*)logout/$', 'logout'),

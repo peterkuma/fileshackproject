@@ -6,4 +6,9 @@
 /media/
 /django
 /db/fileshack.sqlite
+/bulkloader*
+/djangoappengine
+/djangotoolbox
+/dbindexer
+/autoload
 
