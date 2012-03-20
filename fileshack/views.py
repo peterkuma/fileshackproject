@@ -101,7 +101,9 @@ def index(request, store):
                 return HttpResponse(t.render(c))
         else:
             t = loader.get_template("fileshack/accesscode.html")
-            c = RequestContext(request)
+            c = RequestContext(request, {
+                "accesscode": store.accesscode, # Reveal accesscode.
+            })
             return HttpResponse(t.render(c))
         
     items = Item.objects.filter(store=store)    
