@@ -2,8 +2,6 @@
 *.komodoproject
 .komodotools
 *~
-/static/
-/media/
 /fileshackproject/settings_local.py
 /django
 /db/fileshack.sqlite
