@@ -22,8 +22,11 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
+#from django.core.wsgi import get_wsgi_application
+#application = get_wsgi_application()
+
+import django.core.handlers.wsgi
+application = django.core.handlers.wsgi.WSGIHandler()
 
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
