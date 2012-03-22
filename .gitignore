@@ -2,7 +2,6 @@
 *.komodoproject
 .komodotools
 *~
-/fileshackproject/settings_local.py
 /db/fileshack.sqlite
 /bulkloader*
 /.gaedata
