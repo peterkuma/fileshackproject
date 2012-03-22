@@ -214,9 +214,6 @@ var Item = new Class({
 	body += '\r\n';
 	body += window.btoa(chunk) + '\r\n';
 	//body += chunk + '\r\n'; 
-	//body += '--' + boundary + '\r\n';
-	//body += 'Content-Disposition: form-data; name="csrfmiddlewaretoken"\r\n\r\n';
-	//body += CSRF_TOKEN + '\r\n';
 	body += '--' + boundary + '--\r\n';
 	
 	this.xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);

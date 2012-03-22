@@ -174,7 +174,10 @@ var FileShack = new Class({
         }
         
         if (ITEM_SIZE_LIMIT > 0 && file.size > ITEM_SIZE_LIMIT) {
-            item.error(ITEM_SIZE_LIMIT_ERROR_LABEL, ITEM_SIZE_LIMIT_ERROR_MESSAGE);
+            item.onError({
+                label: ITEM_SIZE_LIMIT_ERROR_LABEL,
+                message: ITEM_SIZE_LIMIT_ERROR_MESSAGE
+	    });
             return;
         }
         
