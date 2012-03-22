@@ -181,15 +181,6 @@ def upload(request, store, id):
             try: id = int(id)
             except ValueError: raise Item.DoesNotExist
             item = Item.objects.get(pk=id)
-            
-            #if item.status() != "UPLOADING" and item.status() != "STALE":
-            #    data = {
-            #        "status": "alreadyexists",
-            #        "error_label": "Upload failed",
-            #        "error_message": "An item with the exact content already exists",
-            #        "item": item.simple(),
-            #    }
-            #    return HttpResponseServerError(json.dumps(data, default=json_handler))
 
             size = blobstore.BlobInfo.get(item.fileobject).size
             if size < offset:
