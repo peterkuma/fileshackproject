@@ -290,7 +290,7 @@ def delete(request, store, item_id):
 
 @require_store
 @require_login
-def update(request, store, since):
+def update(request, store, since=None):
     since_dt = None
     if since != None:
         try:
