@@ -80,7 +80,7 @@ var FileShack = new Class({
         }
         
         dropbox.addEvent('change', function(e) {
-            if (typeof e.target.files == 'undefined') { // No support for File API.
+            if (typeof e.target.files == 'undefined' || typeof FileReader == 'undefined') { // No support for File API.
                 this_.uploadSimple(dropbox);
             } else { // Upload using File API.
                 Array.each(e.target.files, function(file) {
