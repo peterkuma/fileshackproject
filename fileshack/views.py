@@ -236,7 +236,7 @@ def upload(request, store, id):
                 return HttpResponseServerError(JSONEncoder().encode(data))
             else:
                 try:
-                    if request.META.get("HTTP_X_CONTENT_TRANSFER_ENCODING") == "base64":
+                    if request.META.get("HTTP_X_FILE_ENCODING") == "base64":
                         f2.write(chunk.decode("base64"))
                     else:
                         f2.write(chunk)
