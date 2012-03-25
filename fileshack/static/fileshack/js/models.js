@@ -210,7 +210,7 @@ var Item = new Class({
 	body += 'Content-Type: application/octet-stream\r\n';
 	// Do not advertise base64 encoding because of a bug in django prior to 1.4.
 	// base64 encoding is always assumed.
-	//body += 'Content-Transfer-Encoding: base64\r\n';
+	body += 'X-Content-Transfer-Encoding: base64\r\n';
 	body += '\r\n';
 	body += window.btoa(chunk) + '\r\n';
 	//body += chunk + '\r\n'; 

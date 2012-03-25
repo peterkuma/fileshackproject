@@ -38,6 +38,7 @@ import json
 import urllib
 import mimetypes
 import time
+import binascii
 
 from models import *
 
@@ -234,7 +235,19 @@ def upload(request, store, id):
                 }
                 return HttpResponseServerError(JSONEncoder().encode(data))
             else:
-                f2.write(chunk.decode("base64"))
+                try:
+                    if request.META.get("HTTP_X_CONTENT_TRANSFER_ENCODING") == "base64":
+                        f2.write(chunk.decode("base64"))
+                    else:
+                        f2.write(chunk)
+                except binascii.Error:
+                    data = {
+                        "status": "failed",
+                        "error_label": "Upload failed",
+                        "error_message": "The browser sent an invalid chunk",
+                        "item": item.simple(),
+                    }
+                    return HttpResponseServerError(JSONEncoder().encode(data))
         
         item.size = f2.tell()
         f2.close()
