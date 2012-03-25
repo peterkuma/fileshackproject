@@ -42,6 +42,7 @@ import binascii
 
 from google.appengine.api import files
 from google.appengine.ext import blobstore
+from djangoappengine.storage import BlobstoreUploadedFile
 
 from models import *
 
@@ -141,14 +142,20 @@ def iframe(request, store):
         f = request.FILES["file"]
         item = Item()
         item.store = store
-        item.fileobject.save(urllib.unquote(f.name), f)
-        item.size = f.size
-        item.size_total = f.size
+        item.fileobject = f.blobstore_info.key()
+        item.size = f.blobstore_info.size
+        item.size_total = f.blobstore_info.size
         item.save()
     
     t = loader.get_template("fileshack/iframe.html")
     c = RequestContext(request)
     return HttpResponse(t.render(c))
+
+@require_store
+@require_login
+def iframe_create_upload_url(request, store):
+    url = reverse('fileshack:iframe', kwargs=dict(store_path=store.path))
+    return HttpResponse(blobstore.create_upload_url(url))
 
 @never_cache
 @require_store
@@ -177,6 +184,19 @@ def upload(request, store, id):
                 "item": None,
             }
             return HttpResponseServerError(JSONEncoder().encode(data))
+        
+        if type(f) == BlobstoreUploadedFile:
+            item = Item()
+            item.store = store
+            item.fileobject = f.blobstore_info.key()
+            item.size = f.blobstore_info.size
+            item.size_total = f.blobstore_info.size
+            item.save()
+            data = {
+                "status": "success",
+                "item": item.simple()
+            }
+            return HttpResponse(JSONEncoder().encode(data))
         
         try:
             try: id = int(id)
@@ -284,7 +304,13 @@ def upload(request, store, id):
     
 @require_store
 @require_login
-def simple_upload(request, store):
+def upload_create_upload_url(request, store, id):
+    url = reverse('fileshack:upload', kwargs=dict(store_path=store.path, id=id))
+    return HttpResponse(blobstore.create_upload_url(url))
+    
+@require_store
+@require_login
+def simple_upload(request, store, redirect=False):
     if request.method != "POST" or not request.FILES.has_key("file"):
         return HttpResponseRedirect(store.get_absolute_url())
     
@@ -294,11 +320,17 @@ def simple_upload(request, store):
     f = request.FILES["file"]
     item = Item()
     item.store = store
-    item.fileobject.save(urllib.unquote(f.name), f)
-    item.size = f.size
-    item.size_total = f.size
+    item.fileobject = f.blobstore_info.key()
+    item.size = f.blobstore_info.size
+    item.size_total = f.blobstore_info.size
     item.save()
     return HttpResponseRedirect(store.get_absolute_url())
+    
+@require_store
+@require_login
+def simple_upload_create_upload_url(request, store):
+    url = reverse('fileshack:simple_upload', kwargs=dict(store_path=store.path))
+    return HttpResponse(blobstore.create_upload_url(url))
 
 @require_store
 @require_login

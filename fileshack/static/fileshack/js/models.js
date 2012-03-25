@@ -228,17 +228,21 @@ var Item = new Class({
     uploadSimple: function(formData) {
 	var this_ = this;
 	
+	url = create_upload_url('upload/' + this.id + '/')
+	if (!url) {
+	    this_.fireEvent('error', {
+		label: 'Upload failed',
+		message: 'Failed to retrieve upload URL from the server'
+	    });
+	    return;
+	}
+	
 	this.xhr = new XMLHttpRequest();
-        this.xhr.open('POST', 'upload/' + this.id + '/');
+        this.xhr.open('POST', url);
 	this.xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
 	
 	if (this.xhr.upload) {
 	    this.xhr.upload.addEventListener('progress', function(e) {
-		this_.set('size', e.loaded);
-		this_.set('size_total', e.total);
-	    }, false);
-	
-	    this.xhr.upload.addEventListener('load', function(e) {
 		this_.set('size', e.loaded);
 		this_.set('size_total', e.total);
 	    }, false);

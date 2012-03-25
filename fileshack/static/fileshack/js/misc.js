@@ -22,3 +22,18 @@ function basename(path) {
     path = path.substring(path.lastIndexOf('\\') + 1);
     return path;
 }
+
+function create_upload_url(path) {
+    var url = null;
+    new Request({
+	url: path + 'create_upload_url/',
+	headers: {
+            'X-CSRFToken': CSRF_TOKEN
+        },
+	async: false,
+	onSuccess: function(responseText) {
+	    url = responseText;
+	}
+    }).send()
+    return url;
+}

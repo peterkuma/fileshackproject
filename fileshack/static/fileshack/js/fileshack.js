@@ -62,7 +62,10 @@ var FileShack = new Class({
             // Show the file upload input form.
             $('dropbox-text').setStyle('display', 'none');
             $('dropbox-file').setStyle('visibility', 'visible');
-            dropboxInput.addEvent('change', function() { dropbox.submit(); });
+            dropboxInput.addEvent('change', function() {
+                dropbox.action = create_upload_url('upload/');
+                dropbox.submit();
+            });
         } else {
             // Delegate click on dropbox to the hidden input file element.
             dropbox.addEvent('click', function(e) {
@@ -73,6 +76,8 @@ var FileShack = new Class({
                         var form = iframe.contentDocument.forms[0];
                     else
                         var form = iframe.getDocument().forms[0];
+                    
+                    form.action = create_upload_url('iframe/');
                     form.file.click();
                     iframe.onload = function() { this_.update(); };
                 }
@@ -189,6 +194,7 @@ var FileShack = new Class({
     // No upload by chunks, no resume.
     uploadSimple: function(form) { 
         if (typeof FormData == 'undefined') { // No File API, just submit the form. No progress indication.
+            form.action = create_upload_url('upload/');
             form.submit();
             return;
         }
