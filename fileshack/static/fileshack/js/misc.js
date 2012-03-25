@@ -16,3 +16,9 @@ function bytesToHuman(nBytes) {
     }
     return out;
 }
+
+function basename(path) {
+    path = path.substring(path.lastIndexOf('/') + 1);
+    path = path.substring(path.lastIndexOf('\\') + 1);
+    return path;
+}

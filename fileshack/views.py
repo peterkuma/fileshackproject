@@ -38,6 +38,7 @@ import json
 import urllib
 import mimetypes
 import time
+import binascii
 
 from google.appengine.api import files
 from google.appengine.ext import blobstore
@@ -241,7 +242,19 @@ def upload(request, store, id):
                 }
                 return HttpResponseServerError(JSONEncoder().encode(data))
             else:
-                f2.write(chunk.decode("base64"))
+                try:
+                    if request.META.get("HTTP_X_FILE_ENCODING") == "base64":
+                        f2.write(chunk.decode("base64"))
+                    else:
+                        f2.write(chunk)
+                except binascii.Error:
+                    data = {
+                        "status": "failed",
+                        "error_label": "Upload failed",
+                        "error_message": "The browser sent an invalid chunk",
+                        "item": item.simple(),
+                    }
+                    return HttpResponseServerError(JSONEncoder().encode(data))
         
         f2.close()
         files.finalize(file_name)

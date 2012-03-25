@@ -195,7 +195,7 @@ var FileShack = new Class({
         
         var item = new ItemView(new Item({
             type: 'pending',
-            name: form.file.value,
+            name: basename(form.file.value),
             size: 0,
             size_total: 0,
             status: 'UPLOADING'
