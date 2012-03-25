@@ -66,7 +66,10 @@ var ItemView = new Class({
 	});
 	this.error_close.addEvent('click', function(e) {
 	    this_.clearError();
-	    this_.model.set('type', 'stale');
+	    if (this_.model.size > 0)
+		this_.model.set('type', 'stale');
+	    else
+		this_.model.del();
 	});
     },
     
