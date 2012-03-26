@@ -151,82 +151,90 @@ def iframe(request, store):
 @require_store
 @require_login
 def upload(request, store, id):
-    if request.method == "POST":
+    if request.method != "POST":
+        data = {
+            "status": "failed",
+            "error_label": "Upload failed",
+            "error_message": "Invalid HTTP request",
+        }
+        return HttpResponseBadRequest(JSONEncoder().encode(data))
+    
+    if request.FILES.has_key("file"):
         f = request.FILES["file"]
+        name = urllib.unquote(f.name)
+        try: size_total = int(request.META["HTTP_X_FILE_SIZE"])
+        except (ValueError, KeyError): size_total = f.size
+    else:
+        name = ''
+        size_total = 0 # Unknown.
+
+    try: name = request.META["HTTP_X_FILE_NAME"]
+    except KeyError: name = ''
+    
+    name = os.path.basename(name)
+    
+    try: offset = int(request.META["HTTP_X_FILE_OFFSET"])
+    except (ValueError, KeyError): offset = 0
         
-        try: offset = int(request.META["HTTP_X_FILE_OFFSET"])
-        except (ValueError, KeyError): offset = 0
-        
-        if store.item_limit and f.size > store.item_limit*1024*1024:
+    if store.item_limit and size_total and size_total > store.item_limit*1024*1024:
+        data = {
+            "status": "itemlimitreached",
+            "error_label": "Upload failed",
+            "error_message": "Item size is limited to %d MB" % store.item_limit,
+            "item": None,
+        }
+        return HttpResponseServerError(JSONEncoder().encode(data))
+    
+    if store.store_limit and size_total and store.total() + size_total > store.store_limit*1024*1024:
+        data = {
+            "status": "storelimitreached",
+            "error_label": "Upload failed",
+            "error_message": "The store size limit of %d MB has been reached" % store.store_limit,
+            "item": None,
+        }
+        return HttpResponseServerError(JSONEncoder().encode(data))
+    
+    # If the item exists, open the file for append.
+    try:
+        try: id = int(id)
+        except ValueError: raise Item.DoesNotExist
+        item = Item.objects.get(pk=id)
+        if item.fileobject.size < offset:
             data = {
-                "status": "itemlimitreached",
-                "error_label": "Upload failed",
-                "error_message": "Item size is limited to %d MB" % store.item_limit,
+                "status": "outoforder",
+                "error_label": "Chunk out of order",
+                "error_message": "Application sent a chunk out of order",
+                "item": item.simple(),
+            }
+            return HttpResponseServerError(JSONEncoder().encode(data))
+        fp = default_storage.open(item.fileobject.path, "ab")
+        fp.truncate(offset)
+        
+    # This is a new item.
+    except Item.DoesNotExist:
+        if offset != 0:
+            data = {
+                "status": "outoforder",
+                "error_label": "Chunk out of order",
+                "error_message": "Application sent a chunk of an item that does not exist",
                 "item": None,
             }
             return HttpResponseServerError(JSONEncoder().encode(data))
-        
-        if store.store_limit and store.total() + f.size > store.store_limit*1024*1024:
-            data = {
-                "status": "storelimitreached",
-                "error_label": "Upload failed",
-                "error_message": "The store size limit of %d MB has been reached" % store.store_limit,
-                "item": None,
-            }
-            return HttpResponseServerError(JSONEncoder().encode(data))
-        
-        try:
-            try: id = int(id)
-            except ValueError: raise Item.DoesNotExist
-            item = Item.objects.get(pk=id)
-
-            if item.fileobject.size < offset:
-                time.sleep(0.5)
-                path = default_storage.path(item.fileobject.path)
-                size =  item.fileobject.size
-                newsize = os.path.getsize(path)
-                while newsize != size:
-                    time.sleep(0.5)
-                    size = newsize
-                    newsize = os.path.getsize(path)
-                
-                if size < offset:
-                    data = {
-                        "status": "outoforder",
-                        "error_label": "Chunk out of order",
-                        "error_message": "Application sent a chunk out of order",
-                        "item": item.simple(),
-                    }
-                    return HttpResponseServerError(JSONEncoder().encode(data))
-
-            f2 = default_storage.open(item.fileobject.path, "ab")
-            #f2.truncate(offset)
-            
-        except Item.DoesNotExist:
-            if offset != 0:
-                data = {
-                    "status": "outoforder",
-                    "error_label": "Chunk out of order",
-                    "error_message": "Application sent a chunk of an item that does not exist",
-                    "item": None,
-                }
-                return HttpResponseServerError(JSONEncoder().encode(data))
-            item = Item()
-            item.store = store
-            item.fileobject.save(urllib.unquote(f.name), ContentFile(""))
-            item.fileobject.close()
-            try: item.size_total = int(request.META["HTTP_X_FILE_SIZE"])
-            except (ValueError, KeyError): item.size_total = 0
-            item.save()
-            f2 = default_storage.open(item.fileobject.path, "wb")
-        
+        item = Item()
+        item.store = store
+        item.fileobject.save(name, ContentFile(""))
+        item.fileobject.close()
+        item.size_total = size_total
+        item.save()
+        fp = default_storage.open(item.fileobject.path, "wb")
+    
+    if request.FILES.has_key("file"):
         chunks = f.chunks().__iter__()
         while True:
             try: chunk = chunks.next()
             except StopIteration: break
             except IOError:
-                f2.close()
-                #item.remove()
+                fp.close()
                 data = {
                     "status": "failed",
                     "error_label": "Upload failed",
@@ -237,10 +245,11 @@ def upload(request, store, id):
             else:
                 try:
                     if request.META.get("HTTP_X_FILE_ENCODING") == "base64":
-                        f2.write(chunk.decode("base64"))
+                        fp.write(chunk.decode("base64"))
                     else:
-                        f2.write(chunk)
+                        fp.write(chunk)
                 except binascii.Error:
+                    fp.close()
                     data = {
                         "status": "failed",
                         "error_label": "Upload failed",
@@ -248,29 +257,33 @@ def upload(request, store, id):
                         "item": item.simple(),
                     }
                     return HttpResponseServerError(JSONEncoder().encode(data))
-        
-        item.size = f2.tell()
-        f2.close()
-        
-        if item.size >= item.size_total:
-            item.uploaded = dt.now()
-        
-        if item.size_total < item.size:
-            item.size_total = item.size
-        
-        item.save()
-        data = {
-            "status": "success",
-            "item": Item.objects.get(pk=item.pk).simple()
-        }
-        return HttpResponse(JSONEncoder().encode(data))
-        
+    else:
+        try: fp.write(request.raw_post_data)
+        except IOError:
+            fp.close()
+            data = {
+                "status": "failed",
+                "error_label": "Upload failed",
+                "error_message": "Server-side I/O error",
+                "item": item.simple(),
+            }
+            return HttpResponseServerError(JSONEncoder().encode(data))
+    
+    item.size = fp.tell()
+    fp.close()
+    
+    if item.size_total < item.size:
+        item.size_total = item.size
+    
+    if item.size >= item.size_total:
+        item.uploaded = dt.now()
+    
+    item.save()
     data = {
-        "status": "failed",
-        "error_label": "Upload failed",
-        "error_message": "Invalid HTTP request",
+        "status": "success",
+        "item": Item.objects.get(pk=item.pk).simple()
     }
-    return HttpResponseBadRequest(JSONEncoder().encode(data))
+    return HttpResponse(JSONEncoder().encode(data))
     
 @require_store
 @require_login
