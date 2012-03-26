@@ -213,6 +213,10 @@ var FileShack = new Class({
             reader.readAsBinaryString(data);
         } else if (data instanceof HTMLFormElement && typeof FormData != 'undefined') {
             item.model.upload(new FormData(data));
+        } else if (typeof File != 'undefined' && data instanceof File && typeof FormData != 'undefined') {
+            var formData = new FormData();
+            formData.append('file', data);
+            item.model.upload(formData);
         } else if (typeof File != 'undefined' && data instanceof File) {
             item.model.upload(data);
         } else {
