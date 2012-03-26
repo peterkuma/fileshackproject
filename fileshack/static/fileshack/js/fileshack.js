@@ -47,17 +47,16 @@ var FileShack = new Class({
         
         // Drag & Drop.
         if (typeof dropbox.addEventListener != 'undefined' &&
-            typeof dropbox.ondrop != 'undefined')
+            typeof dropbox.ondrop != 'undefined' &&
+            typeof File != 'undefined')
         {
             // Register Drag & Drop events.
             dropbox.addEventListener("dragenter", function(e) { e.preventDefault(); }, false);
             dropbox.addEventListener("dragover", function(e) { e.preventDefault(); }, false);
             dropbox.addEventListener("drop", function(e) {
                 e.preventDefault();
-                Array.each(e.dataTransfer.files, function(f) {
-                    if (typeof FileReader != 'undefined') this_.upload(f);
-                    else this_.uploadSimple(f.name, f);
-                });
+                if (e.dataTransfer.files)
+                    Array.each(e.dataTransfer.files, function(f) { this_.upload(f); });
             }, false);
         } else {
             // Switch dropbox text, drag & drop is not supported.
@@ -92,12 +91,13 @@ var FileShack = new Class({
         }
         
         dropbox.addEvent('change', function(e) {
-            if (typeof e.target.files == 'undefined' || typeof FileReader == 'undefined') { // No support for File API.
-                this_.uploadSimple(dropbox);
-            } else { // Upload using File API.
+            if (e.target.files && (typeof FileReader != 'undefined' || typeof FormData == 'undefined')) {
                 Array.each(e.target.files, function(file) {
+                    console.log(file);
                     this_.upload(file);
                 });
+            } else {
+                this_.upload(dropbox);
             }
             dropbox.reset();
         });
@@ -145,47 +145,61 @@ var FileShack = new Class({
         xhr.send();
     },
     
-    upload: function(file) {
-        var item = undefined;
+    upload: function(data) {
+        // Determine name and size of the file.
+        if (typeof File != 'undefined' && data instanceof File) {
+            // Older browsers.
+            if (data.fileName) var name = data.fileName;
+            if (data.fileSize) var size = data.fileSize;
+            // Newer browsers.
+            if (data.name) var name = data.name;
+            if (data.size) var size = data.size;
+        } else if (data instanceof HTMLFormElement) {
+            var name = basename(data.file.value);
+        } else {
+            var name = '';
+            var size = 0;
+        }
         
-        Object.each(this.items.all(), function(i) {
-            if (!(i.model.type == 'stale' ||
-                  i.model.type == 'pending' && i.isError()))
-            {
-                return;
-            }
-            if (i.model.size_total != file.size) return;
-            if (item) return;
-            
+        // Is there a stale item with the same size and name?
+        var i = this.items.find(function(i) {
+            if (!(i.model.type == 'stale' || i.model.type == 'pending' && i.isError()))
+                return false;
+            if (i.model.size_total != file.size) return false;
+            if (i.model.name == name) return true;
             var n = i.model.name;
+            // Django appends _#no to duplicate file names, account for that.
             if (n.contains('_')) {
                 var index = n.lastIndexOf('_');
                 var first = n.substring(0, index);
                 var second = n.substring(index);
                 n = first + second.substring(second.indexOf('.'));
             }
-            
-            if (n == file.name) {
-                var c = confirm('A stale file with the same name and size has been found.\nDo you want to resume uploading?');
-                if (c) {
-                    item = i;
-                    item.clearError();
-                }
-            }
+            if (n == name) return true;
+            return false;
         });
+        
+        // If this is a File and FileReader is supported, ask the user about resume.
+        if (i && typeof FileReader != 'undefined' && data instanceof File) {
+            var c = confirm('A stale file with the same name and size has been found.\nDo you want to resume uploading?');
+            if (c) {
+                item = i;
+                item.clearError();
+            }
+        }
 
         if (!item) {
             var item = new ItemView(new Item({
                 type: 'pending',
-                name: file.name,
+                'name': name,
                 size: 0,
-                size_total: file.size,
+                size_total: size,
                 status: 'UPLOADING'
             }));
             this.items.add(item);
         }
         
-        if (ITEM_SIZE_LIMIT > 0 && file.size > ITEM_SIZE_LIMIT) {
+        if (ITEM_SIZE_LIMIT > 0 && size > ITEM_SIZE_LIMIT) {
             item.onError({
                 label: ITEM_SIZE_LIMIT_ERROR_LABEL,
                 message: ITEM_SIZE_LIMIT_ERROR_MESSAGE
@@ -193,28 +207,17 @@ var FileShack = new Class({
             return;
         }
         
-        var reader = new FileReader()
-        reader.onload = function(e) { item.model.upload(e.target.result); };
-        reader.readAsBinaryString(file);
-    },
-    
-    // No upload by chunks, no resume.
-    uploadSimple: function(form) { 
-        if (typeof FormData == 'undefined') { // No File API, just submit the form. No progress indication.
-            form.submit();
-            return;
+        if (typeof File != 'undefined' && data instanceof File && typeof FileReader != 'undefined') {
+            var reader = new FileReader()
+            reader.onload = function(e) { item.model.upload(e.target.result); };
+            reader.readAsBinaryString(data);
+        } else if (data instanceof HTMLFormElement && typeof FormData != 'undefined') {
+            item.model.upload(new FormData(data));
+        } else if (typeof File != 'undefined' && data instanceof File) {
+            item.model.upload(data);
+        } else {
+            data.submit();
         }
-        
-        var item = new ItemView(new Item({
-            type: 'pending',
-            name: basename(form.file.value),
-            size: 0,
-            size_total: 0,
-            status: 'UPLOADING'
-        }));
-        this.items.add(item);
-        
-        item.model.uploadSimple(new FormData(form));
     },
     
     removeStaleItems: function(validIds) {
