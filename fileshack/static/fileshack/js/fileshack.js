@@ -93,7 +93,6 @@ var FileShack = new Class({
         dropbox.addEvent('change', function(e) {
             if (e.target.files && (typeof FileReader != 'undefined' || typeof FormData == 'undefined')) {
                 Array.each(e.target.files, function(file) {
-                    console.log(file);
                     this_.upload(file);
                 });
             } else {
