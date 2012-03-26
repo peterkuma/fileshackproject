@@ -33,8 +33,10 @@ var Model = new Class({
     },
     
     set: function(attr, value) {
-        this[attr] = value;
-        this.fireEvent('change');
+	if (this[attr] != value) {
+	    this[attr] = value;
+	    this.fireEvent('change');
+	}
     },
     
     get: function(attr) {
@@ -118,11 +120,14 @@ var Item = new Class({
     },
     
     upload: function(data, chunkSize) {
-	if (this.type != 'pending') this.set('type', 'pending');
-		 
+	this.set('type', 'pending');
+	
+	if (typeof data == 'string') url = 'upload/' + this.id + '/';
+	else url = create_upload_url('upload/' + this.id + '/')
+	
 	this.xhr = new XMLHttpRequest();
         this.xhr.open('POST', 'upload/' + this.id + '/');
-
+	
 	var this_ = this;
 	var origSize = this.size;
 	var startTime = new Date().getTime();
@@ -130,16 +135,21 @@ var Item = new Class({
 	if (typeof chunkSize == 'undefined')
 	    chunkSize = CHUNK_SIZE;
 	
-	if (data.length < this.size + chunkSize)
+	if (typeof data == 'string' && data.length < this.size + chunkSize)
 	    chunkSize = data.length - this.size;
 	
 	if (this.xhr.upload) {
 	    this.xhr.upload.addEventListener('progress', function(e) {
-		this_.set('size', origSize + e.position/e.total*chunkSize);
+		if (typeof data == 'string') {
+		    this_.set('size', origSize + e.position/e.total*chunkSize);
+		} else {
+		    this_.set('size', e.loaded);
+		    this_.set('size_total', e.total);
+		}
 	    }, false);
 	
 	    this.xhr.upload.addEventListener('load', function(e) {
-		this_.set('size', origSize + chunkSize);
+		if (typeof data == 'string') this_.set('size', origSize + chunkSize);
 	    }, false);
 	}
 	
@@ -147,12 +157,18 @@ var Item = new Class({
 	    if (this.readyState == 4) {
 		try {
 		    var response = JSON.decode(this.responseText);
-		} catch(e) { }
+		} catch(e) {
+		    this_.fireEvent('error', {
+			label: 'Upload failed',
+			message: 'The server responded with an invalid message',
+			details: this.responseText
+		    });
+		}
 		
 		if (this.status == 200 && response.status == 'success') {
-		    this_.size = origSize + chunkSize;
+		    if (typeof data == 'string') this_.size = origSize + chunkSize;
 		    this_.update(response.item);
-		    if (this_.size < this_.size_total) {
+		    if (typeof data == 'string' && this_.size < this_.size_total) {
 			elapsedTime = new Date().getTime() - startTime;
 			if (elapsedTime < CHUNK_UPLOAD_LOW*1000) {
 			    chunkSize *= 2;
@@ -201,87 +217,27 @@ var Item = new Class({
 	    }
 	};
 	
-	var chunk = data.substring(this.size, this.size + chunkSize);
+	if (typeof data == 'string') {
+	    var chunk = data.substring(this.size, this.size + chunkSize);
+	    var boundary = 'xxxxxxxxxxxxxxxxxxxx';
+	    var body = '--' + boundary + '\r\n';
+	    body += 'Content-Disposition: form-data; name="file"; filename="' + encodeURIComponent(this.name) + '"\r\n';
+	    body += 'Content-Type: application/octet-stream\r\n';
+	    body += '\r\n';
+	    body += window.btoa(chunk) + '\r\n';
+	    body += '--' + boundary + '--\r\n';
+	    this.xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
+	    this.xhr.setRequestHeader('Content-Length', body.length);
+	    this.xhr.setRequestHeader('X-File-Size', this.size_total);
+	    this.xhr.setRequestHeader('X-File-Offset', this.size);
+	    this.xhr.setRequestHeader('X-File-Encoding', 'base64');
+	} else {
+	    var body = data;
+	}
 	
-	// Send the chunk as form-data MIME.
-	var boundary = 'xxxxxxxxxxxxxxxxxxxx';
-	var body = '--' + boundary + '\r\n';
-	body += 'Content-Disposition: form-data; name="file"; filename="' + encodeURIComponent(this.name) + '"\r\n';
-	body += 'Content-Type: application/octet-stream\r\n';
-	// Do not advertise base64 encoding because of a bug in django prior to 1.4.
-	// base64 encoding is always assumed.
-	body += '\r\n';
-	body += window.btoa(chunk) + '\r\n';
-	//body += chunk + '\r\n'; 
-	body += '--' + boundary + '--\r\n';
-	
-	this.xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
-	this.xhr.setRequestHeader('Content-Length', body.length);
+	this.xhr.setRequestHeader('X-File-Name', this.name);
 	this.xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
-	this.xhr.setRequestHeader('X-File-Size', this.size_total);
-	this.xhr.setRequestHeader('X-File-Offset', this.size);
-	this.xhr.setRequestHeader('X-File-Encoding', 'base64');
-	this.xhr.send(body);
-	//this.xhr.sendAsBinary(body);
+	if (this.xhr.sendAsBinary) this.xhr.sendAsBinary(body);
+	else this.xhr.send(body);
     },
-    
-    uploadSimple: function(formData) {
-	var this_ = this;
-	
-	url = create_upload_url('upload/' + this.id + '/')
-	if (!url) {
-	    this_.fireEvent('error', {
-		label: 'Upload failed',
-		message: 'Failed to retrieve upload URL from the server'
-	    });
-	    return;
-	}
-	
-	this.xhr = new XMLHttpRequest();
-        this.xhr.open('POST', url);
-	this.xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
-	
-	if (this.xhr.upload) {
-	    this.xhr.upload.addEventListener('progress', function(e) {
-		this_.set('size', e.loaded);
-		this_.set('size_total', e.total);
-	    }, false);
-	}
-	
-	this.xhr.onreadystatechange = function(e) {
-	    if (this.readyState == 4) {
-		try {
-		    var response = JSON.decode(this.responseText);
-		} catch(e) { }
-		
-		if (this.status == 200 && response.status == 'success') {
-		    this_.size = this_.size_total;
-		    this_.type = 'complete';
-		    this_.update(response.item);
-		} else if (this.status != 0) {
-		    this_.set('size', 0);
-		    if (response) {
-			this_.fireEvent('error', {
-			    label: response.error_label,
-			    message: response.error_message
-			});
-		    } else {
-			this_.fireEvent('error', {
-			    label: 'Application Error',
-			    message: this.status+' '+this.statusText,
-			    details: this.responseText
-			});
-		    }
-		} else {
-		    this_.set('size', 0);
-		    this_.fireEvent('error', {
-			label: 'Upload failed',
-			message: 'The upload was terminated before completion'
-		    });
-		}
-	    }
-	};
-	
-	this.xhr.send(formData);
-    }
 });

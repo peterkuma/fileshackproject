@@ -34,6 +34,15 @@ var Collection = new Class({
     all: function() {
 	return this.views;
     },
+    
+    find: function(func) {
+	var view = null;
+	Object.each(this.views, function(v) {
+	    if (view) return; // Already found.
+	    if (func(v)) view = v;
+	});
+	return view;
+    },
 
     add: function(view) {
 	var this_ = this;
