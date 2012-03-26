@@ -1,0 +1,24 @@
+body {
+    font-family: 'Istok Web', helvetica, 'Nimbus Sans', Arial, sans-serif;
+    font-size: 12pt;
+    text-align: center;
+}
+
+#container {
+    margin: 0 auto;
+    text-align: left;
+    width: 850px;
+}
+
+h1 {
+    font-size: 30pt;
+    margin-top: 80px;
+    margin-bottom: 40px;
+}
+
+h1 span {
+    font-size: 22pt;
+    font-family: helvetica, 'Nimbus Sans', Arial, sans-serif;
+    font-weight: normal;
+    color: #888a85;
+}

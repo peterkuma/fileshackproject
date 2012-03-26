@@ -29,6 +29,7 @@ input {
 input:hover,input:focus,input.nonempty {
     border: 3px solid #2dacf8;
     background: url(../img/input-blue-tall.png);
+    outline: none;
 }
 
 button {
@@ -37,13 +38,18 @@ button {
     width: 80px;
     height: 58px;
     margin: 5px;
+    color: #bbb;
+    font-weight: bold;
     border: 3px solid #dddddd;
+    border-radius: 5px;
+    background: url("../img/button-lightsilver-tall.png") repeat-x;
 }
 
 button:hover,button:focus,button.nonempty {
     color: black;
     border: 3px solid #0088cb;
     background: url(../img/button-blue-tall.png);
+    outline: none;
 }
 
 #error {
@@ -51,7 +57,7 @@ button:hover,button:focus,button.nonempty {
     width: 600px;
     height: 162px;
     position: relative;
-    top: 10px;
+    top: -10px;
     left: 100px;
     clear: both;
     background: url(../img/error.png) no-repeat;

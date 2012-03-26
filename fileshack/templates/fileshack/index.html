@@ -4,6 +4,7 @@
 <html>
     <head>
         <title>Fileshack</title>
+	<link rel="stylesheet" type="text/css" href="{% static "fileshack/css/base.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
         <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
         <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
@@ -58,18 +59,25 @@
 				<div class="desc">{% trans "Dropped on" %} <strong class="uploaded">undefined</strong></div>
 			    </a>
 			    <div class="error" style="display: none">
+				<button class="error_close"></button>
 				<div class="error_label">{% trans "Application Error" %}</div>
 				<div class="error_message">{% trans "Unknown error occurred." %}</div>
 				<a class="error_details" style="display: none">{% trans "Details" %}</a>
-				<button class="error_close"></button>
 			    </div>
+			    <div class="info" style="display: none">
+				<button class="info_close" style="display: none"></button>
+				<div class="info_label">{% trans "Info Label" %}</div>
+				<button class="info_yes">{% trans "Yes" %}</button>
+				<button class="info_no">{% trans "No" %}</button>
+				<div class="info_message">{% trans "Message" %}</div>
+			    </div>			    
 			</div>
 		    </div>
 		</div>
             </div>
             <div id="controls">
                 <form action="logout/">
-                    <button type="submit">{% trans "Logout" %}</button>
+                    <button type="submit" class="logout">{% trans "Logout" %}</button>
                 </form>
             </div>
 	    <div id="preload-1"></div>
