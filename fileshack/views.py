@@ -161,99 +161,110 @@ def iframe_create_upload_url(request, store):
 @require_store
 @require_login
 def upload(request, store, id):
-    if request.method == "POST":
+    if request.method != "POST":
+        data = {
+            "status": "failed",
+            "error_label": "Upload failed",
+            "error_message": "Invalid HTTP request",
+        }
+        return HttpResponseBadRequest(JSONEncoder().encode(data))
+    
+    if request.FILES.has_key("file"):
         f = request.FILES["file"]
+        name = urllib.unquote(f.name)
+        try: size_total = int(request.META["HTTP_X_FILE_SIZE"])
+        except (ValueError, KeyError): size_total = f.size
+    else:
+        name = ''
+        size_total = 0 # Unknown.
+
+    try: name = request.META["HTTP_X_FILE_NAME"]
+    except KeyError: name = ''
+    
+    name = os.path.basename(name)
+    
+    try: offset = int(request.META["HTTP_X_FILE_OFFSET"])
+    except (ValueError, KeyError): offset = 0
         
-        try: offset = int(request.META["HTTP_X_FILE_OFFSET"])
-        except (ValueError, KeyError): offset = 0
-        
-        if store.item_limit and f.size > store.item_limit*1024*1024:
+    if store.item_limit and size_total and size_total > store.item_limit*1024*1024:
+        data = {
+            "status": "itemlimitreached",
+            "error_label": "Upload failed",
+            "error_message": "Item size is limited to %d MB" % store.item_limit,
+            "item": None,
+        }
+        return HttpResponseServerError(JSONEncoder().encode(data))
+    
+    if store.store_limit and size_total and store.total() + size_total > store.store_limit*1024*1024:
+        data = {
+            "status": "storelimitreached",
+            "error_label": "Upload failed",
+            "error_message": "The store size limit of %d MB has been reached" % store.store_limit,
+            "item": None,
+        }
+        return HttpResponseServerError(JSONEncoder().encode(data))
+    
+    if request.FILES.has_key("file") and type(f) == BlobstoreUploadedFile:
+        item = Item()
+        item.store = store
+        item.fileobject = f.blobstore_info.key()
+        item.size = f.blobstore_info.size
+        item.size_total = f.blobstore_info.size
+        item.save()
+        data = {
+            "status": "success",
+            "item": item.simple()
+        }
+        return HttpResponse(JSONEncoder().encode(data))
+    
+    # If the item exists, open the file for append.
+    try:
+        try: id = int(id)
+        except ValueError: raise Item.DoesNotExist
+        item = Item.objects.get(pk=id)
+        size = blobstore.BlobInfo.get(item.fileobject).size
+        if size < offset:
             data = {
-                "status": "itemlimitreached",
-                "error_label": "Upload failed",
-                "error_message": "Item size is limited to %d MB" % store.item_limit,
+                "status": "outoforder",
+                "error_label": "Chunk out of order",
+                "error_message": "Application sent a chunk out of order",
+                "item": item.simple(),
+            }
+            return HttpResponseServerError(JSONEncoder().encode(data))
+        fp = blobstore.BlobInfo.get(item.fileobject).open()
+        data = fp.read()
+        fp.close()
+        blobstore.BlobInfo.get(item.fileobject).delete()
+        file_name = files.blobstore.create('application/octet-stream', name)
+        fp = files.open(file_name, "a")
+        fp.write(data)
+        del data
+        
+    # This is a new item.
+    except Item.DoesNotExist:
+        if offset != 0:
+            data = {
+                "status": "outoforder",
+                "error_label": "Chunk out of order",
+                "error_message": "Application sent a chunk of an item that does not exist",
                 "item": None,
             }
             return HttpResponseServerError(JSONEncoder().encode(data))
+        item = Item()
+        item.store = store
+        file_name = files.blobstore.create('application/octet-stream', name)
+        item.size_total = size_total
+        item.save()
+        fp = files.open(file_name, "a")
         
-        if store.store_limit and store.total() + f.size > store.store_limit*1024*1024:
-            data = {
-                "status": "storelimitreached",
-                "error_label": "Upload failed",
-                "error_message": "The store size limit of %d MB has been reached" % store.store_limit,
-                "item": None,
-            }
-            return HttpResponseServerError(JSONEncoder().encode(data))
-        
-        if type(f) == BlobstoreUploadedFile:
-            item = Item()
-            item.store = store
-            item.fileobject = f.blobstore_info.key()
-            item.size = f.blobstore_info.size
-            item.size_total = f.blobstore_info.size
-            item.save()
-            data = {
-                "status": "success",
-                "item": item.simple()
-            }
-            return HttpResponse(JSONEncoder().encode(data))
-        
-        try:
-            try: id = int(id)
-            except ValueError: raise Item.DoesNotExist
-            item = Item.objects.get(pk=id)
-
-            size = blobstore.BlobInfo.get(item.fileobject).size
-            if size < offset:
-                time.sleep(0.5)
-                newsize = blobstore.BlobInfo.get(item.fileobject).size
-                while newsize != size:
-                    time.sleep(0.5)
-                    size = newsize
-                    newsize = blobstore.BlobInfo.get(item.fileobject).size
-                
-                if size < offset:
-                    data = {
-                        "status": "outoforder",
-                        "error_label": "Chunk out of order",
-                        "error_message": "Application sent a chunk out of order",
-                        "item": item.simple(),
-                    }
-                    return HttpResponseServerError(JSONEncoder().encode(data))
-
-            f2 = blobstore.BlobInfo.get(item.fileobject).open()
-            data = f2.read()
-            f2.close()
-            blobstore.BlobInfo.get(item.fileobject).delete()
-            file_name = files.blobstore.create('application/octet-stream', urllib.unquote(f.name))
-            f2 = files.open(file_name, "a")
-            f2.write(data)
-            del data            
-            
-        except Item.DoesNotExist:
-            if offset != 0:
-                data = {
-                    "status": "outoforder",
-                    "error_label": "Chunk out of order",
-                    "error_message": "Application sent a chunk of an item that does not exist",
-                    "item": None,
-                }
-                return HttpResponseServerError(JSONEncoder().encode(data))
-            item = Item()
-            item.store = store
-            file_name = files.blobstore.create('application/octet-stream', urllib.unquote(f.name))
-            try: item.size_total = int(request.META["HTTP_X_FILE_SIZE"])
-            except (ValueError, KeyError): item.size_total = 0
-            item.save()
-            f2 = files.open(file_name, "a")
-        
+    
+    if request.FILES.has_key("file"):
         chunks = f.chunks().__iter__()
         while True:
             try: chunk = chunks.next()
             except StopIteration: break
             except IOError:
-                f2.close()
-                #item.remove()
+                fp.close()
                 data = {
                     "status": "failed",
                     "error_label": "Upload failed",
@@ -264,10 +275,11 @@ def upload(request, store, id):
             else:
                 try:
                     if request.META.get("HTTP_X_FILE_ENCODING") == "base64":
-                        f2.write(chunk.decode("base64"))
+                        fp.write(chunk.decode("base64"))
                     else:
-                        f2.write(chunk)
+                        fp.write(chunk)
                 except binascii.Error:
+                    fp.close()
                     data = {
                         "status": "failed",
                         "error_label": "Upload failed",
@@ -275,32 +287,37 @@ def upload(request, store, id):
                         "item": item.simple(),
                     }
                     return HttpResponseServerError(JSONEncoder().encode(data))
+    else:
+        try: fp.write(request.raw_post_data)
+        except IOError:
+            fp.close()
+            data = {
+                "status": "failed",
+                "error_label": "Upload failed",
+                "error_message": "Server-side I/O error",
+                "item": item.simple(),
+            }
+            return HttpResponseServerError(JSONEncoder().encode(data))
         
-        f2.close()
-        files.finalize(file_name)
-        
-        item.fileobject = files.blobstore.get_blob_key(file_name)
-        item.size = blobstore.BlobInfo.get(item.fileobject).size
-        
-        if item.size >= item.size_total:
-            item.uploaded = dt.now()
-        
-        #if item.size_total < item.size:
-        #    item.size_total = item.size
-        
-        item.save()
-        data = {
-            "status": "success",
-            "item": Item.objects.get(pk=item.pk).simple()
-        }
-        return HttpResponse(JSONEncoder().encode(data))
-        
+    fp.close()
+    files.finalize(file_name)
+    
+    item.fileobject = files.blobstore.get_blob_key(file_name)
+    item.size = blobstore.BlobInfo.get(item.fileobject).size
+    
+    if item.size_total < item.size:
+        item.size_total = item.size
+    
+    if item.size >= item.size_total:
+        item.uploaded = dt.now()
+    
+    item.save()
     data = {
-        "status": "failed",
-        "error_label": "Upload failed",
-        "error_message": "Invalid HTTP request",
+        "status": "success",
+        "item": Item.objects.get(pk=item.pk).simple()
     }
-    return HttpResponseBadRequest(JSONEncoder().encode(data))
+    return HttpResponse(JSONEncoder().encode(data))
+    
     
 @require_store
 @require_login
