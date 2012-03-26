@@ -126,7 +126,7 @@ var Item = new Class({
 	else url = create_upload_url('upload/' + this.id + '/')
 	
 	this.xhr = new XMLHttpRequest();
-        this.xhr.open('POST', 'upload/' + this.id + '/');
+        this.xhr.open('POST', url);
 	
 	var this_ = this;
 	var origSize = this.size;
