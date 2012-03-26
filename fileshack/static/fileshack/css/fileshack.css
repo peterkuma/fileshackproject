@@ -6,39 +6,32 @@
 
 body {
     text-align: center;
-    font-family: 'Istok Web', 'Nimbus Sans', helvetica, 'Arial', sans-serif;
     margin: 50px;
-}
-
-h1 {
-    font-size: 30pt;
-    margin-top: 80px;
-    margin-bottom: 40px;
-}
-
-h1 span {
-    font-size: 22pt;
-    font-family: 'Nimbus Sans', sans-serif;
-    font-weight: normal;
-    color: #888a85;
 }
 
 button {
     border-radius: 5px;
-    height: 32px;
-    font-size: 12pt;
+    font-size: inherit;
     font-weight: bold;
-    background: white;
-    border: 1px solid #dddddd;
-    color: silver;
+    padding: 5px 10px;
     cursor: pointer;
-    box-shadow: 1px 1px 0px #dddddd;
+    font-family: helvetica, "Nimbus Sans", Arial, sans-serif;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 5px;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4);
+    color: silver;
+    background-repeat: repeat-x;
+    background-image: url("../img/button-lightsilver.png");
 }
 
 button:hover,button:focus {
     color: black;
-    border: 1px solid #0088cb;
-    background: url(../img/button-blue.png);    
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+button::-moz-focus-inner {
+    border: none;
 }
 
 #container {
@@ -51,11 +44,11 @@ button:hover,button:focus {
     position: absolute;
     right: 50px;
     top: 30px;
-    font-size: 14pt;
 }
 
-#controls a {
-    color: #5396cb;
+.logout:hover,.logout:focus {
+    background-image: url("../img/button-lightblue.png");
+    color: #003366;
 }
 
 #dropbox {
@@ -67,11 +60,13 @@ button:hover,button:focus {
     color: #7da0a1;
     text-align: center;
     font-size: 18pt;
-    font-family: 'Nimbus Sans', sans-serif;
+    font-family: helvetica, 'Nimbus Sans', Arial, sans-serif;
     line-height: 100px;
     -moz-transition: background 0.2s;
     -o-transition: background 0.2s;
-    /*transition: background 0.2s;*/
+    -webkit-transition: background 0.2s;
+    -ms-transition:  background 0.2s;
+    transition: background 0.2s;
     margin-bottom: 25px;
 }
 
@@ -79,7 +74,9 @@ button:hover,button:focus {
     background: #c0e6fd;
     -moz-transition: background 0.2s;
     -o-transition: background 0.2s;
-    /*transition: background 0.2s;*/
+    -webkit-transition: background 0.2s;
+    -ms-transition:  background 0.2s;
+    transition: background 0.2s;
 }
 
 #dropbox-file {
@@ -135,9 +132,11 @@ button:hover,button:focus {
     font-size: 18pt;
     margin-top: 5px;
     margin-left: 85px;
+    margin-bottom: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 150%;
 }
 
 .item .name {
@@ -201,13 +200,7 @@ button:hover,button:focus {
 }
 
 .item .cancelbtn {
-    width: 90px;
     margin: 4px 0;
-}
-
-.item .cancelbtn:hover,.item .cancelbtn:focus {
-    background: url(../img/button-red.png);
-    border: 1px solid #ee0909;
 }
 
 .item {
@@ -220,69 +213,83 @@ button:hover,button:focus {
     font-size: 12pt;
     margin-left: 85px;
     color: #555753;
-    margin-top: 10px;
+    line-height: 120%;
 }
 
 .item .size {
-    font-size: 22pt;
+    font-size: 20pt;
     color: #555753;
     float: right;
+    line-height: 150%;
 }
 
 .item .deletebtn {
     float: right;
     clear: right;
     margin-top: 6px;
-    /*display: none;*/
-}
-
-.item:hover .deletebtn {
-    /*display: block;*/
 }
 
 .item.stale .deletebtn {
     margin-left: 20px;
 }
 
-.item .deletebtn:hover,.item .deletebtn:focus {
-    background: url(../img/button-red.png);
-    border: 1px solid #ee0909;
+.box:hover .deletebtn,.box:focus .deletebtn,
+.box:hover .cancelbtn,.box:focus .cancelbtn {
+    background-image: url("../img/button-lightred.png");
+    color: #980101;
 }
 
-.error {
-    width: 850px;
-    height: 150px;
+.error,.info {
+    width: 780px;
+    height: 62px;
     margin: 0 auto;
-    background: url(../img/error-wide.png) no-repeat 7px center;
+    background-repeat: no-repeat;
+    background-position: 7px center;
     position: relative;
     top: -20px;
+    padding: 44px 35px 44px 35px;
 }
 
-.error_label {
+.error { color: black; background-image: url(../img/error-wide.png); }
+.info { color: #002b3d; background-image: url(../img/info-wide.png); }
+
+.error_label,.info_label {
     font-size: 22pt;
-    padding: 44px 0 2px 35px;
+    margin-bottom: 4px;
+    line-height: 150%;
 }
 
-.error_message {
+.error_message,.info_message {
     font-size: 18pt;
-    color: #fdeeee;
-    padding: 0 0 15px 35px;
+    line-height: 140%;
 }
 
-.error_message a {
+.error_message { color: #fdeeee; }
+.info_message { color: #339900; }
+
+.error_message a,.info_message a {
     color: inherit;
 }
 
-.error_close,.error_close:hover,.error_close:focus {
-    position: absolute;
-    top: 46px;
-    right: 28px;
-    background: url(../img/error-close.png) no-repeat center center;
+.error_close,.error_close:hover,.error_close:focus,
+.info_close,.info_close:hover,.info_close:focus {
+    float: right;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center center;
     width: 35px;
     height: 35px;
     padding: 0;
     border: none;
     box-shadow: none;
+}
+
+.error_close,.error_close:hover,.error_close:focus {
+    background-image: url(../img/error-close.png);
+}
+
+.info_close,.info_close:hover,.info_close:focus {
+    background-image: url(../img/info-close.png);
 }
 
 .error_details {
@@ -291,4 +298,22 @@ button:hover,button:focus {
     right: 35px;
     color: white;
     font-size: 14pt;
+}
+
+.info_yes {
+    float: right;
+}
+
+.info_no {
+    float: right;
+    margin-right: 8px;
+}
+
+.info_yes,.info_no,.info_yes:hover,.info_no:hover {
+    background-image: url("../img/button-lightgreen.png");
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.info_yes:hover,.info_no:hover {
+    box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
 }

@@ -38,19 +38,31 @@ var FileShack = new Class({
             $('list').insertBefore(view.el, $('list').firstChild);
         });
         
+        // Bootstrap items from JSON embedded in index.html.
         this.bootstrap($('bootstrap').get('text'))
         
         var dropbox = $('dropbox');
         var dropboxInput = $('dropbox-input');
         var iframe = $('iframe');
         
-        if (typeof dropbox.addEventListener != 'undefined') {
+        // Drag & Drop.
+        if (typeof dropbox.addEventListener != 'undefined' &&
+            typeof dropbox.ondrop != 'undefined')
+        {
+            // Register Drag & Drop events.
             dropbox.addEventListener("dragenter", function(e) { e.preventDefault(); }, false);
             dropbox.addEventListener("dragover", function(e) { e.preventDefault(); }, false);
             dropbox.addEventListener("drop", function(e) {
                 e.preventDefault();
-                Array.each(e.dataTransfer.files, function(f) { this_.upload(f); });
+                Array.each(e.dataTransfer.files, function(f) {
+                    if (typeof FileReader != 'undefined') this_.upload(f);
+                    else this_.uploadSimple(f.name, f);
+                });
             }, false);
+        } else {
+            // Switch dropbox text, drag & drop is not supported.
+            $('dropbox-text').setStyle('display', 'none');
+            $('dropbox-text-nodragndrop').setStyle('display', 'block');
         }
         
         dropboxInput.onclick = function(e) {

@@ -4,6 +4,7 @@
 <html>
     <head>
         <title>Fileshack</title>
+	<link rel="stylesheet" type="text/css" href="{% static "fileshack/css/base.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
         <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
         <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
@@ -24,13 +25,14 @@
     </head>
     <body>
         <div id="container">
-            <h1>Welcome to fileshack, <span>drop your items</span></h1>
+            <h1>{%trans "Welcome to fileshack" %}, <span>{% trans "drop your items" %}</span></h1>
             <div id="subcontainer">
 		<iframe src="iframe/" id="iframe" style="display: none"></iframe>
                 <form id="dropbox" action="/upload/" method="post" enctype="multipart/form-data">
-                    <span id="dropbox-text">Drop your item in here or click</span>
+                    <span id="dropbox-text">{% trans "Drop your item in here or click" %}</span>
+		    <span id="dropbox-text-nodragndrop" style="display: none">{% trans "Clink here to upload a file" %}</span>
 		    <div id="dropbox-file">
-			<span id="dropbox-text-alt">Upload </span>
+			<span id="dropbox-text-alt">{% trans "Upload" %} </span>
 			<input id="dropbox-input" type="file" name="file" multiple="multiple" />
 		    </div>
 		    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
@@ -44,31 +46,38 @@
 			    <a class="box" href="">
 				<div class="buttons">
 				    <!--<button class="pausebtn">Pause</button>-->
-				    <button class="cancelbtn">Cancel</button>
+				    <button class="cancelbtn">{% trans "Cancel" %}</button>
 				</div>
 				<div class="size">0 KB</div>
-				<button class="deletebtn">Delete</button>
+				<button class="deletebtn">{% trans "Delete" %}</button>
 				<div class="progress_container">
 				    <div class="progress">0 %x</div>
 				    <div class="progress_size">0 MB / 0 MB</div>
 				</div>
 				<div class="name">undefined</div>
 				<progress class="progressbar" value="0" max="100"></progress>
-				<div class="desc">Dropped on <strong class="uploaded">undefined</strong></div>
+				<div class="desc">{% trans "Dropped on" %} <strong class="uploaded">undefined</strong></div>
 			    </a>
 			    <div class="error" style="display: none">
-				<div class="error_label">Application Error</div>
-				<div class="error_message">Unknown error occurred.</div>
-				<a class="error_details" style="display: none">Details</a>
 				<button class="error_close"></button>
+				<div class="error_label">{% trans "Application Error" %}</div>
+				<div class="error_message">{% trans "Unknown error occurred." %}</div>
+				<a class="error_details" style="display: none">{% trans "Details" %}</a>
 			    </div>
+			    <div class="info" style="display: none">
+				<button class="info_close" style="display: none"></button>
+				<div class="info_label">{% trans "Info Label" %}</div>
+				<button class="info_yes">{% trans "Yes" %}</button>
+				<button class="info_no">{% trans "No" %}</button>
+				<div class="info_message">{% trans "Message" %}</div>
+			    </div>			    
 			</div>
 		    </div>
 		</div>
             </div>
             <div id="controls">
                 <form action="logout/">
-                    <button type="submit">Logout</button>
+                    <button type="submit" class="logout">{% trans "Logout" %}</button>
                 </form>
             </div>
 	    <div id="preload-1"></div>
