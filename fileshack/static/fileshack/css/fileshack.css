@@ -144,7 +144,7 @@ button::-moz-focus-inner {
 }
 
 .item.pending .name,.item.stale .name {
-    width: 380px;
+    width: 400px;
 }
 
 .item.unfinished .name {
@@ -161,10 +161,11 @@ button::-moz-focus-inner {
 .item .progress {
     color: #555753;
     font-size: 26pt;
+    line-height: 150%;
 }
 
 .item.pending .progressbar,.item.stale .progressbar {
-    width: 380px;
+    width: 400px;
     height: 25px;
     margin-left: 90px;
     margin-top: 10px;
@@ -180,10 +181,11 @@ button::-moz-focus-inner {
 .item .progress_size,.item .progress_size {
     font-size: 14pt;
     color: #555753;
+    line-height: 120%;
 }
 
 .item .buttons {
-    width: 120px;
+    width: 100px;
     height: 100px;
     float: right;
     text-align: right;
