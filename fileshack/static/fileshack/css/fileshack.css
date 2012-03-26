@@ -133,9 +133,11 @@ button::-moz-focus-inner {
     font-size: 18pt;
     margin-top: 5px;
     margin-left: 85px;
+    margin-bottom: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 150%;
 }
 
 .item .name {
@@ -212,13 +214,14 @@ button::-moz-focus-inner {
     font-size: 12pt;
     margin-left: 85px;
     color: #555753;
-    margin-top: 10px;
+    line-height: 120%;
 }
 
 .item .size {
-    font-size: 22pt;
+    font-size: 20pt;
     color: #555753;
     float: right;
+    line-height: 150%;
 }
 
 .item .deletebtn {
