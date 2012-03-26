@@ -26,9 +26,8 @@ button {
 
 button:hover,button:focus {
     color: black;
-    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.6);
-    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 button::-moz-focus-inner {
