@@ -71,6 +71,7 @@ var ItemView = new Class({
 	    else
 		this_.model.del();
 	});
+	emulateProgress(this.progressbar);
     },
     
     show: function(what) {
@@ -92,6 +93,7 @@ var ItemView = new Class({
 	    this.progressbar.value = (this.model.size * 100)/this.model.size_total;
 	else
 	    this.progressbar.value = 1;
+	updateProgress(this.progressbar);
 	
 	var percentage = 0;
 	if (this.model.size > 0 && this.model.size_total > 0)
