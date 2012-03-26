@@ -1,9 +1,10 @@
 {% load staticfiles %}
+{% load i18n %}
 <!DOCTYPE html>
 <html>
     <head>
         <title>Fileshack</title>
-        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/base.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/accesscode.css" %}" />
         <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
         <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
@@ -13,11 +14,11 @@
     </head>
     <body>
         <div id="container">
-            <h1>Welcome to fileshack, <span>enter the access code</span></h1>
+            <h1>{% trans "Welcome to fileshack," %} <span>{% trans "enter the access code" %}</span></h1>
             <form method="post">
                 {% csrf_token %}
                 <input id="accesscode" type="password" name="accesscode" value="{{ accesscode|escape }}" />
-                <button id="ok" type="submit">OK</button>
+                <button id="ok" type="submit">{% trans "OK" %}</button>
             </form>
             {% if error_label %}
                 <div id="error"><div class="label">{{ error_label }}</div><div class="message">{{ error_message }}</div></div>
