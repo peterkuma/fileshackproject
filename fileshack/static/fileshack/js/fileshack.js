@@ -72,6 +72,7 @@ var FileShack = new Class({
         if (Browser.ie && Browser.version <= 7) {
             // Show the file upload input form.
             $('dropbox-text').setStyle('display', 'none');
+            $('dropbox-text-nodragndrop').setStyle('display', 'none');
             $('dropbox-file').setStyle('visibility', 'visible');
             dropboxInput.addEvent('change', function() {
                 dropbox.action = create_upload_url('upload/');

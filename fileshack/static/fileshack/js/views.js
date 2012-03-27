@@ -25,7 +25,7 @@ var View = new Class({
     
     initialize: function(model) {
         this.model = model;
-        this.el = $(this.template).cloneNode(true);
+        this.el = $(this.template).clone(true, false);
 	
 	var this_ = this;
 	Array.each(this.attributes, function(attr) {
