@@ -87,10 +87,15 @@ var FileShack = new Class({
                         var form = iframe.contentDocument.forms[0];
                     else
                         var form = iframe.getDocument().forms[0];
-                    
                     form.action = create_upload_url('iframe/');
+                    form.file.onchange = function() {
+                        var item = this_.upload(form);
+                        iframe.onload = function() {
+                            item.model.del();
+                            this_.update();
+                        };
+                    };
                     form.file.click();
-                    iframe.onload = function() { this_.update(); };
                 }
             });
         }
@@ -98,7 +103,6 @@ var FileShack = new Class({
         dropbox.addEvent('change', function(e) {
             if (e.target.files && (typeof FileReader != 'undefined' || typeof FormData == 'undefined')) {
                 Array.each(e.target.files, function(file) {
-                    console.log(file);
                     this_.upload(file);
                 });
             } else {
@@ -159,7 +163,7 @@ var FileShack = new Class({
             // Newer browsers.
             if (data.name) var name = data.name;
             if (data.size) var size = data.size;
-        } else if (data instanceof HTMLFormElement) {
+        } else if (data.file) {
             var name = basename(data.file.value);
         } else {
             var name = '';
@@ -209,7 +213,7 @@ var FileShack = new Class({
                 label: ITEM_SIZE_LIMIT_ERROR_LABEL,
                 message: ITEM_SIZE_LIMIT_ERROR_MESSAGE
 	    });
-            return;
+            return null;
         }
         
         if (typeof File != 'undefined' && data instanceof File && typeof FileReader != 'undefined') {
@@ -228,6 +232,8 @@ var FileShack = new Class({
             data.action = create_upload_url('upload/');
             data.submit();
         }
+        
+        return item;
     },
     
     removeStaleItems: function(validIds) {
