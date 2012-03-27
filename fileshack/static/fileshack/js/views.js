@@ -100,6 +100,10 @@ var ItemView = new Class({
 	    percentage = Math.round((this.model.size * 100)/this.model.size_total);
 	this.progress.set('text', percentage + ' %');    
 	if (this.model.type == 'stale') this.progress.set('text', 'stale');
+	if (this.model.type == 'pending' && !this.model.size_total) {
+	    this.progress.set('text', '');
+	    this.progress_size.set('text', '');
+	}
 	
 	if (this.model.url) this.box.href = this.model.url;
 	else this.box.href = 'javascript: return false';
