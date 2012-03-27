@@ -20,9 +20,10 @@ function updateProgress(pb) {
     } else {
 	pb.addClass('progress-emulation-indeterminate');
 	fx = new Fx.Tween(pb, {
-	    duration: 600,
+	    duration: 'long',
+	    transition: 'linear',
 	    property: 'background-position',
-	    link: 'chain',
+	    link: 'chain'
 	});
 	var atStart = true;
 	fx.addEvent('complete', function() {
