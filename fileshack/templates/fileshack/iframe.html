@@ -5,7 +5,7 @@
     </head>
     <body>
 	<form name="form" method="POST" enctype="multipart/form-data">
-	    <input type="file" name="file" onchange="document.forms[0].submit()" />
+	    <input type="file" name="file" />
 	    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
 	</form>
     </body>
