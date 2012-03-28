@@ -29,7 +29,9 @@ button {
 button:hover,button:focus {
     color: black;
     box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
     -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    -o-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 button::-moz-focus-inner {
@@ -289,6 +291,9 @@ button::-moz-focus-inner {
     padding: 0;
     border: none;
     box-shadow: none;
+    -moz-box-shadow: none;
+    -wekkit-box-shadow: none;
+    -o-box-shadow: none;
 }
 
 .error_close,.error_close:hover,.error_close:focus {
@@ -323,4 +328,7 @@ button::-moz-focus-inner {
 
 .info_yes:hover,.info_no:hover {
     box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+    -o-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
 }
