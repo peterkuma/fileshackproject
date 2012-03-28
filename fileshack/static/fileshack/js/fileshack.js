@@ -64,22 +64,21 @@ var FileShack = new Class({
             $('dropbox-text-nodragndrop').setStyle('display', 'block');
         }
         
+        var clickDelegated = false;
         dropboxInput.onclick = function(e) {
+            clickDelegated = true;
             if (typeof e.stopPropagation != 'undefined')
                 e.stopPropagation();
         };
         
         if (Browser.ie && Browser.version <= 7) {
-            // Show the file upload input form.
-            $('dropbox-text').setStyle('display', 'none');
-            $('dropbox-text-nodragndrop').setStyle('display', 'none');
-            $('dropbox-file').setStyle('visibility', 'visible');
-            dropboxInput.addEvent('change', function() { dropbox.submit(); });
+            this.fallback();
         } else {
             // Delegate click on dropbox to the hidden input file element.
-            dropbox.addEvent('click', function(e) {
+            dropbox.addEvent('click', function() {
                 if (typeof File != 'undefined') {
                     dropboxInput.click();
+                    window.setTimeout(function() { if (!clickDelegated) this_.fallback(); }, 100);
                 } else { // Fallback to upload by the iframe hack (IE).
                     if (typeof iframe.contentDocument != 'undefined')
                         var form = iframe.contentDocument.forms[0];
@@ -121,6 +120,15 @@ var FileShack = new Class({
             view.model.update(item);
             this_.items.add(view);
         });
+    },
+    
+    fallback: function() {
+        var this_ = this;
+        // Show the file upload input form.
+        $('dropbox-text').setStyle('display', 'none');
+        $('dropbox-text-nodragndrop').setStyle('display', 'none');
+        $('dropbox-file').setStyle('visibility', 'visible');
+        $('dropbox-input').addEvent('change', function() { this_.upload($('dropbox')); });
     },
     
     update: function() {
@@ -171,7 +179,7 @@ var FileShack = new Class({
         var i = this.items.find(function(i) {
             if (!(i.model.type == 'stale' || i.model.type == 'pending' && i.isError()))
                 return false;
-            if (i.model.size_total != file.size) return false;
+            if (i.model.size_total != size) return false;
             if (i.model.name == name) return true;
             var n = i.model.name;
             // Django appends _#no to duplicate file names, account for that.
@@ -185,8 +193,8 @@ var FileShack = new Class({
             return false;
         });
         
-        // If this is a File and FileReader is supported, ask the user about resume.
-        if (i && typeof FileReader != 'undefined' && data instanceof File) {
+        // If this is a File, ask the user about resume.
+        if (i && data instanceof File) {
             var c = confirm('A stale file with the same name and size has been found.\nDo you want to resume uploading?');
             if (c) {
                 item = i;
@@ -224,7 +232,7 @@ var FileShack = new Class({
             formData.append('file', data);
             item.model.upload(formData);
         } else if (typeof File != 'undefined' && data instanceof File) {
-            item.model.upload(data);
+            item.model.upload(data.getAsBinary());
         } else {
             data.submit();
         }
