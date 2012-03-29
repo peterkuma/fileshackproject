@@ -46,7 +46,7 @@ var ItemView = new Class({
     
     template: 'item-template',
     attributes: ['box', 'name', 'size', 'progress_container', 'progress',
-		 'progressbar', 'progress_size',
+		 'progressbar', 'progressbar_alt', 'progress_size',
 		 'uploaded', 'desc', 'deletebtn', 'cancelbtn', 'buttons',
 		 'error', 'error_label', 'error_message', 'error_details', 'error_close'],
     
@@ -71,6 +71,11 @@ var ItemView = new Class({
 	    else
 		this_.model.del();
 	});
+	if (!this.progressbar) {
+	    this.progressbar = this.progressbar_alt;
+	    this.progressbar.removeClass('progressbar_alt');
+	    this.progressbar.addClass('progressbar');
+	}
 	emulateProgress(this.progressbar);
     },
     
@@ -89,12 +94,13 @@ var ItemView = new Class({
 	this.size.set('text', bytesToHuman(this.model.size_total));
 	this.uploaded.set('text', this.model.uploaded.format('%e %B %Y'));
 	this.progress_size.set('text', bytesToHuman(this.model.size) + ' / ' + bytesToHuman(this.model.size_total));
-	if (this.model.size_total != 0)
-	    this.progressbar.value = (this.model.size * 100)/this.model.size_total;
-	else
-	    this.progressbar.value = 1;
-	updateProgress(this.progressbar);
-	
+	if (this.progressbar) {
+	    if (this.model.size_total != 0)
+		this.progressbar.value = (this.model.size * 100)/this.model.size_total;
+	    else
+		this.progressbar.value = 1;
+	    updateProgress(this.progressbar);
+	}
 	var percentage = 0;
 	if (this.model.size > 0 && this.model.size_total > 0)
 	    percentage = Math.round((this.model.size * 100)/this.model.size_total);

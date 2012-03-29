@@ -64,25 +64,20 @@ var FileShack = new Class({
             $('dropbox-text-nodragndrop').setStyle('display', 'block');
         }
         
+        var clickDelegated = false;
         dropboxInput.onclick = function(e) {
-            if (typeof e.stopPropagation != 'undefined')
-                e.stopPropagation();
+            clickDelegated = true;
+            if (e && e.stopPropagation) e.stopPropagation();
         };
         
         if (Browser.ie && Browser.version <= 7) {
-            // Show the file upload input form.
-            $('dropbox-text').setStyle('display', 'none');
-            $('dropbox-text-nodragndrop').setStyle('display', 'none');
-            $('dropbox-file').setStyle('visibility', 'visible');
-            dropboxInput.addEvent('change', function() {
-                dropbox.action = create_upload_url('upload/');
-                dropbox.submit();
-            });
+            this.fallback();
         } else {
             // Delegate click on dropbox to the hidden input file element.
-            dropbox.addEvent('click', function(e) {
+            dropbox.addEvent('click', function() {
                 if (typeof File != 'undefined') {
                     dropboxInput.click();
+                    window.setTimeout(function() { if (!clickDelegated) this_.fallback(); }, 100);
                 } else { // Fallback to upload by the iframe hack (IE).
                     if (typeof iframe.contentDocument != 'undefined')
                         var form = iframe.contentDocument.forms[0];
@@ -122,6 +117,14 @@ var FileShack = new Class({
         });
     },
     
+    fallback: function() {
+        var this_ = this;
+        // Show the file upload input form.
+        $('dropbox-text').setStyle('display', 'none');
+        $('dropbox-text-nodragndrop').setStyle('display', 'none');
+        $('dropbox-file').setStyle('visibility', 'visible');
+    },
+    
     update: function() {
         var xhr = new XMLHttpRequest();
         
@@ -151,6 +154,15 @@ var FileShack = new Class({
     },
     
     upload: function(data) {
+        var this_ = this;
+        // If input[type="file"].files is supported, upload per parts.
+        if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement &&
+            data.file && data.file.files)
+        {
+            Array.each(data.file.files, function(file) { this_.upload(file); });
+            return null;
+        }
+        
         // Determine name and size of the file.
         if (typeof File != 'undefined' && data instanceof File) {
             // Older browsers.
@@ -170,7 +182,7 @@ var FileShack = new Class({
         var i = this.items.find(function(i) {
             if (!(i.model.type == 'stale' || i.model.type == 'pending' && i.isError()))
                 return false;
-            if (i.model.size_total != file.size) return false;
+            if (i.model.size_total != size) return false;
             if (i.model.name == name) return true;
             var n = i.model.name;
             // Django appends _#no to duplicate file names, account for that.
@@ -184,8 +196,8 @@ var FileShack = new Class({
             return false;
         });
         
-        // If this is a File and FileReader is supported, ask the user about resume.
-        if (i && typeof FileReader != 'undefined' && data instanceof File) {
+        // If this is a File, ask the user about resume.
+        if (i && data instanceof File) {
             var c = confirm('A stale file with the same name and size has been found.\nDo you want to resume uploading?');
             if (c) {
                 item = i;
@@ -216,14 +228,14 @@ var FileShack = new Class({
             var reader = new FileReader()
             reader.onload = function(e) { item.model.upload(e.target.result); };
             reader.readAsBinaryString(data);
-        } else if (data instanceof HTMLFormElement && typeof FormData != 'undefined') {
+        } else if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement && typeof FormData != 'undefined') {
             item.model.upload(new FormData(data));
         } else if (typeof File != 'undefined' && data instanceof File && typeof FormData != 'undefined') {
             var formData = new FormData();
             formData.append('file', data);
             item.model.upload(formData);
         } else if (typeof File != 'undefined' && data instanceof File) {
-            item.model.upload(data);
+            item.model.upload(data.getAsBinary());
         } else {
             data.submit();
         }
