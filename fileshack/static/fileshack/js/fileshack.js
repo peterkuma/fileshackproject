@@ -67,8 +67,7 @@ var FileShack = new Class({
         var clickDelegated = false;
         dropboxInput.onclick = function(e) {
             clickDelegated = true;
-            if (typeof e.stopPropagation != 'undefined')
-                e.stopPropagation();
+            if (e && e.stopPropagation) e.stopPropagation();
         };
         
         if (Browser.ie && Browser.version <= 7) {
@@ -96,14 +95,8 @@ var FileShack = new Class({
             });
         }
         
-        dropbox.addEvent('change', function(e) {
-            if (e.target.files && (typeof FileReader != 'undefined' || typeof FormData == 'undefined')) {
-                Array.each(e.target.files, function(file) {
-                    this_.upload(file);
-                });
-            } else {
-                this_.upload(dropbox);
-            }
+        dropboxInput.addEvent('change', function() {
+            this_.upload(dropbox);
             dropbox.reset();
         });
         
@@ -128,7 +121,6 @@ var FileShack = new Class({
         $('dropbox-text').setStyle('display', 'none');
         $('dropbox-text-nodragndrop').setStyle('display', 'none');
         $('dropbox-file').setStyle('visibility', 'visible');
-        $('dropbox-input').addEvent('change', function() { this_.upload($('dropbox')); });
     },
     
     update: function() {
@@ -160,6 +152,15 @@ var FileShack = new Class({
     },
     
     upload: function(data) {
+        var this_ = this;
+        // If input[type="file"].files is supported, upload per parts.
+        if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement &&
+            data.file && data.file.files)
+        {
+            Array.each(data.file.files, function(file) { this_.upload(file); });
+            return null;
+        }
+        
         // Determine name and size of the file.
         if (typeof File != 'undefined' && data instanceof File) {
             // Older browsers.
@@ -225,7 +226,7 @@ var FileShack = new Class({
             var reader = new FileReader()
             reader.onload = function(e) { item.model.upload(e.target.result); };
             reader.readAsBinaryString(data);
-        } else if (data instanceof HTMLFormElement && typeof FormData != 'undefined') {
+        } else if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement && typeof FormData != 'undefined') {
             item.model.upload(new FormData(data));
         } else if (typeof File != 'undefined' && data instanceof File && typeof FormData != 'undefined') {
             var formData = new FormData();

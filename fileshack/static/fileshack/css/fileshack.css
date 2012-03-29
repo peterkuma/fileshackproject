@@ -115,6 +115,7 @@ button::-moz-focus-inner {
 .item .buttons { display: none; }
 .item .progress_container { display: none; }
 .item .progressbar { display: none; }
+.item .progressbar_alt { display: none; }
 
 .item.complete .desc { display: block; }
 .item.complete .size { display: block; }
