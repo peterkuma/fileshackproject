@@ -88,8 +88,8 @@ var FileShack = new Class({
                         var form = iframe.contentDocument.forms[0];
                     else
                         var form = iframe.getDocument().forms[0];
-                    form.action = create_upload_url('iframe/');
                     form.file.onchange = function() {
+                        form.action = create_upload_url('iframe/');
                         var item = this_.upload(form);
                         iframe.onload = function() {
                             item.model.del();
@@ -101,14 +101,9 @@ var FileShack = new Class({
             });
         }
         
-        dropbox.addEvent('change', function(e) {
-            if (e.target.files && (typeof FileReader != 'undefined' || typeof FormData == 'undefined')) {
-                Array.each(e.target.files, function(file) {
-                    this_.upload(file);
-                });
-            } else {
-                this_.upload(dropbox);
-            }
+        dropboxInput.addEvent('change', function() {
+            dropbox.action = create_upload_url('upload/');
+            this_.upload(dropbox);
             dropbox.reset();
         });
         
@@ -230,7 +225,6 @@ var FileShack = new Class({
         } else if (typeof File != 'undefined' && data instanceof File) {
             item.model.upload(data);
         } else {
-            data.action = create_upload_url('upload/');
             data.submit();
         }
         
