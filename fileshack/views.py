@@ -151,7 +151,7 @@ def iframe(request, store):
 @require_store
 @require_login
 def upload(request, store, id):
-    if request.method != "POST":
+    if request.method != "POST" or not request.FILES.has_key("file"):
         data = {
             "status": "failed",
             "error_label": "Upload failed",
@@ -228,37 +228,10 @@ def upload(request, store, id):
         item.save()
         fp = default_storage.open(item.fileobject.path, "wb")
     
-    if request.FILES.has_key("file"):
-        chunks = f.chunks().__iter__()
-        while True:
-            try: chunk = chunks.next()
-            except StopIteration: break
-            except IOError:
-                fp.close()
-                data = {
-                    "status": "failed",
-                    "error_label": "Upload failed",
-                    "error_message": "Server-side I/O error",
-                    "item": item.simple(),
-                }
-                return HttpResponseServerError(JSONEncoder().encode(data))
-            else:
-                try:
-                    if request.META.get("HTTP_X_FILE_ENCODING") == "base64":
-                        fp.write(chunk.decode("base64"))
-                    else:
-                        fp.write(chunk)
-                except binascii.Error:
-                    fp.close()
-                    data = {
-                        "status": "failed",
-                        "error_label": "Upload failed",
-                        "error_message": "The browser sent an invalid chunk",
-                        "item": item.simple(),
-                    }
-                    return HttpResponseServerError(JSONEncoder().encode(data))
-    else:
-        try: fp.write(request.raw_post_data)
+    chunks = f.chunks().__iter__()
+    while True:
+        try: chunk = chunks.next()
+        except StopIteration: break
         except IOError:
             fp.close()
             data = {
@@ -268,6 +241,21 @@ def upload(request, store, id):
                 "item": item.simple(),
             }
             return HttpResponseServerError(JSONEncoder().encode(data))
+        else:
+            try:
+                if request.META.get("HTTP_X_FILE_ENCODING") == "base64":
+                    fp.write(chunk.decode("base64"))
+                else:
+                    fp.write(chunk)
+            except binascii.Error:
+                fp.close()
+                data = {
+                    "status": "failed",
+                    "error_label": "Upload failed",
+                    "error_message": "The browser sent an invalid chunk",
+                    "item": item.simple(),
+                }
+                return HttpResponseServerError(JSONEncoder().encode(data))
     
     item.size = fp.tell()
     fp.close()
