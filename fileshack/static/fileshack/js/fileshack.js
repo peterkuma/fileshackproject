@@ -84,6 +84,7 @@ var FileShack = new Class({
                     else
                         var form = iframe.getDocument().forms[0];
                     form.file.onchange = function() {
+                        form.action = create_upload_url('iframe/');
                         var item = this_.upload(form);
                         iframe.onload = function() {
                             item.model.del();
@@ -96,6 +97,7 @@ var FileShack = new Class({
         }
         
         dropboxInput.addEvent('change', function() {
+            dropbox.action = create_upload_url('upload/');
             this_.upload(dropbox);
             dropbox.reset();
         });
