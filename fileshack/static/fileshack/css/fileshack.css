@@ -6,7 +6,7 @@
 
 body {
     text-align: center;
-    margin: 50px;
+    margin: 5% 0;
 }
 
 button {
@@ -41,13 +41,13 @@ button::-moz-focus-inner {
 #container {
     margin: 0 auto;
     text-align: left;
-    width: 850px;
+    width: 820px;
+    padding: 0 20px;
 }
 
 #controls {
-    position: absolute;
-    right: 50px;
-    top: 30px;
+    float: right;
+    margin: 12px 0;
 }
 
 .logout:hover,.logout:focus {
