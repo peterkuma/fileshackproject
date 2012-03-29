@@ -27,6 +27,11 @@
     </head>
     <body>
         <div id="container">
+	    <div id="controls">
+                <form action="logout/">
+                    <button type="submit" class="logout">{% trans "Logout" %}</button>
+                </form>
+            </div>
             <h1>{%trans "Welcome to fileshack" %}, <span>{% trans "drop your items" %}</span></h1>
             <div id="subcontainer">
 		<iframe src="iframe/" id="iframe" style="display: none"></iframe>
@@ -77,11 +82,6 @@
 			</div>
 		    </div>
 		</div>
-            </div>
-            <div id="controls">
-                <form action="logout/">
-                    <button type="submit" class="logout">{% trans "Logout" %}</button>
-                </form>
             </div>
 	    <div id="preload-1"></div>
 	    <div id="preload-2"></div>
