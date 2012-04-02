@@ -98,7 +98,8 @@ def logout(request, store):
 @require_store
 def index(request, store):
     if (not request.session.has_key("fileshack_stores") or \
-        not store.id in request.session["fileshack_stores"]):
+        not store.id in request.session["fileshack_stores"]) \
+        and store.accesscode != "":
         
         if request.method == "POST":
             accesscode = request.POST.get("accesscode")
@@ -125,6 +126,7 @@ def index(request, store):
     items = Item.objects.filter(store=store)    
     t = loader.get_template("fileshack/index.html")
     c = RequestContext(request, {
+        "store": store,
         "items": items,
         "item_size_limit": store.item_limit,
         "items_json": JSONEncoder().encode([i.simple() for i in items])

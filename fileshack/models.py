@@ -32,7 +32,7 @@ from datetime import timedelta
 class Store(Model):
     path = CharField(_("path"), help_text=_("Path relative to the base URL under which the store is accessible. Leave empty if not sure."), unique=True, blank=True, max_length=200)
     media = CharField(_("media"), help_text=_("Directiory under MEDIA_PATH into which files will be uploaded. Leave empty if not sure."), blank=True, max_length=200)
-    accesscode = CharField(_("access code"), help_text=_("Protect access to the store by an access code."), max_length=200)
+    accesscode = CharField(_("access code"), help_text=_("Protect access to the store by an access code."), max_length=200, blank=True)
     item_limit = IntegerField(_("item size limit"), help_text=_("Limit the size of a single file."), default=0)
     store_limit = IntegerField(_("store size limit"), help_text=_("Limit the size of the entire store."), default=0)
     protect_files = BooleanField(_("protect files"), help_text=_("Protect files by a random string, so that they cannot be downloaded by guessing their name."), default=True)

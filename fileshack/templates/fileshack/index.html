@@ -28,9 +28,11 @@
     <body>
         <div id="container">
 	    <div id="controls">
-                <form action="logout/">
-                    <button type="submit" class="logout">{% trans "Logout" %}</button>
-                </form>
+		{% if store.accesscode %}
+		    <form action="logout/">
+			<button type="submit" class="logout">{% trans "Logout" %}</button>
+		    </form>
+		{% endif %}
             </div>
             <h1>{%trans "Welcome to fileshack" %}, <span>{% trans "drop your items" %}</span></h1>
             <div id="subcontainer">
