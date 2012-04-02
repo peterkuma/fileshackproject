@@ -28,6 +28,8 @@ import os
 from random import choice
 from datetime import datetime as dt
 from datetime import timedelta
+import base64
+import hashlib, hmac
 
 class Store(Model):
     path = CharField(_("path"), help_text=_("Path relative to the base URL under which the store is accessible. Leave empty if not sure."), unique=True, blank=True, max_length=200)
@@ -36,6 +38,7 @@ class Store(Model):
     item_limit = IntegerField(_("item size limit"), help_text=_("Limit the size of a single file (MB)."), default=0)
     store_limit = IntegerField(_("store size limit"), help_text=_("Limit the size of the entire store (MB)."), default=0)
     protect_files = BooleanField(_("protect files"), help_text=_("Protect files by a random string, so that they cannot be downloaded by guessing their name."), default=True)
+    allow_watch = BooleanField(_("allow watch"), help_text=_("Allow users to subscribe to receive e-mail updates."), default=True)
     
     def __unicode__(self):
         url = self.get_absolute_url()
@@ -133,5 +136,58 @@ class Item(Model):
         return self.name()
 
     class Meta:
-        ordering = ('created'),
+        ordering = [('created')]
 
+class User(Model):
+    email = EmailField(_("e-mail"), max_length=254, unique=True)
+    created = DateTimeField(_("created"), auto_now_add=True)
+    modified = DateTimeField(_("modified"), auto_now=True)
+    last_notification = DateTimeField(_("last notification"), null=True)
+
+    def unsubscribe_hmac(self):
+        h = hmac.HMAC(settings.SECRET_KEY)
+        h.update("unsubscribe:"+self.email)
+        return base64.urlsafe_b64encode(h.digest())
+
+    def unsubscribe_url(self):
+        return reverse("fileshack:unsubscribe", kwargs={
+            "email": self.email,
+            "hmac": self.unsubscribe_hmac(),
+        })
+    
+    def unsubscribe(self):
+        for w in self.watchers: w.delete()
+
+    class Meta:
+        verbose_name = _("user")
+        verbose_name_plural = ("users")
+        ordering = [("created")]
+
+DIGEST_CHOICES = [
+    ("immediately", _("Immediately")),
+    ("hourly", _("Hourly")),
+    ("daily", _("Daily")),
+    ("weekly", _("Weekly")),
+]
+
+class Watcher(Model):
+    user = ForeignKey(User, verbose_name=_("user"), related_name="watchers")
+    store = ForeignKey(Store, verbose_name=_("store"), related_name="watchers")
+    digest = CharField(_("digest"), max_length=50, choices=DIGEST_CHOICES)
+    created = DateTimeField(_("created"), auto_now_add=True)
+    modified = DateTimeField(_("modified"), auto_now=True)
+    
+    def simple(self):
+        return {
+            "id": self.id,
+            "email": self.user.email,
+            "digest": self.digest,
+            "last_notification": self.user.last_notification,
+            "created": self.created,
+        }
+    
+    class Meta:
+        verbose_name = _("watcher")
+        verbose_name_plural = _("watchers")
+        ordering = [("created")]
+        unique_together = ("user", "store")

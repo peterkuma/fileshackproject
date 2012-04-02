@@ -19,11 +19,162 @@ body {
 #controls {
     float: right;
     margin: 12px 0;
+    position: relative;
 }
 
-.logout:hover,.logout:focus {
+#logout {
+    float: right;
+}
+
+#logoutbtn:hover,#logoutbtn:focus {
     background-image: url("../img/button-lightblue.png");
     color: #003366;
+}
+
+#watchbtn {
+    margin-right: 10px;
+    float: right;
+}
+
+#watchbtn:hover,#watchbtn:focus,#watchbtn.active {
+    color: #015a01;
+    background-image: url("../img/button-green.png");
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    -o-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+#watch-dialog {
+    position: absolute;
+    right: 0;
+    top: 34px;
+    z-index: 100;
+    width: 255px;
+    font-size: 12pt;
+}
+
+#watch-dialog .top {
+    background: url("../img/watch-dialog-top.png") no-repeat center top;
+    height: 16px;
+    width: 100%;
+    margin-bottom: -1px;
+    z-index: 40;
+    position: relative;
+}
+
+#watch-dialog .dialog {
+    width: 100%;
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.2);
+    position: absolute;
+    font-size: 10pt;
+    box-shadow: 1px 1px 0 black;
+    -moz-box-shadow: 1px 1px 0 black;
+    -webkit-box-shadow: 1px 1px 0 black;
+    -o-box-shadow: 1px 1px 0 black;
+    border-radius: 1px;
+    z-index: 20;
+}
+
+#watch-dialog .new {
+    padding: 10px 10px 5px 10px;
+    background: #f8f8f8;
+}
+
+#watch-dialog .new button[type="submit"] {
+    display: block;
+    width: 25px;
+    height: 23px;
+    position: relative;
+    float: right;
+    border-radius: 3px;
+    background: url("../img/button-watch-submit.png") no-repeat center center;
+}
+
+#watch-dialog .new label[for="digest"] {
+    display: block;
+    float: left;
+    margin: 8px 5px 0 0;
+    height: 18px;
+    padding-top: 2px;
+}
+
+#watch-dialog .new select[name="digest"] {
+    display: block;
+    margin: 8px 0 5px 0;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 3px;
+    padding: 0 2px;
+    height: 20px;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+#watch-dialog .new button[type="submit"].active {
+    background: url("../img/button-watch-submit-active.png") no-repeat center center;
+    border: 1px solid #0088cb;
+}
+
+#watch-dialog .new input[name="email"] {
+    display: block;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    width: 195px;
+    height: 20px;
+    padding: 2px 5px 0px 5px;
+    background-repeat: repeat-x;
+    font-family: inherit;
+    font-size: inherit;
+    box-shadow: none;
+}
+
+#watch-error {
+    background: #f85050;
+    height: 20px;
+    padding: 10px 15px;
+}
+
+#watch-error a {
+    
+}
+
+#watch-error .details {
+    float: right;
+}
+
+#watch-dialog .watcher {
+    padding: 10px 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#watch-dialog .watcher:hover .deletebtn {
+    background: url("../img/button-watcher-delete-active.png") no-repeat center center;
+}
+
+#watch-dialog .watcher .email {
+    width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#watch-dialog .deletebtn {
+    float: right;
+    display: block;
+    border: none;
+    background: url("../img/button-watcher-delete.png") no-repeat center center;
+    width: 12px;
+    height: 20px;
+}
+
+#watch-dialog .deletebtn:hover,
+#watch-dialog .deletebtn:focus
+{
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    -o-box-shadow: none;
 }
 
 #dropbox {

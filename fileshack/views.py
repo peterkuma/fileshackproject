@@ -21,16 +21,21 @@
 from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseNotFound, \
                         HttpResponseForbidden, HttpResponseRedirect, \
-                        HttpResponseServerError, HttpResponseBadRequest
+                        HttpResponseServerError, HttpResponseBadRequest, \
+                        HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ungettext_lazy as ungettext
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import Http404
 from django.conf import settings
 from django.core.servers.basehttp import FileWrapper
+from django import forms
 from django.views.decorators.http import require_POST, require_GET
+from django.core.mail import send_mail
+from django.contrib.sites.models import get_current_site
 
 try: from django.utils import timezone
 except ImportError: from compat import timezone
@@ -42,6 +47,7 @@ import urllib
 import mimetypes
 import time
 import binascii
+import smtplib
 
 from models import *
 
@@ -125,13 +131,17 @@ def index(request, store):
             c = RequestContext(request)
             return HttpResponse(t.render(c))
         
-    items = Item.objects.filter(store=store)    
+    items = Item.objects.filter(store=store)
+    watchers = Watcher.objects.filter(store=store)
     t = loader.get_template("fileshack/index.html")
     c = RequestContext(request, {
         "store": store,
         "items": items,
         "item_size_limit": store.item_limit,
-        "items_json": JSONEncoder().encode([i.simple() for i in items])
+        "bootstrap": JSONEncoder().encode({
+            "items": [i.simple() for i in items],
+            "watchers": [w.simple() for w in watchers],
+        }),
     })
     return HttpResponse(t.render(c))
 
@@ -401,6 +411,121 @@ def download(request, store, item_id):
     response["Content-Length"] = "%d" % item.size_total
     response["Content-Disposition"] = 'attachment; name="file"; filename="%s"' % urllib.quote(item.name())
     return response
+
+
+@require_store
+@require_login
+@require_POST
+def watch(request, store):
+    if not store.allow_watch:
+        return HttpResponseNotAllowed()
+    
+    class WatcherForm(forms.Form):
+        email = forms.EmailField(max_length=254)
+        digest = forms.CharField(max_length=50)
+    
+    f = WatcherForm(request.POST)
+    if f.is_valid():
+        try: u = User.objects.get(email__iexact=f.cleaned_data["email"])
+        except User.DoesNotExist:
+            u = User(email=f.cleaned_data["email"])
+            u.save()
+        try: w = Watcher.objects.get(store=store, user=u)
+        except Watcher.DoesNotExist: w = Watcher(store=store, user=u)
+        w.digest = f.cleaned_data["digest"]
+        w.save()
+        
+        watchers = Watcher.objects.filter(store=store)
+        return HttpResponse(JSONEncoder().encode({
+            "status": "success",
+            "watcher": w.simple(),
+            "watchers": [w.simple() for w in watchers],
+        }))
+    else:
+        return HttpResponseBadRequest(JSONEncoder().encode({
+            "status": "error",
+            "message": f["email"].errors if f["email"].errors else "Validation Error", 
+        }))
+    
+    if request.method != "POST" or not request.POST.has_key("email"):
+        return HttpResponseBadRequest()
+
+
+@require_store
+@require_login
+@require_POST
+def unwatch(request, store):
+    if not store.allow_watch:
+        return HttpResponseNotAllowed()
+    
+    if not request.POST.has_key("email"):
+        return HttpResponseBadRequest()
+        
+    email = request.POST["email"]
+ 
+    watchers = Watcher.objects.filter(store=store, user__email__iexact=email)
+    for w in watchers:
+        w.delete()
+    
+    # Delete user who are not watching any store.
+    User.objects.annotate(n_watchers=Count("watchers")).filter(n_watchers=0).delete()
+    
+    watchers = Watcher.objects.filter(store=store)
+    return HttpResponse(JSONEncoder().encode({
+        "status": "success",
+        "watchers": [w.simple() for w in watchers],
+    }))
+
+
+def digest(request, period):
+    url_prefix = "http://" + get_current_site(request).domain
+    
+    watchers = Watcher.objects.filter(store__allow_watch=True, digest=period)
+    messages = {}
+    # For each user, collect information from all stores. If a user is watching
+    # several stores, he should get only one e-mail.
+    for w in watchers:
+        since = w.user.last_notification if w.user.last_notification else w.created
+        nitems = Item.objects.filter(store=w.store, created__gt=since).count()
+        if nitems == 0: continue
+        if not messages.has_key(w.user): messages[w.user] = ""
+        if w.user.last_notification:
+            messages[w.user] += ugettext("Since the last update:\r\n\r\n")
+        else:
+            messages[w.user] += ugettext("Since you started watching:\r\n\r\n")
+        messages[w.user] += ungettext(
+            "* A new item has been uploaded to %(store_url)s.\r\n\r\n",
+            "* %(count)d items have been uploaded to %(store_url)s.\r\n\r\n",
+            nitems) %  {
+                "count": nitems,
+                "store_url": url_prefix + w.store.get_absolute_url()
+            }
+        messages[w.user] += ugettext("Fileshack\r\n")
+        if settings.SECRET_KEY:
+            messages[w.user] += ugettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
+                "url": url_prefix + w.user.unsubscribe_url()
+            }
+    
+    for (user, text) in messages.iteritems():
+        try:
+            send_mail(_("Fileshack Update"), text, "no-reply@example.org",
+                      [user.email])
+            user.last_notification = datetime.datetime.now()
+            user.save()
+        except smtplib.SMTPException: pass
+    
+    return HttpResponse(ungettext(
+        "A digest has been sent to %(count)d person.",
+        "A digest has been sent to %(count)d people.",
+        len(messages)) % { "count": len(messages) })
+
+
+def unsubscribe(request, email, hmac):
+    u = get_object_or_404(User, email=email)
+    if u.unsubscribe_hmac != hmac:
+        return HttpResponseBadRequest()
+    u.unsubscribe()
+    return HttpResponse(_("You have been unsubscribed"))
 
 
 def page_not_found(request):

@@ -36,7 +36,7 @@ TIME_ZONE = None
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-#SITE_ID = 1
+SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    #'django.contrib.sites',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
@@ -128,6 +128,8 @@ INSTALLED_APPS = (
 
 # Serve static and media files even when DEBUG == False.
 SERVE_STATIC = False
+
+FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
 # Override the settings with local modifications.
 from settings_local import *
