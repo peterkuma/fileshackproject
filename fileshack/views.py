@@ -76,14 +76,17 @@ def require_store(view):
 def require_login(view):
     def login_wrapper(request, *args, **kwargs):
         store = kwargs.get("store")
+        if not store: return Http404()
         
-        if store == None:
-            return HttpResponseForbidden("No store defined")
-        if not request.session.has_key("fileshack_stores") or \
-           not store.id in request.session["fileshack_stores"]:
-            return HttpResponseForbidden("Not logged in")
-            
-        return view(request, *args, **kwargs)
+        if store.accesscode == "":
+            return view(request, *args, **kwargs)
+        
+        if request.session.has_key("fileshack_stores") and \
+           store.id in request.session["fileshack_stores"]:
+            return view(request, *args, **kwargs)
+        
+        return HttpResponseNotAllowed()
+        
     return login_wrapper
 
 @require_store
