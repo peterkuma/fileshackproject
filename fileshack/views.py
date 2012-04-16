@@ -305,6 +305,12 @@ def upload(request, store, id):
     
     if item.size >= item.size_total:
         item.uploaded = timezone.now()
+        
+    # Notify watchers. This could potentially block. It may be a good idea
+    # to allow for alternatives such as an asynchronous send_mail
+    # (django snippets) or celery.
+    if item.status() == "READY":
+        digest(request)
     
     item.save()
     data = {
@@ -477,7 +483,7 @@ def unwatch(request, store):
     }))
 
 
-def digest(request, period):
+def digest(request, period="immediately"):
     url_prefix = "http://" + get_current_site(request).domain
     
     watchers = Watcher.objects.filter(store__allow_watch=True, digest=period)
@@ -485,26 +491,39 @@ def digest(request, period):
     # For each user, collect information from all stores. If a user is watching
     # several stores, he should get only one e-mail.
     for w in watchers:
-        since = w.user.last_notification if w.user.last_notification else w.created
+        user = w.user
+        m = messages.get(user, "")
+        
+        if user.last_notification:
+            since = user.last_notification
+        else:
+            since = w.created
+        
         nitems = Item.objects.filter(store=w.store, created__gt=since).count()
         if nitems == 0: continue
-        if not messages.has_key(w.user): messages[w.user] = ""
-        if w.user.last_notification:
-            messages[w.user] += ugettext("Since the last update:\r\n\r\n")
-        else:
-            messages[w.user] += ugettext("Since you started watching:\r\n\r\n")
-        messages[w.user] += ungettext(
-            "* A new item has been uploaded to %(store_url)s.\r\n\r\n",
-            "* %(count)d items have been uploaded to %(store_url)s.\r\n\r\n",
+        
+        # Preamble.
+        if not m and period != "immediately":
+            if user.last_notification:
+                m += ugettext("Since the last update:\r\n\r\n")
+            else:
+                m += ugettext("Since you started watching:\r\n\r\n")
+        
+        if period != "immediately": m += "* "
+        m += ungettext(
+            "A new item has been uploaded to %(store_url)s.\r\n\r\n",
+            "%(count)d items have been uploaded to %(store_url)s.\r\n\r\n",
             nitems) %  {
                 "count": nitems,
                 "store_url": url_prefix + w.store.get_absolute_url()
             }
-        messages[w.user] += ugettext("Fileshack\r\n")
+        
+        m += ugettext("Fileshack\r\n")
         if settings.SECRET_KEY:
-            messages[w.user] += ugettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
+            m += ugettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
                 "url": url_prefix + w.user.unsubscribe_url()
             }
+        messages[user] = m
     
     for (user, text) in messages.iteritems():
         try:
