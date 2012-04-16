@@ -302,6 +302,7 @@ def delete(request, store, item_id):
     
     return HttpResponse("Item has been deleted")
 
+@never_cache
 @require_store
 @require_login
 def update(request, store, since=None):
