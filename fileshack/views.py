@@ -61,14 +61,9 @@ def require_store(view):
         if not kwargs.has_key("store_path"):
             raise Http404()
         store_path = kwargs.pop("store_path")
-        #if  store_path != "" and store_path[-1] != "/":
-        #    raise Http404()
-        store = None
-        try: store = Store.objects.get(path=store_path)
-        except Store.DoesNotExist: pass
-        #try: store = Store.objects.get(path=store_path[:-1])
-        #except Store.DoesNotExist: pass
-        if store == None: raise Http404()
+        if  len(store_path) > 0 and store_path[-1] == "/":
+            store_path = store_path[:-1]
+        store = get_object_or_404(Store, path=store_path)
         return view(*args, store=store, **kwargs)
         
     return store_wrapper
