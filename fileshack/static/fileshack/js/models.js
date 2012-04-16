@@ -245,7 +245,7 @@ var Watcher = new Class({
     Extends: Model,
     
     defaults: {
-	id: uuid(),
+	pk: 'email',
 	email: '',
 	digest: 'daily', // 'immediately', 'hourly', 'daily', 'weekly'.
 	last_notification: new Date(),
