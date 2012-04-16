@@ -19,7 +19,6 @@ body {
 #controls {
     float: right;
     margin: 12px 0;
-    position: relative;
 }
 
 #logout {

@@ -301,6 +301,10 @@ var Watch = new Class({
             transition: Fx.Transitions.Sine.easeOut,
             duration: 100
         });
+        
+        window.addEvent('resize', function() { this_.positionDialog(); });
+        this.positionDialog();
+        
         this.email.addEvent('change', function() { this_.render(); });
         this.email.addEvent('keyup', function() { this_.render(); });
         this.watchbtn.addEvent('click', function() {
@@ -327,6 +331,20 @@ var Watch = new Class({
             });
             watcher.model.save();
         });
+    },
+    
+    positionDialog: function() {
+        var display = this.dialog.getStyle('display');
+        var visibility = this.dialog.getStyle('visibility');
+        this.dialog.setStyle('visibility', 'hidden');
+        this.dialog.setStyle('display', 'block');
+        this.dialog.setStyle('left', this.watchbtn.getPosition().x +
+                                     this.watchbtn.getSize().x/2 -
+                                     this.dialog.getSize().x/2);
+        this.dialog.setStyle('top', this.watchbtn.getPosition().y +
+                                    this.watchbtn.getSize().y);
+        this.dialog.setStyle('display', display);
+        this.dialog.setStyle('visibility', visibility);
     },
     
     render: function() {
