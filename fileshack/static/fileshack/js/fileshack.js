@@ -86,7 +86,7 @@ var FileShack = new Class({
                     form.file.onchange = function() {
                         var item = this_.upload(form);
                         iframe.onload = function() {
-                            item.model.del();
+                            item.model.remove();
                             this_.update();
                         };
                     };
