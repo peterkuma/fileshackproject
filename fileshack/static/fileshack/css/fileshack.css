@@ -250,11 +250,11 @@ button::-moz-focus-inner {
 }
 
 .error,.info {
-    width: 780px;
+    width: 770px;
     height: 62px;
-    margin: 0 auto;
+    margin-left: -10px;
     background-repeat: no-repeat;
-    background-position: 7px center;
+    background-position: 4px center;
     position: relative;
     top: -20px;
     padding: 44px 35px 44px 35px;
@@ -290,10 +290,11 @@ button::-moz-focus-inner {
     width: 35px;
     height: 35px;
     padding: 0;
+    margin-right: -14px;
     border: none;
     box-shadow: none;
     -moz-box-shadow: none;
-    -wekkit-box-shadow: none;
+    -webkit-box-shadow: none;
     -o-box-shadow: none;
 }
 
