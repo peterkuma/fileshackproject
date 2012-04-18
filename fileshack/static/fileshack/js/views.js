@@ -126,7 +126,7 @@ var ItemView = new Class({
 	this.error_label.set('text', e.label);
 	if (e.message_html) this.error_message.set('html', e.message_html);
 	else this.error_message.set('text', e.message)
-	if (e.details) {
+	if (e.details && window.btoa) {
 	    this.error_details.setStyle('display', 'block');
 	    this.error_details.href = 'data:text/html;base64,' + window.btoa(e.details);
 	}

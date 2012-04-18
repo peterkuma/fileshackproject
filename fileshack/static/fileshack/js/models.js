@@ -72,26 +72,24 @@ var Item = new Class({
     },
     
     update: function(json) {
-	json.modified =  new Date().parse(json.modified);
-	json.uploaded = new Date().parse(json.uploaded);
-	json.created = new Date().parse(json.created);
-	
-	if (this.type == 'pending') {
-	    // Do not update status and size of pending items.
-	    json.status = this.status;
-	    json.size = this.size;
-	}
-	
-	if (json.status == 'READY')
+	if (this.type == 'pending')
+	    ; // Do nothing.
+	else if (json.status == 'READY')
 	    this.type = 'complete';
-	if (json.status == 'UPLOADING' && this.type != 'pending')
+	else if (json.status == 'UPLOADING')
 	    this.type = 'unfinished';
-	if (json.status == 'STALE')
+	else if (json.status == 'STALE')
 	    this.type = 'stale';
-	//this.parent(json);
+	
 	for (var attr in json) {
+	    if (this.type == 'pending' && (attr == 'status' || attr == 'size'))
+		continue;
 	    this[attr] = json[attr];
 	}
+	this.modified = new Date().parse(json.modified);
+	this.uploaded = new Date().parse(json.uploaded);
+	this.created = new Date().parse(json.created);
+	
 	this.fireEvent('change');
     },
     

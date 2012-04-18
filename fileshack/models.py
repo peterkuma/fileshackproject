@@ -49,12 +49,8 @@ class Store(Model):
         return url
         
     def total(self):
-        total = 0
-        for dirpath, dirnames, filenames in os.walk(os.path.join(settings.MEDIA_ROOT, "fileshack", self.media)):
-            for f in filenames:
-                fp = os.path.join(dirpath, f)
-                total += os.path.getsize(fp)
-        return total
+        if self.items.count() == 0: return 0
+        return self.items.all().aggregate(Sum("size"))["size__sum"]
 
 def item_upload_to(instance, filename):
     key = ""
@@ -64,7 +60,7 @@ def item_upload_to(instance, filename):
     return os.path.join(instance.store.media, key, filename)
 
 class Item(Model):
-    store = ForeignKey(Store, verbose_name=_("store"))
+    store = ForeignKey(Store, verbose_name=_("store"), related_name="items")
     fileobject = FileField(_("file"), upload_to=item_upload_to)
     created = DateTimeField(_("created"), auto_now_add=True)
     uploaded = DateTimeField(_("uploaded"), auto_now_add=True)

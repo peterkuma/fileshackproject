@@ -43,7 +43,6 @@ var FileShack = new Class({
         
         var dropbox = $('dropbox');
         var dropboxInput = $('dropbox-input');
-        var iframe = $('iframe');
         
         // Drag & Drop.
         if (typeof dropbox.addEventListener != 'undefined' &&
@@ -79,18 +78,7 @@ var FileShack = new Class({
                     dropboxInput.click();
                     window.setTimeout(function() { if (!clickDelegated) this_.fallback(); }, 100);
                 } else { // Fallback to upload by the iframe hack (IE).
-                    if (typeof iframe.contentDocument != 'undefined')
-                        var form = iframe.contentDocument.forms[0];
-                    else
-                        var form = iframe.getDocument().forms[0];
-                    form.file.onchange = function() {
-                        var item = this_.upload(form);
-                        iframe.onload = function() {
-                            item.model.remove();
-                            this_.update();
-                        };
-                    };
-                    form.file.click();
+                    this_.uploadIFrame();
                 }
             });
         }
@@ -195,7 +183,7 @@ var FileShack = new Class({
         });
         
         // If this is a File, ask the user about resume.
-        if (i && data instanceof File) {
+        if (i && typeof File != 'undefined' && data instanceof File) {
             var c = confirm('A stale file with the same name and size has been found.\nDo you want to resume uploading?');
             if (c) {
                 item = i;
@@ -239,6 +227,43 @@ var FileShack = new Class({
         }
         
         return item;
+    },
+    
+    uploadIFrame: function() {
+        var this_ = this;
+        var iframe = $('iframe');
+        var form = iframe.contentDocument.forms[0];
+        
+        form.file.onchange = function() {
+            var item = this_.upload(form);
+            iframe.onload = function() {
+                var responseText = iframe.contentDocument.body.innerHTML;
+                iframe.onload = null;
+                iframe.src = iframe.src;
+                try {
+		    var response = JSON.decode(responseText);
+		} catch(e) {
+		    item.onError({
+			label: 'Upload failed',
+			message: 'The server responded with an invalid message',
+			details: responseText
+		    });
+                    return;
+		}
+                item.model.update(response.item);
+                if (response.status != 'success') {
+                    item.onError({
+			label: response.error_label,
+			message: response.error_message,
+                        details: response.details
+                    });
+                    return;
+                }
+                item.model.set('type', 'complete');
+                item.model.update(response.item);
+            };
+        };
+        form.file.click();
     },
     
     removeStaleItems: function(validIds) {

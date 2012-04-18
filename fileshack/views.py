@@ -134,18 +134,44 @@ def index(request, store):
 @require_store
 @require_login
 def iframe(request, store):
-    if request.method == "POST" and request.FILES.has_key("file"):
-        f = request.FILES["file"]
-        item = Item()
-        item.store = store
-        item.fileobject.save(urllib.unquote(f.name), f)
-        item.size = f.size
-        item.size_total = f.size
-        item.save()
+    if request.method != "POST":
+        t = loader.get_template("fileshack/iframe.html")
+        c = RequestContext(request)
+        return HttpResponse(t.render(c))  
     
-    t = loader.get_template("fileshack/iframe.html")
-    c = RequestContext(request)
-    return HttpResponse(t.render(c))
+    if not request.FILES.has_key("file"):
+        return HttpResponseForbidden()
+    f = request.FILES["file"]
+    
+    item = Item()
+    item.fileobject.name = urllib.unquote(f.name)
+    item.store = store
+    item.size = f.size
+    item.size_total = f.size
+    
+    if store.item_limit and f.size > store.item_limit*1024*1024:
+        return HttpResponse(JSONEncoder().encode({
+            "status": "itemlimitreached",
+            "error_label": "Upload failed",
+            "error_message": "Item size is limited to %d MB" % store.item_limit,
+            "item": item.simple(),
+        }))
+
+    if store.store_limit and store.total() + f.size > store.store_limit*1024*1024:
+        return HttpResponse(JSONEncoder().encode({
+            "status": "storelimitreached",
+            "error_label": "Upload failed",
+            "error_message": "The store size limit of %d MB has been reached" % store.store_limit,
+            "item": item.simple(),
+        }))
+    
+    item.fileobject.save(urllib.unquote(f.name), f)
+    item.save()
+    
+    return HttpResponse(JSONEncoder().encode({
+        "status": "success",
+        "item": Item.objects.get(pk=item.pk).simple()
+    }))
 
 @never_cache
 @require_store
@@ -185,7 +211,7 @@ def upload(request, store, id):
         }
         return HttpResponseServerError(JSONEncoder().encode(data))
     
-    if store.store_limit and size_total and store.total() + size_total > store.store_limit*1024*1024:
+    if store.store_limit and size_total and store.total() + size_total - offset > store.store_limit*1024*1024:
         data = {
             "status": "storelimitreached",
             "error_label": "Upload failed",
