@@ -297,6 +297,13 @@ var Watch = new Class({
         this.submit = $$('#watch-dialog .new button[type="submit"]')[0];
         this.error = $('watch-error');
         
+        if (!this.form.checkValidity) {
+            this.form.checkValidity = function() {
+                var pattern  = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                return this.email.value.match(pattern);
+            }
+        }
+        
         var fx = new Fx.Reveal(this.dialog, {
             transition: Fx.Transitions.Sine.easeOut,
             duration: 100
@@ -326,6 +333,7 @@ var Watch = new Class({
             }));
             watcher.model.addEvent('save', function() {
                 this_.form.reset();
+                this_.submit.removeClass('active');
                 this_.error.hide();
                 this_.watchers.add(watcher);
             });
