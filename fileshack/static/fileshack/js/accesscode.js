@@ -4,11 +4,11 @@ document.addEvent('domready', function() {
     
     function update() {
         if (input.value != '') {
-            input.addClass('nonempty');
-            button.addClass('nonempty');
+            input.addClass('active');
+            button.addClass('active');
         } else {
-            input.removeClass('nonempty');
-            button.removeClass('nonempty');
+            input.removeClass('active');
+            button.removeClass('active');
         }
     }
 

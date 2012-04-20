@@ -13,10 +13,10 @@
     <body>
         <div id="container">
             <h1>{% trans "Welcome to fileshack," %} <span>{% trans "enter the access code" %}</span></h1>
-            <form method="post">
+            <form method="post" id="accesscode-form">
                 {% csrf_token %}
-                <input id="accesscode" type="password" name="accesscode" value="{{ accesscode|escape }}" />
                 <button id="ok" type="submit">{% trans "OK" %}</button>
+		<input id="accesscode" type="password" name="accesscode" value="{{ accesscode|escape }}" required="required" />
             </form>
             {% if error_label %}
                 <div id="error"><div class="label">{{ error_label }}</div><div class="message">{{ error_message }}</div></div>

@@ -112,7 +112,7 @@ def index(request, store):
                 c = RequestContext(request, {
                     "accesscode": accesscode,
                     "error_label": _("Wrong access code"),
-                    "error_message": _("Please try again."),
+                    "error_message": _("Please try again"),
                 })
                 return HttpResponse(t.render(c))
         else:
