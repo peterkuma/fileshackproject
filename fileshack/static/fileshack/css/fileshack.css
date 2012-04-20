@@ -80,7 +80,7 @@ body {
 }
 
 #watch-dialog .new {
-    padding: 10px 10px 5px 10px;
+    padding: 10px;
     background: #f8f8f8;
 }
 
@@ -92,30 +92,6 @@ body {
     float: right;
     border-radius: 3px;
     background: url("../img/button-watch-submit.png") no-repeat center center;
-}
-
-#watch-dialog .new label[for="digest"] {
-    display: block;
-    float: left;
-    margin: 8px 5px 0 0;
-    height: 18px;
-    padding-top: 2px;
-}
-
-#watch-dialog .new select[name="digest"] {
-    display: block;
-    margin: 8px 0 5px 0;
-    border: 1px solid #ccc;
-    background: white;
-    border-radius: 3px;
-    padding: 0 2px;
-    height: 20px;
-    font-size: inherit;
-    font-family: inherit;
-}
-
-#watch-dialog .new select[name="digest"]:focus {
-    outline: none;
 }
 
 #watch-dialog .new button[type="submit"].active {

@@ -28,7 +28,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.translation import ungettext_lazy as ungettext
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.http import Http404
 from django.conf import settings
 from django.core.servers.basehttp import FileWrapper
@@ -428,17 +428,15 @@ def watch(request, store):
     
     class WatcherForm(forms.Form):
         email = forms.EmailField(max_length=254)
-        digest = forms.CharField(max_length=50)
     
     f = WatcherForm(request.POST)
     if f.is_valid():
         try: u = User.objects.get(email__iexact=f.cleaned_data["email"])
         except User.DoesNotExist:
-            u = User(email=f.cleaned_data["email"])
+            u = User(email=f.cleaned_data["email"], last_notification=None)
             u.save()
         try: w = Watcher.objects.get(store=store, user=u)
         except Watcher.DoesNotExist: w = Watcher(store=store, user=u)
-        w.digest = f.cleaned_data["digest"]
         w.save()
         
         watchers = Watcher.objects.filter(store=store)
@@ -483,53 +481,41 @@ def unwatch(request, store):
     }))
 
 
-def digest(request, period="immediately"):
+def digest(request):
     url_prefix = "http://" + get_current_site(request).domain
+    now = datetime.datetime.now()
     
-    watchers = Watcher.objects.filter(store__allow_watch=True, digest=period)
+    watchers = Watcher.objects.filter(user__last_notification=None)
+    for store in Store.objects.filter(allow_watch=True):
+        since = now - datetime.timedelta(minutes=store.watch_delay)
+        watchers |= store.watchers.filter(user__last_notification__lt=since)
+    
     messages = {}
-    # For each user, collect information from all stores. If a user is watching
-    # several stores, he should get only one e-mail.
     for w in watchers:
         user = w.user
-        m = messages.get(user, "")
-        
-        if user.last_notification:
-            since = user.last_notification
-        else:
-            since = w.created
-        
+        text = messages.get(user, "")
+        since = user.last_notification or w.created
         nitems = Item.objects.filter(store=w.store, created__gt=since).count()
         if nitems == 0: continue
-        
-        # Preamble.
-        if not m and period != "immediately":
-            if user.last_notification:
-                m += ugettext("Since the last update:\r\n\r\n")
-            else:
-                m += ugettext("Since you started watching:\r\n\r\n")
-        
-        if period != "immediately": m += "* "
-        m += ungettext(
+        text += ungettext(
             "A new item has been uploaded to %(store_url)s.\r\n\r\n",
             "%(count)d items have been uploaded to %(store_url)s.\r\n\r\n",
             nitems) %  {
                 "count": nitems,
                 "store_url": url_prefix + w.store.get_absolute_url()
             }
-        
-        m += ugettext("Fileshack\r\n")
-        if settings.SECRET_KEY:
-            m += ugettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
-                "url": url_prefix + w.user.unsubscribe_url()
-            }
-        messages[user] = m
+        messages[user] = text
     
     for (user, text) in messages.iteritems():
+        text += ugettext("Fileshack\r\n")
+        if settings.SECRET_KEY:
+            text += ugettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
+                "url": url_prefix + user.unsubscribe_url()
+            }
         try:
             send_mail(_("Fileshack Update"), text, "no-reply@example.org",
                       [user.email])
-            user.last_notification = datetime.datetime.now()
+            user.last_notification = now
             user.save()
         except smtplib.SMTPException: pass
     
@@ -539,12 +525,23 @@ def digest(request, period="immediately"):
         len(messages)) % { "count": len(messages) })
 
 
-def unsubscribe(request, email, hmac):
-    u = get_object_or_404(User, email=email)
-    if u.unsubscribe_hmac != hmac:
-        return HttpResponseBadRequest()
-    u.unsubscribe()
-    return HttpResponse(_("You have been unsubscribed"))
+@require_GET
+def unsubscribe(request):
+    email = request.GET.get("u")
+    hmac = request.GET.get("hmac")
+    
+    try: u = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return render(request, "fileshack/unsubscribe.html",
+                      dict(result="doesnotexist"),
+                      status=404)
+    
+    if u.unsubscribe_hmac() != hmac:
+        return render(request, "fileshack/unsubscribe.html",
+                      dict(result="invalid"),
+                      status=403) # Forbidden.
+    u.delete()
+    return render(request, "fileshack/unsubscribe.html", dict(result="success"))
 
 
 def page_not_found(request):

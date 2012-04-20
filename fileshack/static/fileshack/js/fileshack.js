@@ -293,7 +293,6 @@ var Watch = new Class({
         this.dialog = $('watch-dialog');
         this.form = $$('#watch-dialog .new')[0];
         this.email = $$('#watch-dialog .new input[name="email"]')[0];
-        this.digest = $$('#watch-dialog .new select[name="digest"]')[0];
         this.submit = $$('#watch-dialog .new button[type="submit"]')[0];
         this.error = $('watch-error');
         
@@ -329,7 +328,6 @@ var Watch = new Class({
             if (!this_.form.checkValidity()) return;
             var watcher = new WatcherView(new Watcher({
                 email: this_.email.value,
-                digest: this_.digest.value
             }));
             watcher.model.addEvent('save', function() {
                 this_.form.reset();

@@ -247,7 +247,6 @@ var Watcher = new Class({
     defaults: {
 	pk: 'email',
 	email: '',
-	digest: 'daily', // 'immediately', 'hourly', 'daily', 'weekly'.
 	last_notification: new Date(),
 	created: new Date()
     },
@@ -260,7 +259,6 @@ var Watcher = new Class({
 	    headers: { 'X-CSRFToken': CSRF_TOKEN },
 	    data: {
 		email: this.email,
-		digest: this.digest
 	    },
 	    onSuccess: function(response) {
 		this_.update(response.watcher);

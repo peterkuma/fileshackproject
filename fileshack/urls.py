@@ -1,8 +1,8 @@
 from django.conf.urls.defaults import patterns, include, url
 
 urlpatterns = patterns('fileshack.views',
-    url(r'^digest/(?P<period>.*)/$', 'digest', name='digest'),
-    url(r'^unsubscribe/(?P<email>[^/]+)/(?P<hmac>[^/]+)/$', 'unsubscribe', name='unsubscribe'),
+    url(r'^digest/$', 'digest', name='digest'),
+    url(r'^unsubscribe/$', 'unsubscribe', name='unsubscribe'),
     url(r'^(?P<store_path>.*)logout/$', 'logout'),
     url(r'^(?P<store_path>.*)iframe/$', 'iframe'),
     url(r'^(?P<store_path>.*)upload/$', 'simple_upload'),
