@@ -126,5 +126,8 @@ INSTALLED_APPS = (
     'fileshack',
 )
 
+# Serve static and media files even when DEBUG == False.
+SERVE_STATIC = False
+
 # Override the settings with local modifications.
 from settings_local import *

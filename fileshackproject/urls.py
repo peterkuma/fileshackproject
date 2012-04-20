@@ -9,7 +9,7 @@ handler500 = 'fileshack.views.server_error'
 
 urlpatterns = patterns('')
 
-if settings.DEBUG:
+if settings.DEBUG or settings.SERVE_STATIC:
     urlpatterns += patterns('',
 	url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
 	url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
