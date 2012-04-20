@@ -30,6 +30,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import Http404
 from django.conf import settings
 from django.core.servers.basehttp import FileWrapper
+from django.views.decorators.http import require_POST, require_GET
 
 from datetime import datetime as dt
 import os
@@ -84,6 +85,7 @@ def require_login(view):
     return login_wrapper
 
 @require_store
+@require_POST
 def logout(request, store):
     try:
         request.session["fileshack_stores"].remove(store.id)

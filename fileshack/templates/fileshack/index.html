@@ -25,7 +25,8 @@
 {% block controls %}
     <div id="controls">
 	{% if store.accesscode %}
-	    <form action="logout/">
+	    <form action="logout/" method="post">
+		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
 		<button type="submit" class="logout">{% trans "Logout" %}</button>
 	    </form>
 	{% endif %}
