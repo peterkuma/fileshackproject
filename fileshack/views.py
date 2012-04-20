@@ -22,7 +22,6 @@ from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseNotFound, \
                         HttpResponseForbidden, HttpResponseRedirect, \
                         HttpResponseServerError, HttpResponseBadRequest
-from django.shortcuts import render_to_response
 from django.views.decorators.cache import never_cache
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
