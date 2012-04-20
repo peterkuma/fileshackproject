@@ -24,12 +24,14 @@
 			{% blocktrans with url=store.get_absolute_url %}
 			    Are you looking for <a href="{{ url }}">this store</a>?
 			{% endblocktrans %}
-		    {% elif stores_number > 0 %}
-			{% trans "Have you typed the correct URL?" %}
 		    {% else %}
-			{% blocktrans with url=admin_url %}
-			    Use the <a href="{{ url }}">admin interface</a> to add stores
-			{% endblocktrans %}
+			{% if stores_number > 0 %}
+			    {% trans "Have you typed the correct URL?" %}
+			{% else %}
+			    {% blocktrans with url=admin_url %}
+				Use the <a href="{{ url }}">admin interface</a> to add stores
+			    {% endblocktrans %}
+			{% endif %}
 		    {% endif %}
 		</div>
 	    </div>
