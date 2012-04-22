@@ -21,15 +21,13 @@ body {
     margin: 12px 0;
 }
 
-#logout {
+form[action="logout/"] {
     float: right;
+    margin: 0 0 0 10px;
 }
 
-#logoutbtn {
-    margin-left: 10px;
-}
-
-#logoutbtn:hover,#logoutbtn:focus {
+form[action="logout/"] button:hover,
+form[action="logout/"] button:focus {
     background-image: url("../img/button-lightblue.png");
     color: #003366;
 }
