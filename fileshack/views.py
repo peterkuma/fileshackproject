@@ -32,7 +32,10 @@ from django.conf import settings
 from django.core.servers.basehttp import FileWrapper
 from django.views.decorators.http import require_POST, require_GET
 
-from datetime import datetime as dt
+try: from django.utils import timezone
+except ImportError: from compat import timezone
+
+import datetime
 import os
 import json
 import urllib
@@ -52,7 +55,7 @@ class JSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.__init__(self, **defaults)
     
     def default(self, obj):
-        if isinstance(obj, dt):
+        if isinstance(obj, datetime.datetime):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
@@ -291,7 +294,7 @@ def upload(request, store, id):
         item.size_total = item.size
     
     if item.size >= item.size_total:
-        item.uploaded = dt.now()
+        item.uploaded = timezone.now()
     
     item.save()
     data = {
@@ -336,7 +339,7 @@ def update(request, store, since=None):
     since_dt = None
     if since != None:
         try:
-            since_dt = dt.strptime(since, "%Y-%m-%d_%H:%M:%S")
+            since_dt = datetime.datetime.strptime(since, "%Y-%m-%d_%H:%M:%S")
         except ValueError:
             pass
 
@@ -354,7 +357,7 @@ def update(request, store, since=None):
     
     dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime) else None
     data = JSONEncoder(sort_keys=True, indent=4).encode(dict(
-            time=dt.now().strftime("%Y-%m-%d_%H:%M:%S"),
+            time=timezone.now().strftime("%Y-%m-%d_%H:%M:%S"),
             item_ids=item_ids, items=items_simple))
     return HttpResponse(data)
 
