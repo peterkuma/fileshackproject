@@ -112,6 +112,7 @@ var FileShack = new Class({
     },
     
     update: function() {
+	var this_ = this;
         var xhr = new XMLHttpRequest();
         
         if (this.lastUpdate) xhr.open('GET', 'update/' + this.lastUpdate + '/');
@@ -133,7 +134,7 @@ var FileShack = new Class({
                         this_.items.add(view);
                     }
                 });
-                this.lastUpdate = json.time;
+                this_.lastUpdate = json.time;
             }
         };
         xhr.send();
