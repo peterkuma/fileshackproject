@@ -9,40 +9,38 @@ h1 {
     text-align: center;
 }
 
-form {
-    width: 550px;
+#accesscode-form {
     margin: 0 auto;
+    width: 525px;
 }
 
-input {
+#accesscode-form input[name="accesscode"] {
     width: 400px;
-    font-size: 20pt;
-    height: 40px;
-    border: 3px solid black;
+    height: 44px;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     -o-border-radius: 5px;
-    margin: 5px;
     padding: 6px;
-    float: left;
     border: 3px solid #dddddd;
+    font-size: 24pt;
 }
 
-input:hover,input:focus,input.nonempty {
+#accesscode-form input[name="accesscode"]:hover,
+#accesscode-form input[name="accesscode"]:focus,
+#accesscode-form input[name="accesscode"].active {
     border: 3px solid #2dacf8;
     background: url(../img/input-blue-tall.png);
     outline: none;
 }
 
-button {
-    font-size: 20pt;
-    float: left;
+#accesscode-form button[type="submit"] {
+    display: block;
+    float: right;
     width: 80px;
-    height: 58px;
-    margin: 5px;
+    height: 62px;
+    font-size: 20pt;
     color: #bbb;
-    font-weight: bold;
     border: 3px solid #dddddd;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -51,7 +49,7 @@ button {
     background: url("../img/button-lightsilver-tall.png") repeat-x;
 }
 
-button:hover,button:focus,button.nonempty {
+#accesscode-form button[type="submit"].active {
     color: black;
     border: 3px solid #0088cb;
     background: url(../img/button-blue-tall.png);
@@ -59,14 +57,12 @@ button:hover,button:focus,button.nonempty {
 }
 
 #error {
-    text-align: left;
     width: 600px;
     height: 162px;
-    position: relative;
-    top: -10px;
-    left: 100px;
-    clear: both;
+    margin: -8px auto 0 auto;
+    text-align: left;
     background: url(../img/error.png) no-repeat;
+    position: relative;
 }
 
 #error .label {
@@ -79,3 +75,4 @@ button:hover,button:focus,button.nonempty {
     color: #fdeeee;
     padding: 0 0 15px 30px;
 }
+

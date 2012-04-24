@@ -34,9 +34,9 @@ from google.appengine.ext import blobstore
 class Store(Model):
     path = CharField(_("path"), help_text=_("Path relative to the base URL under which the store is accessible. Leave empty if not sure."), unique=True, blank=True, max_length=200)
     media = CharField(_("media"), help_text=_("Directiory under MEDIA_PATH into which files will be uploaded. Leave empty if not sure."), blank=True, max_length=200)
-    accesscode = CharField(_("access code"), help_text=_("Protect access to the store by an access code."), max_length=200)
-    item_limit = IntegerField(_("item size limit"), help_text=_("Limit the size of a single file."), default=0)
-    store_limit = IntegerField(_("store size limit"), help_text=_("Limit the size of the entire store."), default=0)
+    accesscode = CharField(_("access code"), help_text=_("Protect access to the store by an access code."), max_length=200, blank=True)
+    item_limit = IntegerField(_("item size limit"), help_text=_("Limit the size of a single file (MB)."), default=0)
+    store_limit = IntegerField(_("store size limit"), help_text=_("Limit the size of the entire store (MB)."), default=0)
     protect_files = BooleanField(_("protect files"), help_text=_("Protect files by a random string, so that they cannot be downloaded by guessing their name."), default=True)
     
     def __unicode__(self):
@@ -51,12 +51,8 @@ class Store(Model):
         return url
         
     def total(self):
-        total = 0
-        for dirpath, dirnames, filenames in os.walk(os.path.join(settings.MEDIA_ROOT, "fileshack", self.media)):
-            for f in filenames:
-                fp = os.path.join(dirpath, f)
-                total += os.path.getsize(fp)
-        return total
+        if self.items.count() == 0: return 0
+        return self.items.all().aggregate(Sum("size"))["size__sum"]
 
 def item_upload_to(instance, filename):
     key = ""
@@ -66,7 +62,7 @@ def item_upload_to(instance, filename):
     return os.path.join(instance.store.media, key, filename)
 
 class Item(Model):
-    store = ForeignKey(Store, verbose_name=_("store"))
+    store = ForeignKey(Store, verbose_name=_("store"), related_name="items")
     fileobject = CharField(max_length=100, blank=True)
     created = DateTimeField(_("created"), auto_now_add=True)
     uploaded = DateTimeField(_("uploaded"), auto_now_add=True)

@@ -1,11 +1,8 @@
 #error {
+    margin: -40px auto 0 auto;
     text-align: left;
     width: 600px;
     height: 162px;
-    position: relative;
-    top: -40px;
-    left: 20px;
-    clear: both;
     background: url(../img/error.png) no-repeat;
 }
 

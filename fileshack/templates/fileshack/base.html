@@ -1,0 +1,19 @@
+{% load staticfiles %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}Fileshack{% endblock %}</title>
+	<link rel="stylesheet" type="text/css" href="{% static "fileshack/css/base.css" %}" />
+	{% block extrahead %}{% endblock %}
+    </head>
+    <body>
+        <div id="container">
+	    {% block controls %}{% endblock %}
+            {% block header %}
+		<h1>{% trans "Welcome to fileshack" %}, <span>{% trans "drop your items" %}</span></h1>
+	    {% endblock %}
+	    {% block content %}{% endblock %}
+	</div>
+    </body>
+</html>

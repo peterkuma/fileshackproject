@@ -11,6 +11,9 @@
 #STATIC_ROOT = '/var/www/fileshackproject/static/'
 #STATIC_URL = '/static/'
 
+# Serve static and media files even when DEBUG == False.
+#SERVE_STATIC = True
+
 # Use python -c 'from random import choice; print "".join([choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])'
 # to generate a unique SECRET_KEY.
 #SECRET_KEY = ''
