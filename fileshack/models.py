@@ -39,8 +39,8 @@ class Store(Model):
     item_limit = IntegerField(_("item size limit"), help_text=_("Limit the size of a single file (MB)."), default=0)
     store_limit = IntegerField(_("store size limit"), help_text=_("Limit the size of the entire store (MB)."), default=0)
     protect_files = BooleanField(_("protect files"), help_text=_("Protect files by a random string, so that they cannot be downloaded by guessing their name."), default=True)
-    allow_watch = BooleanField(_("allow watch"), help_text=_("Allow users to subscribe to receive e-mail updates."), default=True)
-    watch_delay = PositiveIntegerField(_("watch delay"), help_text=_("Minimum delay between two notifications in minutes."), default=360)
+    allow_watch = BooleanField(_("allow watch"), help_text=_('Allow users to subscribe to receive e-mail updates. Requires cron (see <a href="http://fileshack.sourceforge.net/doc/#store-watching">documentation</a>).'), default=False)
+    watch_delay = PositiveIntegerField(_("watch delay"), help_text=_("Minimum delay between two notifications in minutes. Only applies when Allow watch is enabled."), default=360)
     
     def __unicode__(self):
         url = self.get_absolute_url()
