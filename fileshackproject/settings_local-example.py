@@ -25,6 +25,13 @@
 # Serve static and media files even when DEBUG == False.
 #SERVE_STATIC = True
 
+# List of hosts which are allowed to run scheduled tasks.
+#FILESHACK_CRON_HOSTS = ('127.0.0.1',)
+
+# Shared secret for running scheduled tasks from hosts not listed
+# in FILESHACK_CRON_HOSTS.
+#FILESHACK_CRON_SECRET = ''
+
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #EMAIL_HOST = 'localhost'
 #EMAIL_HOST_PASSWORD = ''

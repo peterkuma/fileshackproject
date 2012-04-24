@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 
 urlpatterns = patterns('fileshack.views',
-    url(r'^digest/$', 'digest', name='digest'),
+    url(r'^cron/$', 'cron', name='cron'),
     url(r'^unsubscribe/$', 'unsubscribe', name='unsubscribe'),
     url(r'^(?P<store_path>.*)logout/$', 'logout'),
     url(r'^(?P<store_path>.*)iframe/$', 'iframe'),

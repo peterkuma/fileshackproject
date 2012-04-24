@@ -129,6 +129,13 @@ INSTALLED_APPS = (
 # Serve static and media files even when DEBUG == False.
 SERVE_STATIC = False
 
+# List of hosts which are allowed to run scheduled tasks.
+FILESHACK_CRON_HOSTS = ('127.0.0.1',)
+
+# Shared secret for running scheduled tasks from hosts not listed
+# in FILESHACK_CRON_HOSTS.
+FILESHACK_CRON_SECRET = ''
+
 FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
 # Override the settings with local modifications.

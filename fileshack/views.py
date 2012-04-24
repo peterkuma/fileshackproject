@@ -24,6 +24,7 @@ from django.http import HttpResponse, HttpResponseNotFound, \
                         HttpResponseServerError, HttpResponseBadRequest, \
                         HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.translation import ungettext_lazy as ungettext
 from django.core.files.base import ContentFile
@@ -48,6 +49,7 @@ import mimetypes
 import time
 import binascii
 import smtplib
+import socket
 
 from models import *
 
@@ -481,9 +483,36 @@ def unwatch(request, store):
     }))
 
 
+@csrf_exempt
+def cron(request):
+    ok = False
+    
+    # Shared secret authentication.
+    secret = request.POST.get("secret")
+    if settings.FILESHACK_CRON_SECRET and \
+       settings.FILESHACK_CRON_SECRET == secret:
+        ok = True
+    
+    # Host-based authentication.
+    for host in settings.FILESHACK_CRON_HOSTS:
+        try: sockinfos = socket.getaddrinfo(host, None)
+        except socket.gaierror: sockinfos = []
+        ips = [sockinfo[4][0] for sockinfo in sockinfos]
+        if request.META["REMOTE_ADDR"] in ips:
+            ok = True
+            break
+    
+    if not ok: return HttpResponseForbidden(ugettext("Permission denied\n"))
+    
+    output = ugettext("Cron started at %s\n" % \
+                      timezone.now().strftime("%H:%M %Z, %d %b %Y"))
+    output += "digest: " + digest(request)
+    return HttpResponse(output)
+
+
 def digest(request):
     url_prefix = "http://" + get_current_site(request).domain
-    now = datetime.datetime.now()
+    now = timezone.now()
     
     watchers = Watcher.objects.filter(user__last_notification=None)
     for store in Store.objects.filter(allow_watch=True):
@@ -519,10 +548,10 @@ def digest(request):
             user.save()
         except smtplib.SMTPException: pass
     
-    return HttpResponse(ungettext(
-        "A digest has been sent to %(count)d person.",
-        "A digest has been sent to %(count)d people.",
-        len(messages)) % { "count": len(messages) })
+    return ungettext(
+        "A digest has been sent to %(count)d person.\n",
+        "A digest has been sent to %(count)d people.\n",
+        len(messages)) % { "count": len(messages) }
 
 
 @require_GET
