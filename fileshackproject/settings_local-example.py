@@ -26,7 +26,7 @@
 #SERVE_STATIC = True
 
 # List of hosts which are allowed to run scheduled tasks.
-#FILESHACK_CRON_HOSTS = ('127.0.0.1',)
+#FILESHACK_CRON_HOSTS = ('localhost',)
 
 # Shared secret for running scheduled tasks from hosts not listed
 # in FILESHACK_CRON_HOSTS.
