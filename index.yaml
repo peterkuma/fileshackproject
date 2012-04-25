@@ -26,6 +26,11 @@ indexes:
   - name: store_id
   - name: created
 
+- kind: fileshack_item
+  properties:
+  - name: store_id
+  - name: modified
+
 - kind: fileshack_store
   properties:
   - name: __key__

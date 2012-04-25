@@ -173,7 +173,6 @@ def iframe(request, store):
             "item": item.simple(),
         }))
     
-    item.fileobject.save(urllib.unquote(f.name), f)
     item.save()
     
     return HttpResponse(JSONEncoder().encode({
@@ -393,7 +392,7 @@ def update(request, store, since=None):
     item_ids = [item.id for item in all_items]
 
     if since_dt != None:
-        items = Item.objects.filter(store=store, modified__gt=since_dt)
+        items = Item.objects.filter(store=store, modified__gt=since_dt).order_by("modified")
     else:
         items = all_items
 

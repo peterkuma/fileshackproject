@@ -51,8 +51,10 @@ class Store(Model):
         return url
         
     def total(self):
-        if self.items.count() == 0: return 0
-        return self.items.all().aggregate(Sum("size"))["size__sum"]
+        size = 0
+        for item in self.items.all():
+            size += item.size
+        return size
 
 def item_upload_to(instance, filename):
     key = ""
@@ -86,7 +88,7 @@ class Item(Model):
         return self.fileobject and default_storage.exists(self.fileobject.path)
 
     def get_absolute_url(self):
-        if self.status() == "READY":
+        if self.id and self.status() == "READY":
             return reverse("fileshack:download",  kwargs={
                 "store_path": "" if self.store.path == "" else self.store.path+"/",
                 "item_id": self.id,
