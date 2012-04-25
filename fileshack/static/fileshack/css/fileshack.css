@@ -78,7 +78,7 @@ form[action="logout/"] button:focus {
 }
 
 #watch-dialog .new {
-    padding: 10px;
+    padding: 10px 8px;
     background: #f8f8f8;
 }
 
@@ -101,7 +101,7 @@ form[action="logout/"] button:focus {
     display: block;
     border: 1px solid rgba(0,0,0,0.2);
     border-radius: 3px;
-    width: 195px;
+    width: 198px;
     height: 20px;
     padding: 2px 5px 0px 5px;
     background-repeat: repeat-x;
@@ -129,7 +129,7 @@ form[action="logout/"] button:focus {
 }
 
 #watch-dialog .watcher {
-    padding: 10px 14px;
+    padding: 10px 10px 10px 12px;
     border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
