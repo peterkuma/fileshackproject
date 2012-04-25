@@ -500,7 +500,7 @@ def cron(request):
     
     output = ugettext("Cron started at %s\n" % \
                       timezone.now().strftime("%H:%M %Z, %d %b %Y"))
-    output += "digest: " + digest(request)
+    output += "digest: " + digest(request) + "\n"
     return HttpResponse(output)
 
 
@@ -540,11 +540,12 @@ def digest(request):
                       [user.email])
             user.last_notification = now
             user.save()
-        except smtplib.SMTPException: pass
+        except (smtplib.SMTPException, socket.error), e:
+            return u"send_mail: %s" % e.strerror
     
     return ungettext(
-        "A digest has been sent to %(count)d person.\n",
-        "A digest has been sent to %(count)d people.\n",
+        "A digest has been sent to %(count)d person.",
+        "A digest has been sent to %(count)d people.",
         len(messages)) % { "count": len(messages) }
 
 
