@@ -39,6 +39,7 @@
 #EMAIL_PORT = 25
 #EMAIL_USE_TLS = True
 
+# E-mail address from which notifications are sent.
 #FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
 # Fileshack: Be sure to fill in a unique SECRET_KEY. Otherwise recipients
