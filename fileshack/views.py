@@ -307,12 +307,6 @@ def upload(request, store, id):
     
     if item.size >= item.size_total:
         item.uploaded = timezone.now()
-        
-    # Notify watchers. This could potentially block. It may be a good idea
-    # to allow for alternatives such as an asynchronous send_mail
-    # (django snippets) or celery.
-    if item.status() == "READY":
-        digest(request)
     
     item.save()
     data = {
