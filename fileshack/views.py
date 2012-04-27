@@ -541,7 +541,7 @@ def digest(request):
             user.last_notification = now
             user.save()
         except (smtplib.SMTPException, socket.error), e:
-            return u"send_mail: %s" % e.strerror
+            return u"send_mail: %s: %s" % (e.__class__.__name__, e)
     
     return ungettext(
         "A digest has been sent to %(count)d person.",
