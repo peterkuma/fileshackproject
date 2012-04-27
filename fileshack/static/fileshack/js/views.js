@@ -141,3 +141,40 @@ var ItemView = new Class({
 	return this.error.getStyle('display') == 'block';
     }
 });
+
+var WatcherView = new Class({
+    Extends: View,
+    
+    template: 'watcher-template',
+    attributes: ['email', 'deletebtn'],
+    
+    initialize: function(model) {
+	this.parent(model);
+	var this_ = this;
+	this.deletebtn.addEvent('click', function() {
+	    this_.model.del();
+	});
+	this.model.addEvent('error', function(e) { this_.onError(e); });
+    },
+    
+    render: function() {
+	this.email.set('text', this.model.email);
+    },
+    
+    onError: function(e) {
+	var label = $$('#watch-error .label')[0];
+        var message = $$('#watch-error .message')[0];
+        var details = $$('#watch-error .details')[0];
+	
+	if (e.label) label.set('text', e.label+'.');
+	if (e.message_html)
+	    message.set('html', e.message_html);
+	else
+	    message.set('text', e.message);
+	if (e.details) {
+	    details.href = 'data:text/html;base64,' + window.btoa(e.details);
+	    details.show();
+	}
+	$('watch-error').show();
+    }
+});

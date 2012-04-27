@@ -22,6 +22,10 @@
 
 var Model = new Class({
     Implements: Events,
+    
+    defaults: {
+	pk: 'id'
+    },
 
     initialize: function(attributes) {
         for (var attr in this.defaults) {
@@ -237,5 +241,76 @@ var Item = new Class({
 	this.xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
 	if (this.xhr.sendAsBinary) this.xhr.sendAsBinary(body);
 	else this.xhr.send(body);
+    }
+});
+
+var Watcher = new Class({
+    Extends: Model,
+    
+    defaults: {
+	pk: 'email',
+	email: '',
+	last_notification: new Date(),
+	created: new Date()
+    },
+    
+    save: function() {
+	var this_ = this;
+	
+	var req = new Request.JSON({
+	    url: 'watch/',
+	    headers: { 'X-CSRFToken': CSRF_TOKEN },
+	    data: {
+		email: this.email,
+	    },
+	    onSuccess: function(response) {
+		this_.update(response.watcher);
+		this_.fireEvent('save');
+	    },
+	    onFailure: function(xhr) {
+		if (xhr.status == 403) {
+		    this_.fireEvent('error', {
+			label: 'Session expired',
+			message_html: 'Please <a href="javascript:location.reload(true)">log in again</a>'
+		    });
+		} else {
+		    try {
+			var response = JSON.decode(xhr.responseText);
+			this_.fireEvent('error', response);
+		    } catch(e) {
+			this_.fireEvent('error', {
+			    message: xhr.statusText,
+			    details: xhr.responseText
+			});
+		    }
+		}
+	    }
+	});
+	req.send();
+    },
+    
+    del: function() {
+	var this_ = this;
+	var req = new Request.JSON({
+	    url: 'unwatch/',
+	    headers: { 'X-CSRFToken': CSRF_TOKEN },
+	    data: { email: this.email },
+	    onSuccess: function() {
+		this_.remove();
+	    },
+	    onFailure: function(xhr) {
+		if (xhr.status == 403) {
+		    this_.fireEvent('error', {
+			label: 'Session expired',
+			message_html: 'Please <a href="javascript:location.reload(true)">log in again</a>'
+		    });
+		} else {
+		    this_.fireEvent('error', {
+			message: xhr.statusText,
+			details: xhr.responseText
+		    });
+		}
+	    }
+	}).send();
     }
 });

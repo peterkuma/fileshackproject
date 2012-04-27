@@ -35,7 +35,7 @@ TIME_ZONE = None
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-#SITE_ID = 1
+SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -117,7 +117,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    #'django.contrib.sites',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
@@ -133,6 +133,15 @@ INSTALLED_APPS = (
 # This test runner captures stdout and associates tracebacks with their
 # corresponding output. Helps a lot with print-debugging.
 TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'
+
+# List of hosts which are allowed to run scheduled tasks.
+FILESHACK_CRON_HOSTS = ('localhost',)
+
+# Shared secret for running scheduled tasks from hosts not listed
+# in FILESHACK_CRON_HOSTS.
+FILESHACK_CRON_SECRET = ''
+
+FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
 # Override the settings with local modifications.
 from settings_local import *

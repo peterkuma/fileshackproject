@@ -28,6 +28,9 @@ import os
 from random import choice
 from datetime import datetime as dt
 from datetime import timedelta
+import base64
+import hashlib, hmac
+import urllib
 
 from google.appengine.ext import blobstore
 
@@ -38,6 +41,8 @@ class Store(Model):
     item_limit = IntegerField(_("item size limit"), help_text=_("Limit the size of a single file (MB)."), default=0)
     store_limit = IntegerField(_("store size limit"), help_text=_("Limit the size of the entire store (MB)."), default=0)
     protect_files = BooleanField(_("protect files"), help_text=_("Protect files by a random string, so that they cannot be downloaded by guessing their name."), default=True)
+    allow_watch = BooleanField(_("allow watch"), help_text=_('Allow users to subscribe to receive e-mail updates. Requires cron (see <a href="http://fileshack.sourceforge.net/doc/#store-watching">documentation</a>).'), default=False)
+    watch_delay = PositiveIntegerField(_("watch delay"), help_text=_("Minimum delay between two notifications in minutes. Only applies when <strong>Allow watch</strong> is enabled."), default=360)
     
     def __unicode__(self):
         url = self.get_absolute_url()
@@ -129,5 +134,46 @@ class Item(Model):
         return self.name()
 
     class Meta:
-        ordering = ('created'),
+        ordering = [('created')]
 
+class User(Model):
+    email = EmailField(_("e-mail"), max_length=254, unique=True)
+    created = DateTimeField(_("created"), auto_now_add=True)
+    modified = DateTimeField(_("modified"), auto_now=True)
+    last_notification = DateTimeField(_("last notification"), null=True, blank=True)
+
+    def unsubscribe_hmac(self):
+        h = hmac.HMAC(settings.SECRET_KEY)
+        h.update("unsubscribe:"+self.email)
+        return base64.urlsafe_b64encode(h.digest())
+
+    def unsubscribe_url(self):
+        return reverse("fileshack:unsubscribe") + "?" + urllib.urlencode(
+            {"u": self.email, "hmac": self.unsubscribe_hmac()}
+        )
+
+    class Meta:
+        verbose_name = _("user")
+        verbose_name_plural = ("users")
+        ordering = [("created")]
+
+
+class Watcher(Model):
+    user = ForeignKey(User, verbose_name=_("user"), related_name="watchers")
+    store = ForeignKey(Store, verbose_name=_("store"), related_name="watchers")
+    created = DateTimeField(_("created"), auto_now_add=True)
+    modified = DateTimeField(_("modified"), auto_now=True)
+    
+    def simple(self):
+        return {
+            "id": self.id,
+            "email": self.user.email,
+            "last_notification": self.user.last_notification,
+            "created": self.created,
+        }
+    
+    class Meta:
+        verbose_name = _("watcher")
+        verbose_name_plural = _("watchers")
+        ordering = [("created")]
+        unique_together = ("user", "store")

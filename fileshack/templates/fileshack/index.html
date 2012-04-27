@@ -27,8 +27,32 @@
 	{% if store.accesscode %}
 	    <form action="logout/" method="post">
 		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
-		<button type="submit" class="logout">{% trans "Logout" %}</button>
+		<button type="submit">{% trans "Logout" %}</button>
 	    </form>
+	{% endif %}
+	{% if store.allow_watch %}
+	    <button type="button" id="watchbtn">{% trans "Watch" %}</button>
+	    <div id="watch-dialog" style="display: none">
+		<div class="top"></div>
+		<div class="dialog">
+		    <form class="new">
+			    <button type="submit" title="{% trans "Watch" %}"></button>
+			    <input type="email" required="required" spellcheck="false" name="email" placeholder="user@example.org" />
+		    </form>
+		    <div id="watch-error" style="display: none">
+			<a class="details" style="display: none">{% trans "Details" %}</a>
+			<span class="label"></span>
+			<span class="message"></span>
+		    </div>
+		    <div id="watch-list"></div>
+		    <div class="templates" style="display: none">
+			<div class="watcher" id="watcher-template">
+			    <button type="button" class="deletebtn"></button>
+			    <div class="email"></div>
+			</div>
+		    </div>
+		</div>
+	    </div>
 	{% endif %}
     </div>
 {% endblock %}
@@ -46,7 +70,7 @@
 	</form>
 	<div id="list">
 	    <div id="bootstrap" style="display: none">
-		{{ items_json|escape }}
+		{{ bootstrap|escape }}
 	    </div>
 	    <div id="templates" style="display: none">
 		<div id="item-template" class="item">

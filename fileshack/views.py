@@ -21,16 +21,22 @@
 from django.template import Context, RequestContext, loader
 from django.http import HttpResponse, HttpResponseNotFound, \
                         HttpResponseForbidden, HttpResponseRedirect, \
-                        HttpResponseServerError, HttpResponseBadRequest
+                        HttpResponseServerError, HttpResponseBadRequest, \
+                        HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
-from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ungettext_lazy as ungettext
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.http import Http404
 from django.conf import settings
 from django.core.servers.basehttp import FileWrapper
+from django import forms
 from django.views.decorators.http import require_POST, require_GET
+from django.core.mail import send_mail
+from django.contrib.sites.models import get_current_site
 
 try: from django.utils import timezone
 except ImportError: from compat import timezone
@@ -42,6 +48,8 @@ import urllib
 import mimetypes
 import time
 import binascii
+import smtplib
+import socket
 
 from google.appengine.api import files
 from google.appengine.ext import blobstore
@@ -129,13 +137,17 @@ def index(request, store):
             c = RequestContext(request)
             return HttpResponse(t.render(c))
         
-    items = Item.objects.filter(store=store)    
+    items = Item.objects.filter(store=store)
+    watchers = Watcher.objects.filter(store=store)
     t = loader.get_template("fileshack/index.html")
     c = RequestContext(request, {
         "store": store,
         "items": items,
         "item_size_limit": store.item_limit,
-        "items_json": JSONEncoder().encode([i.simple() for i in items])
+        "bootstrap": JSONEncoder().encode({
+            "items": [i.simple() for i in items],
+            "watchers": [w.simple() for w in watchers],
+        }),
     })
     return HttpResponse(t.render(c))
 
@@ -442,6 +454,159 @@ def download(request, store, item_id):
     response["Content-Type"] = "application/octet-stream"
     response["Content-Disposition"] =  'form-data; name="file"; filename="%s"' % blobstore.BlobInfo.get(item.fileobject).filename
     return response
+
+
+@require_store
+@require_login
+@require_POST
+def watch(request, store):
+    if not store.allow_watch:
+        return HttpResponseNotAllowed()
+    
+    class WatcherForm(forms.Form):
+        email = forms.EmailField(max_length=254)
+    
+    f = WatcherForm(request.POST)
+    if f.is_valid():
+        try: u = User.objects.get(email__iexact=f.cleaned_data["email"])
+        except User.DoesNotExist:
+            u = User(email=f.cleaned_data["email"], last_notification=None)
+            u.save()
+        try: w = Watcher.objects.get(store=store, user=u)
+        except Watcher.DoesNotExist: w = Watcher(store=store, user=u)
+        w.save()
+        
+        watchers = Watcher.objects.filter(store=store)
+        return HttpResponse(JSONEncoder().encode({
+            "status": "success",
+            "watcher": w.simple(),
+            "watchers": [w.simple() for w in watchers],
+        }))
+    else:
+        return HttpResponseBadRequest(JSONEncoder().encode({
+            "status": "error",
+            "message": f["email"].errors if f["email"].errors else "Validation Error", 
+        }))
+    
+    if request.method != "POST" or not request.POST.has_key("email"):
+        return HttpResponseBadRequest()
+
+
+@require_store
+@require_login
+@require_POST
+def unwatch(request, store):
+    if not store.allow_watch:
+        return HttpResponseNotAllowed()
+    
+    if not request.POST.has_key("email"):
+        return HttpResponseBadRequest()
+        
+    email = request.POST["email"]
+ 
+    watchers = Watcher.objects.filter(store=store, user__email__iexact=email)
+    for w in watchers:
+        w.delete()
+    
+    # Delete user who are not watching any store.
+    User.objects.annotate(n_watchers=Count("watchers")).filter(n_watchers=0).delete()
+    
+    watchers = Watcher.objects.filter(store=store)
+    return HttpResponse(JSONEncoder().encode({
+        "status": "success",
+        "watchers": [w.simple() for w in watchers],
+    }))
+
+
+@csrf_exempt
+def cron(request):
+    ok = False
+    
+    # Shared secret authentication.
+    secret = request.POST.get("secret")
+    if settings.FILESHACK_CRON_SECRET and \
+       settings.FILESHACK_CRON_SECRET == secret:
+        ok = True
+    
+    # Host-based authentication.
+    for host in settings.FILESHACK_CRON_HOSTS:
+        try: sockinfos = socket.getaddrinfo(host, None)
+        except socket.gaierror: sockinfos = []
+        ips = [sockinfo[4][0] for sockinfo in sockinfos]
+        if request.META["REMOTE_ADDR"] in ips:
+            ok = True
+            break
+    
+    if not ok: return HttpResponseForbidden(ugettext("Permission denied\n"))
+    
+    output = ugettext("Cron started at %s\n" % \
+                      timezone.now().strftime("%H:%M %Z, %d %b %Y"))
+    output += "digest: " + digest(request) + "\n"
+    return HttpResponse(output)
+
+
+def digest(request):
+    url_prefix = "http://" + get_current_site(request).domain
+    now = timezone.now()
+    
+    watchers = Watcher.objects.filter(user__last_notification=None)
+    for store in Store.objects.filter(allow_watch=True):
+        since = now - datetime.timedelta(minutes=store.watch_delay)
+        watchers |= store.watchers.filter(user__last_notification__lt=since)
+    
+    messages = {}
+    for w in watchers:
+        user = w.user
+        text = messages.get(user, "")
+        since = user.last_notification or w.created
+        nitems = Item.objects.filter(store=w.store, created__gt=since).count()
+        if nitems == 0: continue
+        text += ungettext(
+            "A new item has been uploaded to %(store_url)s.\r\n\r\n",
+            "%(count)d items have been uploaded to %(store_url)s.\r\n\r\n",
+            nitems) %  {
+                "count": nitems,
+                "store_url": url_prefix + w.store.get_absolute_url()
+            }
+        messages[user] = text
+    
+    for (user, text) in messages.iteritems():
+        text += ugettext("Fileshack\r\n")
+        if settings.SECRET_KEY:
+            text += ugettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
+                "url": url_prefix + user.unsubscribe_url()
+            }
+        try:
+            send_mail(_("Fileshack Update"), text, settings.FILESHACK_EMAIL_FROM,
+                      [user.email])
+            user.last_notification = now
+            user.save()
+        except (smtplib.SMTPException, socket.error), e:
+            return u"send_mail: %s: %s" % (e.__class__.__name__, e)
+    
+    return ungettext(
+        "A digest has been sent to %(count)d person.",
+        "A digest has been sent to %(count)d people.",
+        len(messages)) % { "count": len(messages) }
+
+
+@require_GET
+def unsubscribe(request):
+    email = request.GET.get("u")
+    hmac = request.GET.get("hmac")
+    
+    try: u = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return render(request, "fileshack/unsubscribe.html",
+                      dict(result="doesnotexist"),
+                      status=404)
+    
+    if u.unsubscribe_hmac() != hmac:
+        return render(request, "fileshack/unsubscribe.html",
+                      dict(result="invalid"),
+                      status=403) # Forbidden.
+    u.delete()
+    return render(request, "fileshack/unsubscribe.html", dict(result="success"))
 
 
 def page_not_found(request):

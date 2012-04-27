@@ -38,8 +38,8 @@ var FileShack = new Class({
             $('list').insertBefore(view.el, $('list').firstChild);
         });
         
-        // Bootstrap items from JSON embedded in index.html.
-        this.bootstrap($('bootstrap').get('text'))
+        var bootstrap = JSON.decode($('bootstrap').get('text'));
+        this.bootstrap(bootstrap.items);
         
         var dropbox = $('dropbox');
         var dropboxInput = $('dropbox-input');
@@ -92,11 +92,16 @@ var FileShack = new Class({
         //window.setInterval(function() { this_.update() }, this.options.updateInterval);
         window.uuid = uuid();
         //this.update();
+        
+        if ($('watchbtn')) {
+            // Watch dialog.
+            watch = new Watch();
+            watch.bootstrap(bootstrap.watchers);
+        }
     },
     
-    bootstrap: function(json) {
+    bootstrap: function(items) {
         var this_ = this;
-        items = JSON.decode(json);
         Array.each(items, function(item) {
             var view = new ItemView(new Item());
             view.model.update(item);
@@ -273,6 +278,94 @@ var FileShack = new Class({
         Object.each(this.items.all(), function(item) {
             if (item.model.type != 'pending' && !validIds.contains(item.model.id))
                 item.model.remove();
+        });
+    }
+});
+
+var Watch = new Class({
+    initialize: function() {
+        var this_ = this;
+        
+        this.watchers = new Collection();
+        this.watchers.addEvent('add', function(view) {
+            $('watch-list').appendChild(view.el);
+        });
+        
+        this.watchbtn = $('watchbtn');
+        this.dialog = $('watch-dialog');
+        this.form = $$('#watch-dialog .new')[0];
+        this.email = $$('#watch-dialog .new input[name="email"]')[0];
+        this.submit = $$('#watch-dialog .new button[type="submit"]')[0];
+        this.error = $('watch-error');
+        
+        if (!this.form.checkValidity) {
+            this.form.checkValidity = function() {
+                var pattern  = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                return this.email.value.match(pattern);
+            }
+        }
+        
+        var fx = new Fx.Reveal(this.dialog, {
+            transition: Fx.Transitions.Sine.easeOut,
+            duration: 100
+        });
+        
+        window.addEvent('resize', function() { this_.positionDialog(); });
+        this.positionDialog();
+        
+        this.email.addEvent('change', function() { this_.render(); });
+        this.email.addEvent('keyup', function() { this_.render(); });
+        this.watchbtn.addEvent('click', function() {
+            if (this_.watchbtn.hasClass('active')) {
+                this_.watchbtn.removeClass('active');
+                this_.form.reset();
+                this_.error.hide();
+            } else {
+                this_.watchbtn.addClass('active');
+            }
+            fx.toggle();
+        });
+        this.submit.addEvent('click', function(e) {
+            if (e.preventDefault) e.preventDefault();
+            if (!this_.form.checkValidity()) return;
+            var watcher = new WatcherView(new Watcher({
+                email: this_.email.value,
+            }));
+            watcher.model.addEvent('save', function() {
+                this_.form.reset();
+                this_.submit.removeClass('active');
+                this_.error.hide();
+                this_.watchers.add(watcher);
+            });
+            watcher.model.save();
+        });
+    },
+    
+    positionDialog: function() {
+        var display = this.dialog.getStyle('display');
+        var visibility = this.dialog.getStyle('visibility');
+        this.dialog.setStyle('visibility', 'hidden');
+        this.dialog.setStyle('display', 'block');
+        this.dialog.setStyle('left', this.watchbtn.getPosition().x +
+                                     this.watchbtn.getSize().x/2 -
+                                     this.dialog.getSize().x/2);
+        this.dialog.setStyle('top', this.watchbtn.getPosition().y +
+                                    this.watchbtn.getSize().y);
+        this.dialog.setStyle('display', display);
+        this.dialog.setStyle('visibility', visibility);
+    },
+    
+    render: function() {
+        if (this.form.checkValidity()) this.submit.addClass('active');
+        else this.submit.removeClass('active');
+    },
+    
+    bootstrap: function(watchers) {
+        var this_ = this;
+        Array.each(watchers, function(watcher) {
+            var view = new WatcherView(new Watcher());
+            view.model.update(watcher);
+            this_.watchers.add(view);
         });
     }
 });
