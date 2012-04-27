@@ -520,25 +520,6 @@ def unwatch(request, store):
 
 @csrf_exempt
 def cron(request):
-    ok = False
-    
-    # Shared secret authentication.
-    secret = request.POST.get("secret")
-    if settings.FILESHACK_CRON_SECRET and \
-       settings.FILESHACK_CRON_SECRET == secret:
-        ok = True
-    
-    # Host-based authentication.
-    for host in settings.FILESHACK_CRON_HOSTS:
-        try: sockinfos = socket.getaddrinfo(host, None)
-        except socket.gaierror: sockinfos = []
-        ips = [sockinfo[4][0] for sockinfo in sockinfos]
-        if request.META["REMOTE_ADDR"] in ips:
-            ok = True
-            break
-    
-    if not ok: return HttpResponseForbidden(ugettext("Permission denied\n"))
-    
     output = ugettext("Cron started at %s\n" % \
                       timezone.now().strftime("%H:%M %Z, %d %b %Y"))
     output += "digest: " + digest(request) + "\n"

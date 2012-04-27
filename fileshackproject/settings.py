@@ -134,13 +134,6 @@ INSTALLED_APPS = (
 # corresponding output. Helps a lot with print-debugging.
 TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'
 
-# List of hosts which are allowed to run scheduled tasks.
-FILESHACK_CRON_HOSTS = ('localhost',)
-
-# Shared secret for running scheduled tasks from hosts not listed
-# in FILESHACK_CRON_HOSTS.
-FILESHACK_CRON_SECRET = ''
-
 FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
 # Override the settings with local modifications.
