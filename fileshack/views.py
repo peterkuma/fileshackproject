@@ -585,6 +585,7 @@ def unsubscribe(request):
         return render(request, "fileshack/unsubscribe.html",
                       dict(result="invalid"),
                       status=403) # Forbidden.
+    u.watchers.all().delete()
     u.delete()
     return render(request, "fileshack/unsubscribe.html", dict(result="success"))
 
