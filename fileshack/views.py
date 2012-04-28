@@ -468,7 +468,7 @@ def watch(request, store):
     
     f = WatcherForm(request.POST)
     if f.is_valid():
-        try: u = User.objects.get(email__iexact=f.cleaned_data["email"])
+        try: u = User.objects.get(email=f.cleaned_data["email"])
         except User.DoesNotExist:
             u = User(email=f.cleaned_data["email"], last_notification=None)
             u.save()
@@ -504,12 +504,11 @@ def unwatch(request, store):
         
     email = request.POST["email"]
  
-    watchers = Watcher.objects.filter(store=store, user__email__iexact=email)
-    for w in watchers:
-        w.delete()
-    
-    # Delete user who are not watching any store.
-    User.objects.annotate(n_watchers=Count("watchers")).filter(n_watchers=0).delete()
+    try:
+        u = User.objects.get(email=email)
+        u.watchers.filter(store=store).delete()
+        if u.watchers.count() == 0: u.delete()
+    except User.DoesNotExist: pass
     
     watchers = Watcher.objects.filter(store=store)
     return HttpResponse(JSONEncoder().encode({
@@ -530,13 +529,13 @@ def digest(request):
     url_prefix = "http://" + get_current_site(request).domain
     now = timezone.now()
     
-    watchers = Watcher.objects.filter(user__last_notification=None)
-    for store in Store.objects.filter(allow_watch=True):
-        since = now - datetime.timedelta(minutes=store.watch_delay)
-        watchers |= store.watchers.filter(user__last_notification__lt=since)
-    
     messages = {}
-    for w in watchers:
+    for w in Watcher.objects.all():
+        if not w.store.allow_watch: continue
+        since = now - datetime.timedelta(minutes=w.store.watch_delay)
+        if w.user.last_notification and w.user.last_notification >= since:
+            continue
+        
         user = w.user
         text = messages.get(user, "")
         since = user.last_notification or w.created
