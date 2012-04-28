@@ -329,12 +329,10 @@ var Watch = new Class({
             var watcher = new WatcherView(new Watcher({
                 email: this_.email.value,
             }));
-            watcher.model.addEvent('save', function() {
-                this_.form.reset();
-                this_.submit.removeClass('active');
-                this_.error.hide();
-                this_.watchers.add(watcher);
-            });
+            this_.form.reset();
+            this_.submit.removeClass('active');
+            this_.error.hide();
+            this_.watchers.add(watcher);
             watcher.model.save();
         });
     },
