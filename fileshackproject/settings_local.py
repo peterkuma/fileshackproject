@@ -4,12 +4,10 @@ ADMINS = (
     ('Peter Kuma', 'peto.kuma@gmail.com'),
 )
 
-#TIME_ZONE = 'UTC'
+TIME_ZONE = 'UTC'
 
-#MEDIA_ROOT = '/var/www/fileshackproject/media/'
-#MEDIA_URL = '/media/'
-#STATIC_ROOT = '/var/www/fileshackproject/static/'
-#STATIC_URL = '/static/'
+# E-mail address from which notifications are sent.
+FILESHACK_EMAIL_FROM = 'fileshack@fileshackweb.appspot.com'
 
 # Use python -c 'from random import choice; print "".join([choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])'
 # to generate a unique SECRET_KEY.
