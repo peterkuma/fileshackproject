@@ -497,11 +497,18 @@ def cron(request):
             break
     
     if not ok: return HttpResponseForbidden(ugettext("Permission denied\n"))
-    
+
     output = ugettext("Cron started at %s\n" % \
                       timezone.now().strftime("%H:%M %Z, %d %b %Y"))
-    output += "digest: " + digest(request) + "\n"
-    return HttpResponse(output)
+    
+    error = False
+    
+    # digest.
+    response = digest(request)
+    output += u"digest: %s\n" % response.content
+    if response.status_code != 200: error = True
+    
+    return HttpResponseServerError(output) if error else HttpResponse(output)
 
 
 def digest(request):
@@ -529,6 +536,9 @@ def digest(request):
             }
         messages[user] = text
     
+    n = 0
+    output = u""
+    error = False
     for (user, text) in messages.iteritems():
         text += ugettext("Fileshack\r\n")
         if settings.SECRET_KEY:
@@ -540,13 +550,22 @@ def digest(request):
                       [user.email])
             user.last_notification = now
             user.save()
+            n = n + 1
         except (smtplib.SMTPException, socket.error), e:
-            return u"send_mail: %s: %s" % (e.__class__.__name__, e)
+            output += u"\nsend_mail: %s: %s" % (e.__class__.__name__, e)
+            
+            if isinstance(e, smtplib.SMTPRecipientsRefused):
+                continue # Recipient refused, continue sending messages.
+            else:
+                error = True
+                break # Serious error, does not make sense to continue.
     
-    return ungettext(
+    output = ungettext(
         "A digest has been sent to %(count)d person.",
         "A digest has been sent to %(count)d people.",
-        len(messages)) % { "count": len(messages) }
+        n) % { "count": n } + output
+    
+    return HttpResponseServerError(output) if error else HttpResponse(output)
 
 
 @require_GET
