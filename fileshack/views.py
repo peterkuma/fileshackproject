@@ -546,8 +546,8 @@ def digest(request):
                 "url": url_prefix + user.unsubscribe_url()
             }
         try:
-            send_mail(_("Fileshack Update"), text, settings.FILESHACK_EMAIL_FROM,
-                      [user.email])
+            send_mail(ugettext("Fileshack Update"), text,
+                      settings.FILESHACK_EMAIL_FROM, [user.email])
             user.last_notification = now
             user.save()
             n = n + 1
