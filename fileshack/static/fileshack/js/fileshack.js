@@ -38,12 +38,11 @@ var FileShack = new Class({
             $('list').insertBefore(view.el, $('list').firstChild);
         });
         
-        // Bootstrap items from JSON embedded in index.html.
-        this.bootstrap($('bootstrap').get('text'))
+        var bootstrap = JSON.decode($('bootstrap').get('text'));
+        this.bootstrap(bootstrap.items);
         
         var dropbox = $('dropbox');
         var dropboxInput = $('dropbox-input');
-        var iframe = $('iframe');
         
         // Drag & Drop.
         if (typeof dropbox.addEventListener != 'undefined' &&
@@ -79,19 +78,7 @@ var FileShack = new Class({
                     dropboxInput.click();
                     window.setTimeout(function() { if (!clickDelegated) this_.fallback(); }, 100);
                 } else { // Fallback to upload by the iframe hack (IE).
-                    if (typeof iframe.contentDocument != 'undefined')
-                        var form = iframe.contentDocument.forms[0];
-                    else
-                        var form = iframe.getDocument().forms[0];
-                    form.file.onchange = function() {
-                        form.action = create_upload_url('iframe/');
-                        var item = this_.upload(form);
-                        iframe.onload = function() {
-                            item.model.del();
-                            this_.update();
-                        };
-                    };
-                    form.file.click();
+                    this_.uploadIFrame();
                 }
             });
         }
@@ -105,11 +92,16 @@ var FileShack = new Class({
         //window.setInterval(function() { this_.update() }, this.options.updateInterval);
         window.uuid = uuid();
         //this.update();
+        
+        if ($('watchbtn')) {
+            // Watch dialog.
+            watch = new Watch();
+            watch.bootstrap(bootstrap.watchers);
+        }
     },
     
-    bootstrap: function(json) {
+    bootstrap: function(items) {
         var this_ = this;
-        items = JSON.decode(json);
         Array.each(items, function(item) {
             var view = new ItemView(new Item());
             view.model.update(item);
@@ -126,6 +118,7 @@ var FileShack = new Class({
     },
     
     update: function() {
+	var this_ = this;
         var xhr = new XMLHttpRequest();
         
         if (this.lastUpdate) xhr.open('GET', 'update/' + this.lastUpdate + '/');
@@ -147,7 +140,7 @@ var FileShack = new Class({
                         this_.items.add(view);
                     }
                 });
-                this.lastUpdate = json.time;
+                this_.lastUpdate = json.time;
             }
         };
         xhr.send();
@@ -197,7 +190,7 @@ var FileShack = new Class({
         });
         
         // If this is a File, ask the user about resume.
-        if (i && data instanceof File) {
+        if (i && typeof File != 'undefined' && data instanceof File) {
             var c = confirm('A stale file with the same name and size has been found.\nDo you want to resume uploading?');
             if (c) {
                 item = i;
@@ -243,10 +236,136 @@ var FileShack = new Class({
         return item;
     },
     
+    uploadIFrame: function() {
+        var this_ = this;
+        var iframe = $('iframe');
+        var form = iframe.contentDocument.forms[0];
+        
+        form.file.onchange = function() {
+	    form.action = create_upload_url('iframe/');
+            var item = this_.upload(form);
+            iframe.onload = function() {
+                var responseText = iframe.contentDocument.body.innerHTML;
+                iframe.onload = null;
+                iframe.src = iframe.src;
+                try {
+		    var response = JSON.decode(responseText);
+		} catch(e) {
+		    item.onError({
+			label: 'Upload failed',
+			message: 'The server responded with an invalid message',
+			details: responseText
+		    });
+                    return;
+		}
+                item.model.update(response.item);
+                if (response.status != 'success') {
+                    item.onError({
+			label: response.error_label,
+			message: response.error_message,
+                        details: response.details
+                    });
+                    return;
+                }
+                item.model.set('type', 'complete');
+                item.model.update(response.item);
+            };
+        };
+        form.file.click();
+    },
+    
     removeStaleItems: function(validIds) {
         Object.each(this.items.all(), function(item) {
             if (item.model.type != 'pending' && !validIds.contains(item.model.id))
                 item.model.remove();
+        });
+    }
+});
+
+var Watch = new Class({
+    initialize: function() {
+        var this_ = this;
+        
+        this.watchers = new Collection();
+        this.watchers.addEvent('add', function(view) {
+            $('watch-list').appendChild(view.el);
+        });
+        
+        this.watchbtn = $('watchbtn');
+        this.dialog = $('watch-dialog');
+        this.form = $$('#watch-dialog .new')[0];
+        this.email = $$('#watch-dialog .new input[name="email"]')[0];
+        this.submit = $$('#watch-dialog .new button[type="submit"]')[0];
+        this.error = $('watch-error');
+        
+        if (!this.form.checkValidity) {
+            this.form.checkValidity = function() {
+                var pattern  = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                return this.email.value.match(pattern);
+            }
+        }
+        
+        var fx = new Fx.Reveal(this.dialog, {
+            transition: Fx.Transitions.Sine.easeOut,
+            duration: 100
+        });
+        
+        window.addEvent('resize', function() { this_.positionDialog(); });
+        this.positionDialog();
+        
+        this.email.addEvent('change', function() { this_.render(); });
+        this.email.addEvent('keyup', function() { this_.render(); });
+        this.watchbtn.addEvent('click', function() {
+            if (this_.watchbtn.hasClass('active')) {
+                this_.watchbtn.removeClass('active');
+                this_.form.reset();
+                this_.error.hide();
+            } else {
+                this_.watchbtn.addClass('active');
+            }
+            fx.toggle();
+        });
+        this.submit.addEvent('click', function(e) {
+            if (e.preventDefault) e.preventDefault();
+            if (!this_.form.checkValidity()) return;
+            var watcher = new WatcherView(new Watcher({
+                email: this_.email.value,
+            }));
+            watcher.model.addEvent('save', function() {
+                this_.form.reset();
+                this_.submit.removeClass('active');
+                this_.error.hide();
+                this_.watchers.add(watcher);
+            });
+            watcher.model.save();
+        });
+    },
+    
+    positionDialog: function() {
+        var display = this.dialog.getStyle('display');
+        var visibility = this.dialog.getStyle('visibility');
+        this.dialog.setStyle('visibility', 'hidden');
+        this.dialog.setStyle('display', 'block');
+        this.dialog.setStyle('left', this.watchbtn.getPosition().x +
+                                     this.watchbtn.getSize().x/2 -
+                                     this.dialog.getSize().x/2);
+        this.dialog.setStyle('top', this.watchbtn.getPosition().y +
+                                    this.watchbtn.getSize().y);
+        this.dialog.setStyle('display', display);
+        this.dialog.setStyle('visibility', visibility);
+    },
+    
+    render: function() {
+        if (this.form.checkValidity()) this.submit.addClass('active');
+        else this.submit.removeClass('active');
+    },
+    
+    bootstrap: function(watchers) {
+        var this_ = this;
+        Array.each(watchers, function(watcher) {
+            var view = new WatcherView(new Watcher());
+            view.model.update(watcher);
+            this_.watchers.add(view);
         });
     }
 });

@@ -1,22 +1,22 @@
-#error {
+#info {
     margin: -40px auto 0 auto;
     text-align: left;
     width: 600px;
-    height: 162px;
-    background: url(../img/error.png) no-repeat;
+    height: 164px;
+    background: url(../img/info.png) no-repeat;
 }
 
-#error .label {
+#info .label {
     font-size: 23pt;
     padding: 52px 0 2px 30px;
 }
 
-#error .message {
+#info .message {
     font-size: 19pt;
-    color: #fdeeee;
+    color: #339900;
     padding: 0 0 15px 30px;
 }
 
-#error a {
+#info a {
     color: inherit;
 }

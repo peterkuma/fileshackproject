@@ -1,93 +1,115 @@
+{% extends "fileshack/base.html" %}
 {% load staticfiles %}
 {% load i18n %}
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Fileshack</title>
-	<link rel="stylesheet" type="text/css" href="{% static "fileshack/css/base.css" %}" />
-        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
-	<link rel="stylesheet" type="text/css" href="{% static "fileshack/css/progress.css" %}" />
-        <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
-        <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
-        <script type="text/javascript">
-            var CSRF_TOKEN = '{{ csrf_token }}';
-            var CHUNK_SIZE = 512*1024; // 512 KiB.
-	    var CHUNK_UPLOAD_HIGH = 30;
-	    var CHUNK_UPLOAD_LOW = 0;
-            var ITEM_SIZE_LIMIT = {{ item_size_limit }}*1024*1024;
-            var ITEM_SIZE_LIMIT_ERROR_LABEL = '{% trans "Upload failed" %}';
-            var ITEM_SIZE_LIMIT_ERROR_MESSAGE = '{% blocktrans %}Item size is limited to {{ item_size_limit }} MB{% endblocktrans %}';
-        </script>
-	<script type="text/javascript" src="{% static "fileshack/js/misc.js" %}"></script>
-	<script type="text/javascript" src="{% static "fileshack/js/progress.js" %}"></script>
-	<script type="text/javascript" src="{% static "fileshack/js/models.js" %}"></script>
-	<script type="text/javascript" src="{% static "fileshack/js/collections.js" %}"></script>
-	<script type="text/javascript" src="{% static "fileshack/js/views.js" %}"></script>
-        <script type="text/javascript" src="{% static "fileshack/js/fileshack.js" %}"></script>
-		<script type="text/javascript">var _gaq = [['_setAccount', 'UA-30201310-1'], ['_trackPageview']];</script>
-		<script src="http://www.google-analytics.com/ga.js"></script>
-    </head>
-    <body>
-        <div id="container">
-	    <div id="controls">
-                <form action="logout/">
-                    <button type="submit" class="logout">{% trans "Logout" %}</button>
-                </form>
-            </div>
-            <h1>{%trans "Welcome to fileshack" %}, <span>{% trans "drop your items" %}</span></h1>
-            <div id="subcontainer">
-		<iframe src="iframe/" id="iframe" style="display: none"></iframe>
-                <form id="dropbox" action="/upload/" method="post" enctype="multipart/form-data">
-                    <span id="dropbox-text">{% trans "Drop your item in here or click" %}</span>
-		    <span id="dropbox-text-nodragndrop" style="display: none">{% trans "Click here to upload a file" %}</span>
-		    <div id="dropbox-file">
-			<span id="dropbox-text-alt">{% trans "Upload" %} </span>
-			<input id="dropbox-input" type="file" name="file" multiple="multiple" />
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/fileshack.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/progress.css" %}" />
+    <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
+    <script type="text/javascript">
+	var CSRF_TOKEN = '{{ csrf_token }}';
+	var CHUNK_SIZE = 512*1024; // 512 KiB.
+	var CHUNK_UPLOAD_HIGH = 30;
+	var CHUNK_UPLOAD_LOW = 0;
+	var ITEM_SIZE_LIMIT = {{ item_size_limit }}*1024*1024;
+	var ITEM_SIZE_LIMIT_ERROR_LABEL = '{% trans "Upload failed" %}';
+	var ITEM_SIZE_LIMIT_ERROR_MESSAGE = '{% blocktrans %}Item size is limited to {{ item_size_limit }} MB{% endblocktrans %}';
+    </script>
+    <script type="text/javascript" src="{% static "fileshack/js/misc.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/progress.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/models.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/collections.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/views.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/fileshack.js" %}"></script>
+    <script type="text/javascript">var _gaq = [['_setAccount', 'UA-30201310-1'], ['_trackPageview']];</script>
+    <script src="http://www.google-analytics.com/ga.js"></script>
+{% endblock %}
+{% block controls %}
+    <div id="controls">
+	{% if store.accesscode %}
+	    <form action="logout/" method="post">
+		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+		<button type="submit">{% trans "Logout" %}</button>
+	    </form>
+	{% endif %}
+	{% if store.allow_watch %}
+	    <button type="button" id="watchbtn">{% trans "Watch" %}</button>
+	    <div id="watch-dialog" style="display: none">
+		<div class="top"></div>
+		<div class="dialog">
+		    <form class="new">
+			    <button type="submit" title="{% trans "Watch" %}"></button>
+			    <input type="email" required="required" spellcheck="false" name="email" placeholder="user@example.org" />
+		    </form>
+		    <div id="watch-error" style="display: none">
+			<a class="details" style="display: none">{% trans "Details" %}</a>
+			<span class="label"></span>
+			<span class="message"></span>
 		    </div>
-		    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
-                </form>
-                <div id="list">
-		    <div id="bootstrap" style="display: none">
-			{{ items_json|escape }}
-		    </div>
-		    <div id="templates" style="display: none">
-			<div id="item-template" class="item">
-			    <a class="box" href="">
-				<div class="buttons">
-				    <!--<button class="pausebtn">Pause</button>-->
-				    <button class="cancelbtn">{% trans "Cancel" %}</button>
-				</div>
-				<div class="size">0 KB</div>
-				<button class="deletebtn">{% trans "Delete" %}</button>
-				<div class="progress_container">
-				    <div class="progress">0 %x</div>
-				    <div class="progress_size">0 MB / 0 MB</div>
-				</div>
-				<div class="name">undefined</div>
-				<div class="progressbar_alt"></div>
-				<div class="desc">{% trans "Dropped on" %} <strong class="uploaded">undefined</strong></div>
-				<progress class="progressbar" value="0" max="100"></progress>
-			    </a>
-			    <div class="error" style="display: none">
-				<button class="error_close"></button>
-				<div class="error_label">{% trans "Application Error" %}</div>
-				<div class="error_message">{% trans "Unknown error occurred." %}</div>
-				<a class="error_details" style="display: none">{% trans "Details" %}</a>
-			    </div>
-			    <div class="info" style="display: none">
-				<button class="info_close" style="display: none"></button>
-				<div class="info_label">{% trans "Info Label" %}</div>
-				<button class="info_yes">{% trans "Yes" %}</button>
-				<button class="info_no">{% trans "No" %}</button>
-				<div class="info_message">{% trans "Message" %}</div>
-			    </div>			    
+		    <div id="watch-list"></div>
+		    <div class="templates" style="display: none">
+			<div class="watcher" id="watcher-template">
+			    <button type="button" class="deletebtn"></button>
+			    <div class="email"></div>
 			</div>
 		    </div>
 		</div>
-            </div>
-	    <div id="preload-1"></div>
-	    <div id="preload-2"></div>
-	    <div id="preload-3"></div>
-        </div>
-    </body>
-</html>
+	    </div>
+	{% endif %}
+    </div>
+{% endblock %}
+{% block content %}
+    <div id="subcontainer">
+	<iframe src="iframe/" id="iframe" style="display: none"></iframe>
+	<form id="dropbox" action="/upload/" method="post" enctype="multipart/form-data">
+	    <span id="dropbox-text">{% trans "Drop your item in here or click" %}</span>
+	    <span id="dropbox-text-nodragndrop" style="display: none">{% trans "Click here to upload a file" %}</span>
+	    <div id="dropbox-file">
+		<span id="dropbox-text-alt">{% trans "Upload" %} </span>
+		<input id="dropbox-input" type="file" name="file" multiple="multiple" />
+	    </div>
+	    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+	</form>
+	<div id="list">
+	    <div id="bootstrap" style="display: none">
+		{{ bootstrap|escape }}
+	    </div>
+	    <div id="templates" style="display: none">
+		<div id="item-template" class="item">
+		    <a class="box" href="">
+			<div class="buttons">
+			    <!--<button class="pausebtn">Pause</button>-->
+			    <button class="cancelbtn">{% trans "Cancel" %}</button>
+			</div>
+			<div class="size">0 KB</div>
+			<button class="deletebtn">{% trans "Delete" %}</button>
+			<div class="progress_container">
+			    <div class="progress">0 %x</div>
+			    <div class="progress_size">0 MB / 0 MB</div>
+			</div>
+			<div class="name">undefined</div>
+			<div class="progressbar_alt"></div>
+			<div class="desc">{% trans "Dropped on" %} <strong class="uploaded">undefined</strong></div>
+			<progress class="progressbar" value="0" max="100"></progress>
+		    </a>
+		    <div class="error" style="display: none">
+			<button class="error_close"></button>
+			<div class="error_label">{% trans "Application Error" %}</div>
+			<div class="error_message">{% trans "Unknown error occurred." %}</div>
+			<a class="error_details" style="display: none">{% trans "Details" %}</a>
+		    </div>
+		    <div class="info" style="display: none">
+			<button class="info_close" style="display: none"></button>
+			<div class="info_label">{% trans "Info Label" %}</div>
+			<button class="info_yes">{% trans "Yes" %}</button>
+			<button class="info_no">{% trans "No" %}</button>
+			<div class="info_message">{% trans "Message" %}</div>
+		    </div>			    
+		</div>
+	    </div>
+	</div>
+    </div>
+    <div id="preload-1"></div>
+    <div id="preload-2"></div>
+    <div id="preload-3"></div>
+{% endblock %}

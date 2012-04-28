@@ -9,12 +9,15 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="840.00092"
-   height="150.14444"
+   width="835"
+   height="150.00424"
    id="svg2882"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="error-close.svg">
+   sodipodi:docname="error-wide.svg"
+   inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproject/fileshack/static/fileshack/img/error-wide.png"
+   inkscape:export-xdpi="89.997452"
+   inkscape:export-ydpi="89.997452">
   <defs
      id="defs2884">
     <inkscape:perspective
@@ -82,15 +85,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="482.76527"
-     inkscape:cy="-86.352024"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="683.87362"
+     inkscape:cy="141.30619"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1648"
+     inkscape:window-width="1646"
      inkscape:window-height="1023"
-     inkscape:window-x="32"
+     inkscape:window-x="34"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
@@ -109,9 +112,9 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(315.16141,-310.64237)">
+     transform="translate(315.16042,-310.78242)">
     <path
-       transform="matrix(1.6460785,0,0,1.0938461,-537.34273,-34.31356)"
+       transform="matrix(1.636267,0,0,1.0928214,-536.01444,-33.850363)"
        inkscape:export-ydpi="105.57107"
        inkscape:export-xdpi="105.57107"
        inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-wide.png"
@@ -124,7 +127,7 @@
        inkscape:export-xdpi="105.57107"
        inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-wide.png"
        style="color:#000000;fill:none;stroke:#cc0000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m -306.24416,338.16174 103.95642,0 32.43207,-25.55127 30.82871,25.55127 653.37366,0 c 0.20821,0 0.37625,1.70015 0.37625,3.812 l 0,106.47871 c 0,2.11184 -0.16816,3.812 -0.37625,3.812 l -820.59086,0 c -0.20857,0 -0.3764,-1.70016 -0.3764,-3.812 l 0,-106.47871 c 0,-2.11185 0.16788,-3.812 0.3764,-3.812 z"
+       d="m -306.29334,338.27599 103.33678,0 32.23876,-25.52733 30.64495,25.52733 649.47921,0 c 0.20697,0 0.37401,1.69856 0.37401,3.80843 l 0,106.37896 c 0,2.10986 -0.16716,3.80843 -0.37401,3.80843 l -815.6997,0 c -0.20733,0 -0.37416,-1.69857 -0.37416,-3.80843 l 0,-106.37896 c 0,-2.10987 0.16688,-3.80843 0.37416,-3.80843 z"
        id="path54401"
        sodipodi:nodetypes="cccccccccccc" />
     <path
@@ -133,14 +136,14 @@
        inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-wide.png"
        sodipodi:nodetypes="cccccccccccc"
        id="path54403"
-       d="m -305.48631,338.65883 103.69378,0 31.64206,-25.36128 30.9428,25.36128 652.23901,0 c 0.20786,0 0.37519,1.68187 0.37519,3.77101 l 0,105.33366 c 0,2.08913 -0.16745,3.77101 -0.37519,3.77101 l -818.51765,0 c -0.20801,0 -0.37543,-1.68188 -0.37543,-3.77101 l 0,-105.33366 c 0,-2.08914 0.16747,-3.77101 0.37543,-3.77101 z"
+       d="m -305.54001,338.77261 103.07571,0 31.45346,-25.33752 30.75836,25.33752 648.35133,0 c 0.20662,0 0.37295,1.6803 0.37295,3.76748 l 0,105.23498 c 0,2.08717 -0.16645,3.76748 -0.37295,3.76748 l -813.63886,0 c -0.20677,0 -0.37319,-1.68031 -0.37319,-3.76748 l 0,-105.23498 c 0,-2.08718 0.16647,-3.76748 0.37319,-3.76748 z"
        style="color:#000000;fill:#ef0808;fill-opacity:1;fill-rule:nonzero;stroke:#f67f7f;stroke-width:1;stroke-opacity:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <path
        inkscape:export-ydpi="105.57107"
        inkscape:export-xdpi="105.57107"
        inkscape:export-filename="/mnt/data1/www/fileshack/fileshackproj/fileshack/media/error-wide.png"
-       transform="matrix(1.5830178,0,0,0.9145726,-511.39245,41.219383)"
-       style="opacity:0.97832576;color:#000000;fill:#f20909;fill-opacity:1;fill-rule:nonzero;stroke:#ef2929;stroke-width:0.83108991;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter54265);enable-background:accumulate"
+       transform="matrix(1.5735822,0,0,0.91371581,-510.21884,41.611819)"
+       style="opacity:0.97832576;color:#000000;fill:#f20909;fill-opacity:1;fill-rule:nonzero;stroke:#ef2929;stroke-width:0.83396858;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter54265);enable-background:accumulate"
        d="m 138.34266,338.91004 63.57901,0 18.0307,-24.02016 15.84683,24.02016 404.41096,0 c 0.12755,0 0.2302,1.57145 0.2302,3.52342 l 0,98.41783 c 0,1.95197 -0.10269,3.52342 -0.2302,3.52342 l -501.8675,0 c -0.12755,0 -0.2302,-1.57145 -0.2302,-3.52342 l 0,-98.41783 c 0,-1.95197 0.10268,-3.52342 0.2302,-3.52342 z"
        id="path54405"
        sodipodi:nodetypes="cccccccccccc" />

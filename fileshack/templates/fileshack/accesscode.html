@@ -1,30 +1,27 @@
+{% extends "fileshack/base.html" %}
 {% load staticfiles %}
 {% load i18n %}
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Fileshack</title>
-        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/base.css" %}" />
-        <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/accesscode.css" %}" />
-        <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
-        <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
-        <script type="text/javascript" src="{% static "fileshack/js/accesscode.js" %}"></script>
-		<script type="text/javascript">var _gaq = [['_setAccount', 'UA-30201310-1'], ['_trackPageview']];</script>
-		<script src="http://www.google-analytics.com/ga.js"></script>
-    </head>
-    <body>
-        <div id="container">
-            <h1>{% trans "Welcome to fileshack," %} <span>{% trans "enter the access code" %}</span></h1>
-            <form method="post">
-                {% csrf_token %}
-                <input id="accesscode" type="password" name="accesscode" value="{{ accesscode|escape }}" />
-                <button id="ok" type="submit">{% trans "OK" %}</button>
-            </form>
-            {% if error_label %}
-                <div id="error"><div class="label">{{ error_label }}</div><div class="message">{{ error_message }}</div></div>
-            {% endif %}
-        </div>
-	<div id="preload-1"></div>
-	<div id="preload-2"></div>
-    </body>
-</html>
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="{% static "fileshack/css/accesscode.css" %}" />
+    <script type="text/javascript" src="{% static "fileshack/js/mootools.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/mootools-more.js" %}"></script>
+    <script type="text/javascript" src="{% static "fileshack/js/accesscode.js" %}"></script>
+    <script type="text/javascript">var _gaq = [['_setAccount', 'UA-30201310-1'], ['_trackPageview']];</script>
+    <script src="http://www.google-analytics.com/ga.js"></script>
+{% endblock %}
+{% block header %}
+    <h1>{% trans "Welcome to fileshack," %} <span>{% trans "enter the access code" %}</span></h1>
+{% endblock %}
+{% block content %}
+    <form method="post" id="accesscode-form">
+        {% csrf_token %}
+        <button id="ok" type="submit">{% trans "OK" %}</button>
+	<input id="accesscode" type="password" name="accesscode" value="{{ accesscode|escape }}" required="required" />
+    </form>
+    {% if error_label %}
+        <div id="error"><div class="label">{{ error_label }}</div><div class="message">{{ error_message }}</div></div>
+    {% endif %}
+    
+    <div id="preload-1"></div>
+    <div id="preload-2"></div>
+{% endblock %}

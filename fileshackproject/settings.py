@@ -29,7 +29,7 @@ AUTOLOAD_SITECONF = 'indexes'
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'UTC'
+TIME_ZONE = None
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -133,6 +133,8 @@ INSTALLED_APPS = (
 # This test runner captures stdout and associates tracebacks with their
 # corresponding output. Helps a lot with print-debugging.
 TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'
+
+FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
 # Override the settings with local modifications.
 from settings_local import *

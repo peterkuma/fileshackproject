@@ -46,11 +46,12 @@ var Collection = new Class({
 
     add: function(view) {
 	var this_ = this;
-	var id = view.model.id;
+	var id = view.model[view.model.pk];
+	if (this.views[id]) return;
 	this.views[id] = view;
 	view.model.addEvent('change', function() {
-            if (id != view.model.id) {
-                this_.views[view.model.id] = view;
+            if (id != view.model[view.model.pk]) {
+                this_.views[view.model[view.model.pk]] = view;
                 delete this_.views[id];
                 id = view.model.id;
             }
@@ -63,8 +64,7 @@ var Collection = new Class({
     },
     
     remove: function(view) {
-	delete this.views[view.model.id];
-	this.fireEvent('remove', view);
+	delete this.views[view.model[view.model.pk]];
     },
     
     contains: function(id) {
