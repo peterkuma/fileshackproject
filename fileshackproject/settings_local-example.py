@@ -6,14 +6,6 @@
 
 #TIME_ZONE = 'UTC'
 
-#MEDIA_ROOT = '/var/www/fileshackproject/media/'
-#MEDIA_URL = '/media/'
-#STATIC_ROOT = '/var/www/fileshackproject/static/'
-#STATIC_URL = '/static/'
-
-# Serve static and media files even when DEBUG == False.
-#SERVE_STATIC = True
-
 # E-mail address from which notifications are sent.
 #FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
