@@ -273,7 +273,7 @@ var Watcher = new Class({
 			label: 'Session expired',
 			message_html: 'Please <a href="javascript:location.reload(true)">log in again</a>'
 		    });
-		} else {
+		} else if (xhr.status != 0) {
 		    try {
 			var response = JSON.decode(xhr.responseText);
 			this_.fireEvent('error', response);
@@ -283,6 +283,10 @@ var Watcher = new Class({
 			    details: xhr.responseText
 			});
 		    }
+		} else {
+		    this_.fireEvent('error', {
+			message: 'Request failed'
+		    });		    
 		}
 	    }
 	});
@@ -301,10 +305,14 @@ var Watcher = new Class({
 			label: 'Session expired',
 			message_html: 'Please <a href="javascript:location.reload(true)">log in again</a>'
 		    });
-		} else {
+		} else if (xhr.status != 0) {
 		    this_.fireEvent('error', {
 			message: xhr.statusText,
 			details: xhr.responseText
+		    });
+		} else {
+		    this_.fireEvent('error', {
+			message: 'Request failed'
 		    });
 		}
 	    }
