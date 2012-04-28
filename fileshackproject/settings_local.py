@@ -7,7 +7,7 @@ ADMINS = (
 TIME_ZONE = 'UTC'
 
 # E-mail address from which notifications are sent.
-FILESHACK_EMAIL_FROM = 'fileshack@fileshackweb.appspot.com'
+FILESHACK_EMAIL_FROM = 'no-reply@fileshackweb.appspotmail.com'
 
 # Use python -c 'from random import choice; print "".join([choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])'
 # to generate a unique SECRET_KEY.
