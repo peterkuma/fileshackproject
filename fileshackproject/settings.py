@@ -134,6 +134,24 @@ INSTALLED_APPS = (
 # corresponding output. Helps a lot with print-debugging.
 TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'
 
+# Content types safe to be served to the browser.
+FILESHACK_SAFE_TYPES = (
+    'image/jpeg',
+    'image/png',
+    'image/svg+xml',
+    'image/gif',
+    'application/pdf',
+    'text/plain',
+    'text/rtf',
+    'text/xml',
+    'video/ogg',
+    'video/mp4',
+    'video/webm',
+    'audio/ogg',
+    'audio/mpeg',
+    'audio/webm',
+)
+
 FILESHACK_EMAIL_FROM = 'no-reply@example.org'
 
 # Override the settings with local modifications.

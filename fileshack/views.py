@@ -451,9 +451,14 @@ class ItemFileWrapper(FileWrapper):
 def download(request, store, item_id):
     item = get_object_or_404(Item, pk=item_id)
     
+    blobinfo = blobstore.BlobInfo.get(item.fileobject)
+    
     response = HttpResponse()
-    response[blobstore.BLOB_KEY_HEADER] = blobstore.BlobInfo.get(item.fileobject).key()
-    response["Content-Type"] = "application/octet-stream"
+    response[blobstore.BLOB_KEY_HEADER] = blobinfo.key()
+    if blobinfo.content_type in settings.FILESHACK_SAFE_TYPES:
+        response["Content-Type"] = blobinfo.content_type
+    else:
+        response["Content-Type"] = "application/octet-stream"
     response["Content-Disposition"] =  'form-data; name="file"; filename="%s"' % blobstore.BlobInfo.get(item.fileobject).filename
     return response
 
