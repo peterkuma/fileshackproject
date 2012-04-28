@@ -572,7 +572,7 @@ def digest(request):
             user.last_notification = now
             user.save()
             n = n + 1
-        except (smtplib.SMTPException, socket.error), e:
+        except Exception, e:
             output += u"\nsend_mail: %s: %s" % (e.__class__.__name__, e)
             
             if isinstance(e, smtplib.SMTPRecipientsRefused):
