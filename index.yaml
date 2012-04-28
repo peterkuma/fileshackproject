@@ -35,3 +35,19 @@ indexes:
   properties:
   - name: __key__
     direction: desc
+
+- kind: fileshack_watcher
+  properties:
+  - name: store_id
+  - name: created
+
+- kind: fileshack_watcher
+  properties:
+  - name: store_id
+  - name: user_id
+  - name: created
+
+- kind: fileshack_watcher
+  properties:
+  - name: user_id
+  - name: created
