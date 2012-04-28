@@ -295,9 +295,6 @@ var Watcher = new Class({
 	    url: 'unwatch/',
 	    headers: { 'X-CSRFToken': CSRF_TOKEN },
 	    data: { email: this.email },
-	    onSuccess: function() {
-		this_.remove();
-	    },
 	    onFailure: function(xhr) {
 		if (xhr.status == 403) {
 		    this_.fireEvent('error', {
@@ -312,5 +309,7 @@ var Watcher = new Class({
 		}
 	    }
 	}).send();
+	
+	this_.remove();
     }
 });
