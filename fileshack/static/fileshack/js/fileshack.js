@@ -329,10 +329,20 @@ var Watch = new Class({
             var watcher = new WatcherView(new Watcher({
                 email: this_.email.value,
             }));
-            this_.form.reset();
-            this_.submit.removeClass('active');
-            this_.error.hide();
-            this_.watchers.add(watcher);
+	    watcher.model.addEvent('save', function() {
+		this_.form.reset();
+		this_.submit.removeClass('active');
+		this_.error.hide();
+		this_.watchers.add(watcher);
+		this_.email.disabled = false;
+		this_.submit.disabled = false;
+	    });
+	    watcher.model.addEvent('error', function() {
+		this_.email.disabled = false;
+		this_.submit.disabled = false;		
+	    });
+	    this_.email.disabled = true;
+	    this_.submit.disabled = true;
             watcher.model.save();
         });
     },
