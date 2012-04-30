@@ -4,6 +4,8 @@ ADMINS = (
     ('Peter Kuma', 'peto.kuma@gmail.com'),
 )
 
+SERVER_EMAIL = 'root@fileshackweb.appspotmail.com'
+
 TIME_ZONE = 'UTC'
 
 # E-mail address from which notifications are sent.
