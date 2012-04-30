@@ -3,6 +3,9 @@
 #preload-1 { width: 0; height: 0; background: url(../img/button-lightblue.png); }
 #preload-2 { width: 0; height: 0; background: url(../img/button-lightred.png); }
 #preload-3 { width: 0; height: 0; background: url(../img/box-selected.png); }
+#preload-4 { width: 0; height: 0; background: url(../img/button-green.png); }
+#preload-5 { width: 0; height: 0; background: url(../img/button-watch-submit-active.png); }
+#preload-6 { width: 0; height: 0; background: url(../img/button-watcher-delete-active.png); }
 
 body {
     text-align: center;
