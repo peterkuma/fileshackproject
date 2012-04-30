@@ -114,6 +114,10 @@ form[action="logout/"] button:focus {
     outline: none;
 }
 
+#watch-dialog .new input[name="email"]:disabled {
+    background: #eee;
+}
+
 #watch-error {
     background: #f85050;
     height: 20px;
