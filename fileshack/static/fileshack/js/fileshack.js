@@ -318,8 +318,6 @@ var Watch = new Class({
         this.watchbtn.addEvent('click', function() {
             if (this_.watchbtn.hasClass('active')) {
                 this_.watchbtn.removeClass('active');
-                this_.form.reset();
-                this_.error.hide();
             } else {
                 this_.watchbtn.addClass('active');
             }
