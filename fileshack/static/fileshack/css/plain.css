@@ -1,0 +1,53 @@
+h1 {
+    margin-top: 150px;
+}
+
+#container {
+    text-align: center;
+}
+
+#error {
+    margin: -40px auto 0 auto;
+    text-align: left;
+    width: 600px;
+    height: 162px;
+    background: url(../img/error.png) no-repeat;
+}
+
+#error .label {
+    font-size: 23pt;
+    padding: 52px 0 2px 30px;
+}
+
+#error .message {
+    font-size: 19pt;
+    color: #fdeeee;
+    padding: 0 0 15px 30px;
+}
+
+#error a {
+    color: inherit;
+}
+
+#info {
+    margin: -40px auto 0 auto;
+    text-align: left;
+    width: 600px;
+    height: 164px;
+    background: url(../img/info.png) no-repeat;
+}
+
+#info .label {
+    font-size: 23pt;
+    padding: 52px 0 2px 30px;
+}
+
+#info .message {
+    font-size: 19pt;
+    color: #339900;
+    padding: 0 0 15px 30px;
+}
+
+#info a {
+    color: inherit;
+}
