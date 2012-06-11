@@ -210,7 +210,8 @@ def upload(request, store, id):
         name = ''
         size_total = 0 # Unknown.
 
-    try: name = request.META["HTTP_X_FILE_NAME"]
+    try: name = unicode(urllib.unquote(request.META["HTTP_X_FILE_NAME"]),
+                       "utf-8", "replace")
     except KeyError: name = ''
     
     name = os.path.basename(name)

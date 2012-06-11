@@ -234,7 +234,7 @@ var Item = new Class({
 	    var body = data;
 	}
 	
-	this.xhr.setRequestHeader('X-File-Name', this.name);
+	this.xhr.setRequestHeader('X-File-Name', encodeURIComponent(this.name));
 	this.xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
 	if (this.xhr.sendAsBinary) this.xhr.sendAsBinary(body);
 	else this.xhr.send(body);
