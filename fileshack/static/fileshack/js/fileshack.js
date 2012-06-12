@@ -215,11 +215,16 @@ var FileShack = new Class({
             return null;
         }
         
-        if (typeof File != 'undefined' && data instanceof File && typeof FileReader != 'undefined') {
+	if (typeof File != 'undefined' && data instanceof File &&
+	    typeof FormData != 'undefined' &&
+	    (data.slice || data.mozSlice || data.webkitSlice))
+	{
+	    item.model.upload(data);
+	} else if (typeof File != 'undefined' && data instanceof File && typeof FileReader != 'undefined') {
             var reader = new FileReader()
             reader.onload = function(e) { item.model.upload(e.target.result); };
             reader.readAsBinaryString(data);
-        } else if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement && typeof FormData != 'undefined') {
+	} else if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement && typeof FormData != 'undefined') {
             item.model.upload(new FormData(data));
         } else if (typeof File != 'undefined' && data instanceof File && typeof FormData != 'undefined') {
             var formData = new FormData();

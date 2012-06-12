@@ -126,34 +126,31 @@ var Item = new Class({
 	this.remove();
     },
     
-    upload: function(data, chunkSize) {
+    upload: function(data, offset, len) {
+	if (typeof offset == 'undefined') offset = 0;
+	if (typeof data == 'string') this.set('size_total', data.length);
+	if (data.size) this.set('size_total', data.size);
+	if (typeof len == 'undefined') len = CHUNK_SIZE;
+	if (this.size + len > this.size_total)
+	    len = this.size_total - this.size;
+	  
 	this.set('type', 'pending');
 	
 	this.xhr = new XMLHttpRequest();
         this.xhr.open('POST', 'upload/' + this.id + '/');
 	
 	var this_ = this;
-	var origSize = this.size;
 	var startTime = new Date().getTime();
-	
-	if (typeof chunkSize == 'undefined')
-	    chunkSize = CHUNK_SIZE;
-	
-	if (typeof data == 'string' && data.length < this.size + chunkSize)
-	    chunkSize = data.length - this.size;
 	
 	if (this.xhr.upload) {
 	    this.xhr.upload.addEventListener('progress', function(e) {
-		if (typeof data == 'string') {
-		    this_.set('size', origSize + e.position/e.total*chunkSize);
-		} else {
-		    this_.set('size', e.loaded);
-		    this_.set('size_total', e.total);
-		}
+		if (!this_.size_total) this_.set('size_total', e.total);
+		if (!len) len = this_.size_total;
+		this_.set('size', offset + e.position/e.total*len);
 	    }, false);
 	
 	    this.xhr.upload.addEventListener('load', function(e) {
-		if (typeof data == 'string') this_.set('size', origSize + chunkSize);
+		if (typeof data == 'string') this_.set('size', offset + len);
 	    }, false);
 	}
 	
@@ -170,22 +167,24 @@ var Item = new Class({
 		}
 		
 		if (this.status == 200 && response.status == 'success') {
-		    if (typeof data == 'string') this_.size = origSize + chunkSize;
+		    this_.size = offset + len;
 		    this_.update(response.item);
-		    if (typeof data == 'string' && this_.size < this_.size_total) {
+		    
+		    if (this_.size < this_.size_total) {
 			elapsedTime = new Date().getTime() - startTime;
 			if (elapsedTime < CHUNK_UPLOAD_LOW*1000) {
-			    chunkSize *= 2;
+			    len *= 2;
+			    if (len > 64*1024*1024) len = 64*1024*1024;
 			    //console.log('Doubling chunk size');
 			}
 			if (elapsedTime > CHUNK_UPLOAD_HIGH*1000) {
-			    chunkSize /= 2;
-			    if (chunkSize < 32*1024) chunkSize = 32*1024;
+			    len /= 2;
+			    if (len < 32*1024) len = 32*1024;
 			    //console.log('Halving chunk size');
 			}
 			    
 			// Upload the next chunk.
-			this_.upload(data, chunkSize);
+			this_.upload(data, this_.size, len);
 		    } else {
 			// We are done.
 			this_.set('type', 'complete');
@@ -197,7 +196,7 @@ var Item = new Class({
 		    });
 		} else if (this.status != 0) {
 		    // Revert to the original size as the chunk upload failed.
-		    this_.set('size', origSize);
+		    this_.set('size', offset);
 		    if (response) {
 			this_.fireEvent('error', {
 			    label: response.error_label,
@@ -212,7 +211,7 @@ var Item = new Class({
 		    }
 		} else {
 		    // Revert to the original size as the chunk upload failed.
-		    this_.set('size', origSize);
+		    this_.set('size', offset);
 		    this_.fireEvent('error', {
 			label: 'Upload failed',
 			message: 'The upload was terminated before completion'
@@ -221,28 +220,33 @@ var Item = new Class({
 	    }
 	};
 	
-	if (typeof data == 'string') {
-	    var chunk = data.substring(this.size, this.size + chunkSize);
+	if (typeof File != 'undefined' && data instanceof File && typeof FormData != 'undefined') {
+	    if (data.mozSlice) var chunk = data.mozSlice(offset, offset + len);
+	    else if (data.webkiteSlice) var chunk = data.webkitSlice(offset, offset + len);
+	    else var chunk = data.slice(offset, offset + len);
+	    var body = new FormData();
+	    body.append('file', chunk);
+	} else if(typeof data == 'string') {
 	    var boundary = 'xxxxxxxxxxxxxxxxxxxx';
 	    var body = '--' + boundary + '\r\n';
 	    body += 'Content-Disposition: form-data; name="file"; filename="' + encodeURIComponent(this.name) + '"\r\n';
 	    body += 'Content-Type: application/octet-stream\r\n';
 	    body += '\r\n';
-	    body += window.btoa(chunk) + '\r\n';
+	    body += window.btoa(data.substring(offset, offset + len)) + '\r\n';
 	    body += '--' + boundary + '--\r\n';
 	    this.xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
-	    this.xhr.setRequestHeader('Content-Length', body.length);
-	    this.xhr.setRequestHeader('X-File-Size', this.size_total);
-	    this.xhr.setRequestHeader('X-File-Offset', this.size);
 	    this.xhr.setRequestHeader('X-File-Encoding', 'base64');
 	} else {
 	    var body = data;
+	    len = this.size_total - offset;
 	}
 	
+	if (this.size_total) this.xhr.setRequestHeader('X-File-Size', this.size_total);
+	this.xhr.setRequestHeader('X-File-Offset', offset);
 	this.xhr.setRequestHeader('X-File-Name', encodeURIComponent(this.name));
 	this.xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
-	if (this.xhr.sendAsBinary) this.xhr.sendAsBinary(body);
-	else this.xhr.send(body);
+	this.xhr.send(body);
+	body = null;
     }
 });
 
