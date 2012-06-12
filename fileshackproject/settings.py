@@ -126,6 +126,8 @@ INSTALLED_APPS = (
     'fileshack',
 )
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 # Serve static and media files even when DEBUG == False.
 SERVE_STATIC = False
 

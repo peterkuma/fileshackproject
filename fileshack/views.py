@@ -118,7 +118,6 @@ def index(request, store):
                     request.session["fileshack_stores"] = [store.id]
                 else:
                    request.session["fileshack_stores"].append(store.id)
-                request.session.set_expiry(3600)
                 return HttpResponseRedirect(store.get_absolute_url())
             else:
                 t = loader.get_template("fileshack/accesscode.html")
