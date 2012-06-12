@@ -63,7 +63,7 @@ var Item = new Class({
     Extends: Model,
     
     defaults: {
-	id: uuid(),
+	id: -1,
 	type: 'complete', // 'pending', 'unfinished', 'stale', 'complete'.
         name: '',
 	url: '',
@@ -73,6 +73,11 @@ var Item = new Class({
         created: new Date(),
         uploaded: new Date(),
         modified: new Date()
+    },
+    
+    initialize: function(attributes) {
+	this.parent(attributes);
+	this.id = uuid();
     },
     
     update: function(json) {

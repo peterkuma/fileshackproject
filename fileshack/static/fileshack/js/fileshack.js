@@ -89,7 +89,6 @@ var FileShack = new Class({
         });
         
         //window.setInterval(function() { this_.update() }, this.options.updateInterval);
-        window.uuid = uuid();
         //this.update();
         
         if ($('watchbtn')) {
