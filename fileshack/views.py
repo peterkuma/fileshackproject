@@ -91,7 +91,7 @@ def require_login(view):
            store.id in request.session["fileshack_stores"]:
             return view(request, *args, **kwargs)
         
-        return HttpResponseForbidden()
+        return HttpResponseForbidden("Login required")
         
     return login_wrapper
 
