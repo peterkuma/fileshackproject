@@ -174,7 +174,7 @@ var Item = new Class({
 			elapsedTime = new Date().getTime() - startTime;
 			if (elapsedTime < CHUNK_UPLOAD_LOW*1000) {
 			    len *= 2;
-			    if (len > 64*1024*1024) len = 64*1024*1024;
+			    //if (len > 64*1024*1024) len = 64*1024*1024;
 			    //console.log('Doubling chunk size');
 			}
 			if (elapsedTime > CHUNK_UPLOAD_HIGH*1000) {
