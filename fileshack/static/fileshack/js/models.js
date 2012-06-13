@@ -127,7 +127,7 @@ var Item = new Class({
     },
     
     upload: function(data, offset, len) {
-	if (typeof offset == 'undefined') offset = 0;
+	if (typeof offset == 'undefined') offset = this.size;
 	if (typeof data == 'string') this.set('size_total', data.length);
 	if (data.size) this.set('size_total', data.size);
 	if (typeof len == 'undefined') len = CHUNK_SIZE;
