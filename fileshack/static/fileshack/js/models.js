@@ -222,7 +222,7 @@ var Item = new Class({
 	
 	if (typeof File != 'undefined' && data instanceof File && typeof FormData != 'undefined') {
 	    if (data.mozSlice) var chunk = data.mozSlice(offset, offset + len);
-	    else if (data.webkiteSlice) var chunk = data.webkitSlice(offset, offset + len);
+	    else if (data.webkitSlice) var chunk = data.webkitSlice(offset, offset + len);
 	    else var chunk = data.slice(offset, offset + len);
 	    var body = new FormData();
 	    body.append('file', chunk);
