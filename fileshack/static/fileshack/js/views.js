@@ -101,6 +101,9 @@ var ItemView = new Class({
 		this.progressbar.value = 1;
 	    updateProgress(this.progressbar);
 	}
+	if (this.model.readonly)
+	    this.deletebtn.hide();
+
 	var percentage = 0;
 	if (this.model.size > 0 && this.model.size_total > 0)
 	    percentage = Math.round((this.model.size * 100)/this.model.size_total);

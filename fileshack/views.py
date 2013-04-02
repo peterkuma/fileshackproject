@@ -154,7 +154,7 @@ def iframe(request, store):
         c = RequestContext(request)
         return HttpResponse(t.render(c))  
     
-    if not request.FILES.has_key("file"):
+    if not request.FILES.has_key("file") or store.readonly is True:
         return HttpResponseForbidden()
     f = request.FILES["file"]
     
@@ -192,7 +192,8 @@ def iframe(request, store):
 @require_store
 @require_login
 def upload(request, store, id):
-    if request.method != "POST" or not request.FILES.has_key("file"):
+    if request.method != "POST" or not request.FILES.has_key("file") or \
+       store.readonly is True:
         data = {
             "status": "failed",
             "error_label": "Upload failed",
@@ -318,7 +319,8 @@ def upload(request, store, id):
 @require_store
 @require_login
 def simple_upload(request, store):
-    if request.method != "POST" or not request.FILES.has_key("file"):
+    if request.method != "POST" or not request.FILES.has_key("file") or \
+       store.readonly is True:
         return HttpResponseRedirect(store.get_absolute_url())
     
     #if store.item_limit and f.size > store.item_limit*1024*1024:
@@ -340,8 +342,9 @@ def delete(request, store, item_id):
         return HttpResponseForbidden()
         
     item = get_object_or_404(Item, pk=item_id, store=store)
+    if item.is_readonly:
+        return HttpResponseForbidden()
     item.delete()
-    
     return HttpResponse("Item has been deleted")
 
 @never_cache
