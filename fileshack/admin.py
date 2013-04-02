@@ -5,7 +5,7 @@ class StoreAdmin(admin.ModelAdmin):
     list_display = ("__unicode__",)
 
 class ItemAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ('created', 'size_total', 'size')
 
 admin.site.register(Store, StoreAdmin)
 admin.site.register(Item, ItemAdmin)

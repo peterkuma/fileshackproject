@@ -146,6 +146,8 @@ class Item(Model):
 
     class Meta:
         ordering = [('created')]
+        verbose_name = _("file")
+        verbose_name_plural = ("files")
 
 class User(Model):
     email = EmailField(_("e-mail"), max_length=254, unique=True)
