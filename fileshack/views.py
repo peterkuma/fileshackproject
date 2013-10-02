@@ -100,6 +100,9 @@ def require_login(view):
 def logout(request, store):
     try:
         request.session["fileshack_stores"].remove(store.id)
+        # FIX: we should call session.save() because django session system doesn't track
+        # the changes made inside of the list
+        request.session.save()
     except (KeyError, ValueError):
         pass
     request.session.save()
@@ -117,7 +120,10 @@ def index(request, store):
                 if not request.session.has_key("fileshack_stores"):
                     request.session["fileshack_stores"] = [store.id]
                 else:
-                   request.session["fileshack_stores"].append(store.id)
+                    request.session["fileshack_stores"].append(store.id)
+                    # FIX: we should call session.save() because django session system doesn't track
+                    # the changes made inside of the list
+                    request.session.save()
                 return HttpResponseRedirect(store.get_absolute_url())
             else:
                 t = loader.get_template("fileshack/accesscode.html")
