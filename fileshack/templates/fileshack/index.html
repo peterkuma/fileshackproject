@@ -59,6 +59,7 @@
 {% block content %}
     <div id="subcontainer">
 	<iframe src="iframe/" id="iframe" style="display: none"></iframe>
+	{% if not store.readonly %}
 	<form id="dropbox" action="/upload/" method="post" enctype="multipart/form-data">
 	    <span id="dropbox-text">{% trans "Drop your item in here or click" %}</span>
 	    <span id="dropbox-text-nodragndrop" style="display: none">{% trans "Click here to upload a file" %}</span>
@@ -68,6 +69,7 @@
 	    </div>
 	    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
 	</form>
+	{% endif %}
 	<div id="list">
 	    <div id="bootstrap" style="display: none">
 		{{ bootstrap|escape }}

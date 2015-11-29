@@ -72,7 +72,8 @@ var Item = new Class({
         status: 'READY', // 'READY', 'UPLOADING', 'STALE'.
         created: new Date(),
         uploaded: new Date(),
-        modified: new Date()
+        modified: new Date(),
+        readonly: false,
     },
     
     initialize: function(attributes) {
@@ -98,6 +99,7 @@ var Item = new Class({
 	this.modified = new Date().parse(json.modified);
 	this.uploaded = new Date().parse(json.uploaded);
 	this.created = new Date().parse(json.created);
+	this.readonly = json.readonly;
 	
 	this.fireEvent('change');
     },

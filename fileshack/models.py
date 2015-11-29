@@ -41,6 +41,7 @@ class Store(Model):
     protect_files = BooleanField(_("protect files"), help_text=_("Protect files by a random string, so that they cannot be downloaded by guessing their name."), default=True)
     allow_watch = BooleanField(_("allow watch"), help_text=_('Allow users to subscribe to receive e-mail updates. Requires cron (see <a href="http://fileshack.sourceforge.net/doc/#store-watching">documentation</a>).'), default=False)
     watch_delay = PositiveIntegerField(_("watch delay"), help_text=_("Minimum delay between two notifications in minutes. Only applies when <strong>Allow watch</strong> is enabled."), default=360)
+    readonly = BooleanField(_("read only"), help_text=_("Set all files to read only. Uploading or deleting files is disabled."), default=False)
     
     def __unicode__(self):
         url = self.get_absolute_url()
@@ -72,6 +73,11 @@ class Item(Model):
     modified = DateTimeField(_("modified"), auto_now=True)
     size_total = IntegerField(_("size total"), default=0)
     size = IntegerField(_("size"), default=0)
+    readonly = BooleanField(_("read only"), default=False)
+    
+    @property
+    def is_readonly(self):
+        return self.store.readonly or self.readonly
     
     def delete(self):
         dir = os.path.dirname(os.path.join(settings.MEDIA_ROOT, self.fileobject.name))
@@ -132,6 +138,7 @@ class Item(Model):
             "modified": self.modified,
             "created": self.created,
             "uploaded": self.uploaded,
+            "readonly": self.is_readonly,
         }
     
     def __unicode__(self):
@@ -139,6 +146,8 @@ class Item(Model):
 
     class Meta:
         ordering = [('created')]
+        verbose_name = _("file")
+        verbose_name_plural = ("files")
 
 class User(Model):
     email = EmailField(_("e-mail"), max_length=254, unique=True)
