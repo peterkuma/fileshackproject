@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>Fileshack, drop your items</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="css/base.css" />
+		<script type="text/javascript" src="js/mootools.js"></script>
+		<script type="text/javascript" src="js/mootools-more.js"></script>
+		<script type="text/javascript" src="js/base.js"></script>
+		<script type="text/javascript">var _gaq = [['_setAccount', 'UA-30201310-3'], ['_trackPageview']];</script>
+		<script src="http://www.google-analytics.com/ga.js"></script>
+	</head>
+	<body>
+		<header>
+			<a href=".">
+				<hgroup>
+					<h1>fileshack</h1>
+					<h2>drop your items</h2>
+				</hgroup>
+			</a>
+		</header>
+		<div id="label">fileshack allows you to create your own simple, hosted web file storage</div>
+		<!--<nav>
+			<a id="tryitout" href="http://fileshackweb.appspot.com/"><span>Try it out!</span></a>
+			<div class="sep"></div>
+			<a id="download" href="http://sourceforge.net/projects/fileshack/files/fileshackproject-0.8.tar.gz/download"><span>Download fileshack 0.8</span></a>
+			<div class="sep"></div>
+			<a href="doc/" id="nav-doc" class="right">Documentation</a>
+		</nav>-->
+		<div id="content">
+	        <div id="intro">
+	            <a href="img/screenshot.png"><img src="img/screenshot-small.png" alt="" /></a>
+	            <p>
+	                Fileshack is an open source web application for hosting a web file storage,
+	                focusing on providing a repository for exchanging documents in groups of small number of people.
+	                It has a simple interface and an open permission model,
+	                anyone who knows the access code can download, upload and delete files,
+	                or opt-in to receive notifications.
+	                <div>
+	                <!--<a href="http://fileshackweb.appspot.com/" style="display: block; float: right; margin-right: 25px; text-decoration: none"><button class="greenbtn">Try it out ➜</button></a>-->
+	                <a href="doc/" style="display: block; float: right; text-decoration: none; margin-right: 18px"><div class="bluebtn">Get started ➜</div></a>
+	                </div>
+	            </p>
+	        </div>
+	        <!--
+	        <div class="note">
+	        	There are some major changes planned to the authentication
+	        	system and repositories. Please share your opinion at
+	      		<a href="https://github.com/peterkuma/fileshackproject/issues/4">Call for comments: Authentication system and repositories</a>.
+	      	</div>
+	      	-->
+			<article>
+			    <h1>Features</h1>
+			    <div class="feature">
+			        <img src="img/dragndrop.png" alt="" />
+			        <strong>Drag and drop. </strong>
+			        Files can be uploaded by dropping them into a box.
+			        If that is not convenient, a traditional upload dialog can be opened by clicking the box.
+			    </div>
+			    <div class="feature">
+			        <img src="img/smart-upload.png" alt="" />
+			        <strong>Chunk upload. </strong>
+			        Files are uploaded by chunks, so that when a transfer
+			        is interrupted, it can be resumed.
+			        Files of GB's in size can be uploaded.
+			    </div>
+			    <div class="feature">
+			        <img src="img/repository-watching.png" alt="" />
+			        <strong>Repository watching. </strong>
+			        If you want to be notified of new uploads, you can register an e-mail address where notifications are sent.
+			    </div>
+			    <div class="feature">
+			        <img src="img/html5.png" alt="" />
+			        <strong>HTML5. </strong>
+			        Fileshack leverages many features of HTML5 such as File API, Drag & Drop and CSS3.
+			        However, it is backward-compatible with browsers which do not support these features.
+			    </div>
+			    <div class="feature" style="width: 390px; height: 120px; margin: 20px 20px 0 0; float: left">
+			        <strong>Django. </strong>
+			        Fileshack uses the python development framework django.
+			        This means it can be integrated with existing django applications,
+			        and easily extended.
+			    </div>
+			    <div class="feature" style="height: 120px; margin-top: 50px">
+			        <strong>MIT license. </strong>
+			        Fileshack is open source, distributed under a license which
+			        allows you to modify and redistribute its content,
+			        or combine with commercial software.
+                </div>
+			</article>
+		</div>
+		<footer>
+			<a id="github" href="http://github.com/peterkuma/fileshackproject"><img src="img/github.png" height="70" alt="github" /></a>
+			<form id="subscribe" action="https://sourceforge.net/projects/fileshack/lists/fileshack-general">
+				<div>Join the mailing list</div>
+				<input type="email" name="email" placeholder="me@example.org" spellcheck="false" required="required" />
+				<button>Subscribe</button>
+			</form>
+			<div id="credits">
+				Copyright 2012–2021 <a href="https://peterkuma.net">Peter Kuma</a> and contributors<br />
+				Hosting provided by <a href="https://sourceforge.net">SourceForge</a> & <a href="https://github.com">GitHub</a>
+			</div>
+		</footer>
+		<div id="preload-1"></div>
+	</body>
+</html>
+

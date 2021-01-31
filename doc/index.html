@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>Fileshack, drop your items</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="../css/base.css" />
+		<script type="text/javascript" src="../js/mootools.js"></script>
+		<script type="text/javascript" src="../js/mootools-more.js"></script>
+		<script type="text/javascript" src="../js/base.js"></script>
+		<script type="text/javascript">var _gaq = [['_setAccount', 'UA-30201310-3'], ['_trackPageview']];</script>
+		<script src="http://www.google-analytics.com/ga.js"></script>
+	</head>
+	<body>
+		<header>
+			<a href="../">
+				<hgroup>
+					<h1>fileshack</h1>
+					<h2>drop your items</h2>
+				</hgroup>
+			</a>
+		</header>
+		<div id="label">fileshack allows you to create your own simple, hosted web file storage</div>
+		<div id="content">
+			<article>
+<h1>Getting Started</h1>
+<h2 id="installation">Installation</h2>
+
+<p>
+Fileshack can be hosted on your own server or on <a href="https://developers.google.com/appengine/">Google AppEngine</a>.
+While the latter is better if you prefer hosting for free (up to <a href="https://developers.google.com/appengine/docs/quotas">a certain
+amount of traffic</a>), the former means you do not have to disclose your files to a third
+party.
+</p>
+
+<h3>Native Installation</h3>
+<p>Fileshack is based on the web development framework <a href="http://www.djangoproject.com">Django</a>.
+In order to deploy fileshack on your server, you first need to have a working web server such as
+<a href="http://www.apache.org/">Apache</a> or <a href="http://www.nginx.org/">nginx</a>.
+There are countless ways of deploying Django.
+One of the most popular and simple combinations is Apache and <a href="http://code.google.com/p/modwsgi/">mod_wsgi</a>,
+which will be covered here. Other convenient combinations are Apache or nginx with 
+<a href="https://docs.djangoproject.com/en/dev/howto/deployment/fastcgi/">FastCGI</a> or <a href="http://gunicorn.org/">gunicorn</a>, possibly with Django run on startup by <a href="http://supervisord.org/">supervisord</a>.
+It should also be possible to run fileshack on Windows with IIS. You will sure
+be able to find instructions for installing Django projects in these other combinations on the web.</p>
+
+<h4>Apache and mod_wsgi</h4>
+<p>If you run a Linux or a BSD distribution, both Apache and mod_wsgi are likely
+available via the distribution's packaging system.
+We will put Django and fileshack inside a <a href="http://www.virtualenv.org/">virtualenv</a>.
+Assuming Apache, mod_wsgi and virtualenv are installed, follow these steps:</p>
+
+<div class="note">Substitute your preferred installation directory for
+<var><em>/home/user/www/fs/</em></var> and your domain for <var><em>fileshack.example.org</em></var>.</div>
+
+<ol>
+	<li>
+		Create a new virtualenv:
+		<div class="cmd">
+			mkdir -p <em>/home/user/www</em><br />
+			cd <em>/home/user/www</em><br />
+			python3 -m venv fs<br />
+			cd fs<br />
+			. bin/activate
+		</div>
+	</li>
+	<li>
+		Install django inside the virtual environment:
+		<div class="cmd">
+			pip3 install django
+		</div>
+	</li>
+	<li>
+		Clone the fileshackproject repository:
+		<div class="cmd">
+			git clone git://github.com/peterkuma/fileshackproject.git<br />
+			cd fileshackproject<br />
+		</div>
+	</li>
+	<li>
+		Copy and customize the local settings example file:
+		<div class="cmd">
+			cp fileshackproject/settings_local-example.py fileshackproject/settings_local.py<br />
+			vi fileshackproject/settings_local.py
+		</div>
+		Normally, you do not need to modify anything except for <var>ADMINS</var>,
+		<var>SECRET_KEY</var>, and uncommenting
+		<var>DEBUG = False</var> once your installation works properly.
+	</li>
+	<li>
+		Initialize database:
+		<div class="cmd">
+			./manage.py migrate --run-syncdb<br />
+			./manage.py createsuperuser
+		</div>
+		You will be asked to create a superuser account, by which you
+		can later log in to the administration interface at
+		<var>http://<em>fileshack.example.org</em>/admin/</var>.
+		This command also creates a default store.
+	</li>
+	<li>
+		Collect static files into the <var>static</var> directory:
+		<div class="cmd">
+			./manage.py collectstatic --noinput
+		</div>
+	</li>
+	<li>
+		At this point you can try to run fileshack with the integrated development server:
+		<div class="cmd">
+		    ./manage.py runserver<br />
+		</div>
+		The default store should be accessible at
+		<a href="http://localhost:8000">http://localhost:8000</a>.
+		If everything works fine, continue with setting up Apache.
+	</li>
+	<li>
+		Make sure Apache has a permission to write to <var>db</var>,
+		the database file <var>db/fileshack.sqlite</var> and <var>media</var>.
+		<div class="cmd">
+			sudo chown www-data db db/fileshack.sqlite media
+		</div>
+		<p><var>media</var> is the directory where fileshack stores the uploaded files.
+		If you like, you can make it a symlink to a different directory on the
+		file system.</p>
+	</li>
+	<li>
+		Create a new virtual host in the Apache configuration:
+		<div class="code">
+&lt;VirtualHost *:80&gt;<br />
+&nbsp;&nbsp;&nbsp;ServerName <em>fileshack.example.org</em><br />
+&nbsp;&nbsp;&nbsp;DocumentRoot <em>/home/user/www/fs/</em><br />
+&nbsp;&nbsp;&nbsp;ErrorLog /var/log/apache2/fileshack_error.log<br />
+&nbsp;&nbsp;&nbsp;CustomLog /var/log/apache2/fileshack_access.log common<br /><br />
+	
+&nbsp;&nbsp;&nbsp;&lt;Location /&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Options -Indexes<br />
+&nbsp;&nbsp;&nbsp;&lt;/Location&gt;<br /><br />
+
+&nbsp;&nbsp;&nbsp;Alias /static/ <em>/home/user/www/fs</em>/fileshackproject/static/<br />
+&nbsp;&nbsp;&nbsp;Alias /media/ <em>/home/user/www/fs</em>/fileshackproject/media/<br />
+&nbsp;&nbsp;&nbsp;WSGIScriptAlias / <em>/home/user/www/fs</em>/fileshackproject/fileshackproject/wsgi_virtualenv.py<br />&lt;/VirtualHost&gt;
+		</div>
+		<div class="note">
+			<var>wsgi_virtualenv.py</var> is the WSGI application for use with virtualenv. Use <var>wsgi.py</var>
+			instead if you decide not to use virtualenv.
+		</div>
+	</li>
+	<li>
+		Test the configuration and restart apache:
+		<div class="cmd">
+			apache2ctl configtest<br />
+			apache2ctl restart
+		</div>
+	</li>
+	<li>
+		Fileshack should now be accessible at <var>http://<em>fileshack.example.org</em></var>.
+		You can manage stores in the administration interface at
+		<var>http://<em>fileshack.example.org</em>/admin/</var>.
+		You are advised to protect the default store by an access code.
+		If you encounter any problems, drop an e-mail to the mailing list at
+		<a href="mailto:fileshack-general@lists.sourceforge.net">fileshack-general@lists.sourceforge.net</a>.
+		<div class="note">
+			Do not forget to set <var>DEBUG = False</var> in
+			<var>settings_local.py</var>
+			before going public. Otherwise, users are presented with
+			ugly HTTP 404 and HTTP 500 pages, potentially revealing sensitive
+			information. Moreover, the django project is configured
+			to serve static files, which is strongly discouraged in production
+			environments (this should be the task of the web server).
+		</div>
+	</li>
+</ol>
+
+<h3 id="store-watching">Store Watching (optional)</h3>
+<p>Fileshack allows users to opt in to receive e-mail notifications when
+new files are uploaded. When enabled, a <strong>Watch</strong> button
+is displayed next to the <strong>Logout</strong> button, allowing users
+to enter an e-mail address to which to send notifications.
+However, several more steps need to be taken in order to support
+this feature.
+</p>
+
+<h5>Cron</h5>
+
+<p>If you want your fileshack installation to support store watching,
+you have to set up periodic requests to the service which
+sends the notifications:</p>
+
+<div class="code"> 
+http://<em>fileshack.example.org</em>/cron/
+</div>
+
+<p>For security reasons, access to this URL is allowed only from hosts specified
+in the configuration variable <var>FILESHACK_CRON_HOSTS</var>, or to those who
+present with the shared secret <var>FILESHACK_CRON_SECRET</var>.</p>
+
+<p>On Linux and other unix-like systems, periodic requests to a URL can be
+accomplished by a scheduled command in the system daemon
+<a href="https://en.wikipedia.org/wiki/Cron">cron</a>.
+In order to schedule such a request every 10 minutes,
+create a file <var>/etc/cron.d/fileshack</var>:
+
+<div class="code">
+# Run scheduled tasks of the web application fileshack.<br />
+#<br />
+*/10	 * * * * <em>user</em> python -c 'import sys, httplib; c=httplib.HTTPConnection("<em>fileshack.example.org</em>"); c.request("POST","/cron/","secret=<em>yoursecret</em>"); r=c.getresponse(); r.status==200 or sys.stdout.write(r.read())'
+</div>
+
+<p>Replace <em>user</em> with your username, and
+<em>fileshack.example.org</em> with the correct
+hostname of your fileshack installation.</p>
+
+<p>If the hostname is not <strong>localhost</strong>,
+you will have to set up a shared secret.
+Replace <em>yoursecret</em> in the command above with your chosen
+secret, and set <var>FILESHACK_CRON_SECRET</var> in
+<var>fileshackproject/settings_local.py</var> to the same value.
+</p>
+
+<p>Alternatively, you can add the IP address of the cron machine to
+<var>FILESHACK_CRON_HOSTS</var>. In this case, you do not have to
+supply the shared secret. By default,
+<var>FILESHACK_CRON_HOSTS</var> contains only <strong>localhost</strong>.</p>
+
+<div class="note">If anything goes wrong with the cron command, you should
+receive an e-mail with the command output on your user account from cron.
+In any case, you can test by executing the python command above in the console.
+Alternatively, the same can be accomplised more simply with:
+
+<div class="code">
+curl -d secret=<em>yoursecret</em> http://<em>fileshack.example.org</em>/cron/
+</div>
+</div>
+
+<h5>Settings</h5>
+<p>Store watching requires several configuration variables to be set up
+properly — mail server settings EMAIL_*, FILESHACK_EMAIL_FROM and SECRET_KEY
+in <var>fileshackproject/settings_local.py</var>.
+Mail server settings are described in detail in the
+<a href="https://docs.djangoproject.com/en/1.4/ref/settings/#std:setting-EMAIL_HOST">django documentation</a>.
+</p>
+
+<div class="note">
+You have reload Apache in order for the new settings to be applied.
+</div>
+
+<div class="note">If you do not set <var>SECRET_KEY</var>,
+users will not be able to unsubscribe
+via a link in notification messages. These links are protected
+by HMAC, which requires a private secret.
+</div>
+
+<h5>Admin</h5>
+
+<p>In <strong>Sites</strong>, modify the <strong>example.org</strong>
+domain to reflect your domain setting.</p>
+
+<p>Finally, you can enable <strong>Allow watch</strong>
+in your chosen stores. To prevent bothering users
+with copious amounts of messages, at most one notification is sent
+per 6-hour period to a particular e-mail address.
+This can be tuned by the <strong>Watch delay</strong>
+option.</p>
+
+<h3>Google AppEngine</h3>
+<p>Google AppEngine is an application hosting service provided by Google.
+The good thing about AppEngine is that your application is hosted for free
+as long as you stay below rather high limits of bandwidth and storage
+capacity. The bad thing is that it requires a special API to be used for
+managing files, which prevents fileshack from running as efficiently as a
+native installation, and some features such as downloading of unfinished
+files are not supported. The demo on this site is hosted on Google AppEngine.</p>
+
+<p>If you decided to deploy fileshack on Google AppEngine, follow these steps:</p>
+<ol>
+	<li>
+		<a href="https://accounts.google.com/ServiceLogin?service=ah&amp;passive=true&amp;continue=https://appengine.google.com/_ah/conflogin%3Fcontinue%3Dhttps://appengine.google.com/&amp;ltmpl=ae">
+		Create an Google account</a> (if you do not have any), and log in.
+		Go to <a href="https://appengine.google.com/">Google AppEngine</a>
+		and create a new application. Choose <strong>High Replication</strong>
+		as the storage mode, and an <strong>Application Identifier</strong>
+		of your preference.
+	</li>
+	<li>
+		Prepare a clean working directory for the deployment:
+		<div class="cmd">
+			mkdir /home/user/fileshack<br />
+			cd /home/user/fileshack
+		</div>
+	<li>
+		Download <a href="https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">Google App Engine SDK for Python</a>
+		and unpack it into the working directory. Add it the PATH environment
+		variable:
+		<div class="cmd">
+			export PATH="$PATH:/home/user/fileshack/google_appengine"
+		</div>
+	</li>
+	<li>
+		Clone repositories from the django-nonrel project into the working directory:
+		<div class="cmd">
+			hg clone https://bitbucket.org/wkornewald/django-nonrel<br />
+			hg clone https://bitbucket.org/wkornewald/djangoappengine<br />
+			hg clone https://bitbucket.org/wkornewald/djangotoolbox<br />
+			hg clone https://bitbucket.org/twanschik/django-autoload<br />
+			hg clone https://bitbucket.org/wkornewald/django-dbindexer<br />
+		</div>
+		<div class="note">If you do not want to use <a href="http://mercurial.selenic.com/">mercurial</a> (hg),
+		you can download them from <a href="http://www.allbuttonspressed.com/projects/djangoappengine">allbuttonspressed.com</a>.</div>
+	</li>
+	<li>
+		Clone the appengine branch of fileshack into the working directory:
+		<div class="cmd">
+			git clone -b appengine git://github.com/peterkuma/fileshackproject.git<br />
+			cd fileshackproject
+		</div>
+	</li>
+	<li>
+		Open app.yaml and set <em>application:</em> to the <strong>Application Identifier</strong>
+		you chose when you created the application on Google AppEngine.
+		<div class="cmd">
+			vi app.yaml
+		</div>
+	</li>
+	<li>
+		Copy and customize the local settings example file:
+		<div class="cmd">
+			cp fileshackproject/settings_local-example.py fileshackproject/settings_local.py<br />
+			vi fileshackproject/settings_local.py
+		</div>
+		<p>Normally, you do not need to modify anything except for <var>ADMINS</var> and uncommenting
+		<var>DEBUG = False</var> once your installation works properly.</p>
+	</li>
+	<li>
+		Collect static files into the <var>static</var> directory:
+		<div class="cmd">
+			./manage.py collectstatic --noinput
+		</div>
+	</li>
+	<li>
+		Run server locally. Is everything OK?
+		<div class="cmd">
+			./manage.py runserver
+		</div>
+	</li>
+	<li>
+		Deploy! You will be asked for your Google Account login details
+		in the process. The process will also create a new django
+		superuser account (say yes when prompted).
+		<div class="cmd">
+			./manage.py deploy
+		</div>
+	</li>
+	<li>
+		Go to the django administration console at
+		<var>http://<em>appidentifier</em>.appspot.com/admin/</var>,
+		and log in with the superuser account. Create a new Store
+		with an empty <em>Path</em>, empty <em>Media</em>,
+		and <em>Access code</em> of your choice.
+	</li>
+	<li>
+		Fileshack should now be accessible at <var>http://<em>appidentifier</em>.appspot.com</var>,
+		and your Google administration console at <a href="http://appspot.com">http://appspot.com</a>.
+		If you encounter any problems, drop an e-mail to the mailing list at
+		<a href="mailto:fileshack-general@lists.sourceforge.net">fileshack-general@lists.sourceforge.net</a>.
+	</li>
+</ol>
+
+<h2 id="compatibility">Compatibility</h2>
+<p>Fileshack is known to work with at least the following browsers:</p>
+<ul>
+	<li>Firefox 3.5 and newer</li>
+	<li>Google Chrome</li>
+	<li>Opera</li>
+	<li>Safari 5 on Windows and Snow Leopard</li>
+	<li>Internet Explorer 7, 8, 9</li>
+</ul>
+<p>Drag &amp; Drop and progress indication are not supported in all browsers.</p>
+
+<h2 id="releasenotes">Release Notes</h2>
+<div class="releasenotes">
+	<h4>Fileshack 0.9<span class="date">(25 June 2012)</span></h4>
+	<ul>
+	    <li>Files are not read into memory in full,
+	    but uploaded by File.slice() if available.
+	    This greatly reduces memory footprint and improves performance
+	    when uploading large files.</li>
+		<li>It is now possible to upload multiple files at once.</li>
+		<li>Fixed handling of unicode characters in file names.</li>
+		<li>Sessions now last until the browser is closed.</li>
+		<li>Fixed error message in Opera on expired session.</li>
+	</ul>
+	<h4>Fileshack 0.8<span class="date">(27 April 2012)</span></h4>
+	<ul>
+		<li>Store watching.</li>
+		<li>Fixed HTTP 404 page.</li>
+		<li>Logout is now protected against CSRF.</li>
+		<li>Django 1.4 timezone support.</li>
+	</ul>
+	<h4>Fileshack 0.7<span class="date">(18 April 2012)</span></h4>
+	<ul>
+		<li>Fixed uploading to custom (non-default) stores.</li>
+		<li>Fixed enforcement of store size limit.</li>
+		<li>Fixed error dialog placement.</li>
+		<li>Improved uploading in IE. Items are now replaced in-place without
+		    a refresh, and errors are reported in the usual way via an error
+		    dialog.</li>
+		<li>Open stores with an empty access code are now allowed.</li>
+	</ul>
+	<h4>Fileshack 0.6<span class="date">(29 March 2012)</span></h4>
+	<ul>
+		<li>Fixed uploading in Safari 5 on Snow Leopard.</li>
+		<li>Fixed regression in IE and Firefox 3.5.</li>
+		<li>Tweaked style to better support small screens.</li>
+	</ul>
+	<h4>Fileshack 0.5<span class="date">(28 March 2012)</span></h4>
+	<ul>
+		<li>Fixed uploading in Firefox 3.5.</li>
+		<li>Fixed style in some legacy browsers.</li>
+	</ul>
+	<h4>Fileshack 0.4<span class="date">(27 March 2012)</span></h4>
+	<ul>
+		<li>Fixed upload indication in IE 8 and 9.</li>
+		<li>Fixed dropbox text in IE 7.</li>
+		<li>Fixed delete in IE 7 and 8.</li>
+	</ul>
+	<h4>Fileshack 0.3<span class="date">(26 March 2012)</span></h4>
+	<ul>
+		<li>Fixed upload by Drag &amp; Drop in Safari.</li>
+		<li>Fixed dropbox text when Drag &amp; Drop is not supported.</li>
+	</ul>
+	<h4>Fileshack 0.2<span class="date">(25 March 2012)</span></h4>
+	<ul>
+		<li>Support for Safari and IE6-9.</li>
+	</ul>
+	<h4>Fileshack 0.1<span class="date">(20 March 2012)</span></h4>
+	<ul>
+		<li>Initial release.</li>
+	</ul>
+</div>
+
+<h2 id="howdoesitwork">How does it work?</h2>
+<p>Fileshack uses one of the following methods of uploading a file,
+listed from the most sophisticated to the least sophisticated:
+<ol>
+	<li>
+		<strong>XMLHttpRequest with File API.</strong> File is read into browser
+		memory by FileReader and uploaded by chunks. During upload, chunk size
+		is tuned so that an optimal upload time is achieved. If upload fails,
+		it can be resumed by starting from the last uploaded chunk. File
+		upload progress is show.
+		This method is supported by Firefox, Google Chrome and Opera.
+		However, as Opera does not support XMLHttpRequest.upload,
+		upload progress is coarse (by chunks).
+	</li>
+	<li>
+		<strong>XMLHttpRequest with FormData.</strong> File is upload
+		in full by XMLHttpRequest.send(FormData). Resume of a failed
+		upload is not supported. Upload progress is indicated.
+		This method is chosen for browers not supporting File API, such
+		as Safari.
+	</li>
+	<li>
+		<strong>Submitting a hidden iframe.</strong> This is a trick
+		allowing submitting a file without displaying a file input element.
+		Click on the dropbox is delegated to a file input element inside
+		a hidden iframe, in order to circumvent a security check in IE not
+		allowing to submit a form when a click was delegated.
+		No progress indication is supported.
+		This method is supported by browsers such as IE8 and IE9.
+	</li>
+	<li>
+		<strong>Explicit file input element.</strong>
+		An input element is displayed inside the dropbox.
+		This method is chosen for browsers such as IE7.
+	</li>
+</ol>
+
+<h2 id="contributing">Contributing</h2>
+You can contribute by <a href="https://github.com/peterkuma/fileshackproject/issues">reporting issues</a>,
+forking or joining the project as a developer on github. Thank you!
+			</article>
+		</div>
+		<footer>
+			<a id="github" href="http://github.com/peterkuma/fileshackproject"><img src="../img/github.png" height="70" alt="github" /></a>
+			<form id="subscribe" action="https://sourceforge.net/projects/fileshack/lists/fileshack-general">
+				<div>Join the mailing list</div>
+				<input type="email" name="email" placeholder="me@example.org" spellcheck="false" required="required" />
+				<button>Subscribe</button>
+			</form>
+			<div id="credits">
+				Copyright 2012–2021 <a href="https://peterkuma.net">Peter Kuma</a> and contributors<br />
+				Hosting provided by <a href="https://sourceforge.net">SourceForge</a> & <a href="https://github.com">GitHub</a>
+			</div>
+		</footer>
+		<div id="preload-1"></div>
+	</body>
+</html>
+

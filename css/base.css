@@ -1,0 +1,345 @@
+@import url(http://fonts.googleapis.com/css?family=Istok+Web:400,700);
+@import url(http://fonts.googleapis.com/css?family=Asap:400,700);
+
+#preload-1 { width: 0; height: 0; background: url(../img/button-blue.png); }
+
+body {
+	font-family: "Istok Web", helvetica, Arial, sans-serif;
+	text-align: center;
+	font-size: 11pt;
+	overflow: scroll;
+	background: url(../img/bg.png) repeat-x;
+}
+
+header {
+	display: block;
+	text-align: left;
+	margin: 50px auto 10px auto;
+	width: 800px;
+	height: 135px;
+	background: url(../img/kiwi.png) no-repeat 100px 0;
+}
+
+header a {
+	display: block;
+	width: 100%;
+	height: 100%;
+	color: inherit;
+	text-decoration: none;
+}
+
+header hgroup {
+	display: block;
+	margin-left: 370px;
+	padding-top: 16px;
+}
+
+header h1 {
+	font-size: 50pt;
+	margin: 0;
+	line-height: 80%;
+}
+
+header h2 {
+	font-size: 28pt;
+	font-style: italic;
+	color: #aaa;
+	margin: 0;
+}
+
+#label {
+	margin: 0px auto;
+	width: 1000px;
+	background: url(../img/separator.png) no-repeat center 40px;
+	height: 50px;
+	text-align: center;
+	font-size: 17pt;
+	color: #666;
+	font-weight: bold;
+}
+
+#intro {
+    font-family: Asap;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    margin: 40px 0;
+    box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
+    -moz-box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
+    -webkit-box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
+    -o-box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
+    height: 295px;
+}
+
+#intro img {
+    border-right: 1px solid #ddd;
+    padding: 22px;
+    width: 350px;
+    display: block;
+    float: left;
+    margin-right: 20px;
+}
+
+#intro p {
+    font-size: 13.8pt;
+    text-align: justify;
+    margin: 20px 25px 20px 20px;
+    color: #333;
+    height: 190px;
+}
+
+a button {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.bluebtn {
+    font-size: 14pt;
+    line-height: 30px;
+    font-family: "Istok Web", helvetica, Arial, sans-serif;
+    padding: 2px 12px;
+    font-weight: bold;
+    border: solid 1px #0169c9;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -o-border-radius: 4px;
+    box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
+    -moz-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
+    -webkit-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
+    -o-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
+    color: #003366;
+    text-shadow: 0 1px 1px #addbfd;
+    background: url(../img/button-blue2.png) repeat-x;
+}
+
+.greenbtn {
+    font-size: 14pt;
+    line-height: 30px;
+    font-family: "Istok Web", helvetica, Arial, sans-serif;
+    padding: 2px 12px;
+    font-weight: bold;
+    border: solid 1px #339900;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -o-border-radius: 4px;
+    color: #002b3d;
+    text-shadow: 0 1px 1px #aeff86;
+    box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
+    -moz-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
+    -webkit-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
+    -o-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
+    background: url(../img/button-green.png) repeat-x;
+
+}
+
+#content {
+	position: relative;
+	text-align: left;
+	margin: 0 auto;
+	width: 790px;
+	clear: both;
+}
+
+article {
+	display: block;
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 790px;
+}
+
+article.new-left {
+	position: absolute;
+	top: 0;
+	left: -790px;
+}
+
+article.new-right {
+	position: absolute;
+	top: 0;
+	left: 790px;
+}
+
+article h1 {
+	font-size: 28pt;
+	margin: 20px 0 4px 0;
+	font-weight: normal;
+}
+
+article h2 {
+	font-size: 22pt;
+	margin: 20px 0 4px 0;
+}
+
+article h3 {
+	font-size: 14pt;
+	margin: 20px 0 4px 0;
+	border-bottom: 1px solid silver;
+}
+
+article h4 {
+	font-size: 11pt;
+	text-transform: uppercase;
+	margin: 20px 0 4px 0;
+}
+
+article h5 {
+	font-size: 100%;
+	margin: 20px 0 4px 0;
+}
+
+article li {
+	margin: 10px 0;
+}
+
+article p {
+	margin: 10px 0;
+}
+
+.feature {
+    margin-top: 20px;
+	margin-bottom: 30px;
+	height: 160px;
+	font-size: 13pt;
+	font-family: Asap, helvetica, Arial, sans-serif;
+}
+
+.feature img {
+    float: left;
+    margin-right: 20px;
+    border: 1px solid #aaa;
+}
+
+.feature strong {
+	font-size: 140%;
+}
+
+footer {
+	display: block;
+	clear: both;
+	display: block;
+	width: 790px;
+	margin: 60px auto;
+	clear: both;
+	height: 100px;
+	text-align: left;
+}
+
+#subscribe {
+	display: block;
+	font-size: 26pt;
+	font-weight: bold;
+	line-height: 100%;
+	padding: 0;
+	width: 400px;
+}
+
+#subscribe div {
+	font-style: italic;
+}
+
+#subscribe input {
+	display: block;
+	float: left;
+	font-family: helvetica, Arial, "Nimbus Sans", sans-serif;
+	border: 1px solid #aaa;
+	padding: 6px;
+	font-size: 14pt;
+	margin: 15px 0;
+	width: 215px;
+	height: 26px;
+	color: #333;
+}
+
+#subscribe input:-moz-placeholder {
+	color: #888;
+}
+
+#subscribe input:focus {
+	outline: none;
+}
+
+#subscribe input:-moz-ui-invalid {
+	box-shadow: none;
+}
+
+#subscribe button {
+	display: block;
+	float: left;
+	font-family: helvetica, Arial, "Nimbus Sans", sans-serif;
+	font-size: 14pt;
+	margin: 15px 0 15px -1px;
+	height: 40px;
+	border: 1px solid #aaa;
+	background: url(../img/button-silver.png) repeat-x;
+	cursor: pointer;
+	color: #666;
+	padding: 0 10px;
+}
+
+#subscribe input:valid + button {
+	background: url(../img/button-blue.png) repeat-x;
+	color: black;
+	border: 1px solid black;
+}
+
+#github {
+	display: block;
+	margin-top: 16px;
+	margin-bottom: 32px;
+	float: right;
+}
+
+#github img {
+	border: none;
+}
+
+#credits {
+	clear: both;
+	padding-top: 16px;
+	padding-bottom: 16px;
+	border-top: 1px solid #666;
+}
+
+var {
+	font-family: monospace;
+	font-style: normal;
+}
+
+.cmd,.code {
+	color: #444;
+	background: #f4f4f4;
+	padding: 10px;
+	margin: 6px 0;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-o-border-radius: 2px;
+	font-family: monospace;
+	border: 2px solid #eee;
+}
+
+.note:before {
+	content: "Note: ";
+	font-weight: bold;
+}
+
+.note {
+	padding: 10px;
+	margin: 6px 0;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-o-border-radius: 2px;
+	border: 2px solid #eee;
+}
+
+.releasenotes .date {
+	color: gray;
+	margin: 0 10px;
+	font-size: 90%;
+}
