@@ -6,27 +6,28 @@ layout: default
 <h2 id="installation">Installation</h2>
 
 <p>
-Fileshack can be hosted on your own server or on <a href="https://developers.google.com/appengine/">Google AppEngine</a>.
-While the latter is better if you prefer hosting for free (up to <a href="https://developers.google.com/appengine/docs/quotas">a certain
+Fileshack can be hosted on your own server or on <a href="https://cloud.google.com/appengine/">Google AppEngine</a>.
+While the latter is better if you prefer hosting for free (up to <a href="https://cloud.google.com/appengine/quotas">a certain
 amount of traffic</a>), the former means you do not have to disclose your files to a third
 party.
 </p>
 
 <h3>Native Installation</h3>
-<p>Fileshack is based on the web development framework <a href="http://www.djangoproject.com">Django</a>.
+<p>Fileshack is based on the web development framework <a href="https://www.djangoproject.com">Django</a>.
 In order to deploy fileshack on your server, you first need to have a working web server such as
-<a href="http://www.apache.org/">Apache</a> or <a href="http://www.nginx.org/">nginx</a>.
+<a href="https://www.apache.org/">Apache</a> or <a href="https://nginx.org/">nginx</a>.
 There are countless ways of deploying Django.
-One of the most popular and simple combinations is Apache and <a href="http://code.google.com/p/modwsgi/">mod_wsgi</a>,
-which will be covered here. Other convenient combinations are Apache or nginx with 
-<a href="https://docs.djangoproject.com/en/dev/howto/deployment/fastcgi/">FastCGI</a> or <a href="http://gunicorn.org/">gunicorn</a>, possibly with Django run on startup by <a href="http://supervisord.org/">supervisord</a>.
+One of the most popular and simple combinations is Apache and <a href="https://code.google.com/p/modwsgi/">mod_wsgi</a>,
+which will be covered here. Other convenient combinations are Apache or nginx with
+<a href="https://docs.djangoproject.com/en/dev/howto/deployment/fastcgi/">FastCGI</a>
+or <a href="https://gunicorn.org/">gunicorn</a>, possibly with Django run on startup by <a href="http://supervisord.org/">supervisord</a>.
 It should also be possible to run fileshack on Windows with IIS. You will sure
 be able to find instructions for installing Django projects in these other combinations on the web.</p>
 
 <h4>Apache and mod_wsgi</h4>
 <p>If you run a Linux or a BSD distribution, both Apache and mod_wsgi are likely
 available via the distribution's packaging system.
-We will put Django and fileshack inside a <a href="http://www.virtualenv.org/">virtualenv</a>.
+We will put Django and fileshack inside a <a href="https://virtualenv.pypa.io/en/latest/">virtualenv</a>.
 Assuming Apache, mod_wsgi and virtualenv are installed, follow these steps:</p>
 
 <div class="note">Substitute your preferred installation directory for
@@ -110,7 +111,7 @@ Assuming Apache, mod_wsgi and virtualenv are installed, follow these steps:</p>
 &nbsp;&nbsp;&nbsp;DocumentRoot <em>/home/user/www/fs/</em><br />
 &nbsp;&nbsp;&nbsp;ErrorLog /var/log/apache2/fileshack_error.log<br />
 &nbsp;&nbsp;&nbsp;CustomLog /var/log/apache2/fileshack_access.log common<br /><br />
-	
+
 &nbsp;&nbsp;&nbsp;&lt;Location /&gt;<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Options -Indexes<br />
 &nbsp;&nbsp;&nbsp;&lt;/Location&gt;<br /><br />
@@ -165,7 +166,7 @@ this feature.
 you have to set up periodic requests to the service which
 sends the notifications:</p>
 
-<div class="code"> 
+<div class="code">
 http://<em>fileshack.example.org</em>/cron/
 </div>
 
@@ -216,7 +217,7 @@ curl -d secret=<em>yoursecret</em> http://<em>fileshack.example.org</em>/cron/
 properly — mail server settings EMAIL_*, FILESHACK_EMAIL_FROM and SECRET_KEY
 in <var>fileshackproject/settings_local.py</var>.
 Mail server settings are described in detail in the
-<a href="https://docs.djangoproject.com/en/1.4/ref/settings/#std:setting-EMAIL_HOST">django documentation</a>.
+<a href="https://docs.djangoproject.com/en/3.1/ref/settings/">django documentation</a>.
 </p>
 
 <div class="note">
@@ -283,8 +284,8 @@ files are not supported. The demo on this site is hosted on Google AppEngine.</p
 			hg clone https://bitbucket.org/twanschik/django-autoload<br />
 			hg clone https://bitbucket.org/wkornewald/django-dbindexer<br />
 		</div>
-		<div class="note">If you do not want to use <a href="http://mercurial.selenic.com/">mercurial</a> (hg),
-		you can download them from <a href="http://www.allbuttonspressed.com/projects/djangoappengine">allbuttonspressed.com</a>.</div>
+		<div class="note">If you do not want to use <a href="https://www.mercurial-scm.org/">mercurial</a> (hg),
+		you can download them from <a href="https://www.allbuttonspressed.com/projects/djangoappengine">allbuttonspressed.com</a>.</div>
 	</li>
 	<li>
 		Clone the appengine branch of fileshack into the working directory:
@@ -338,7 +339,7 @@ files are not supported. The demo on this site is hosted on Google AppEngine.</p
 	</li>
 	<li>
 		Fileshack should now be accessible at <var>http://<em>appidentifier</em>.appspot.com</var>,
-		and your Google administration console at <a href="http://appspot.com">http://appspot.com</a>.
+		and your Google administration console at <a href="https://appspot.com">https://appspot.com</a>.
 		If you encounter any problems, drop an e-mail to the mailing list at
 		<a href="mailto:fileshack-general@lists.sourceforge.net">fileshack-general@lists.sourceforge.net</a>.
 	</li>
