@@ -5,8 +5,9 @@
 
 body {
 	font-family: "Istok Web", helvetica, Arial, sans-serif;
+	line-height: 1.3125em;
 	text-align: center;
-	font-size: 11pt;
+	font-size: 16px;
 	overflow: scroll;
 	background: url(../img/bg.png) repeat-x;
 }
@@ -15,7 +16,8 @@ header {
 	display: block;
 	text-align: left;
 	margin: 50px auto 10px auto;
-	width: 800px;
+	width: 860px;
+	max-width: 100%;
 	height: 135px;
 	background: url(../img/kiwi.png) no-repeat 100px 0;
 }
@@ -53,7 +55,7 @@ header h2 {
 	background: url(../img/separator.png) no-repeat center 40px;
 	height: 50px;
 	text-align: center;
-	font-size: 17pt;
+	font-size: 18.5pt;
 	color: #666;
 	font-weight: bold;
 }
@@ -62,14 +64,8 @@ header h2 {
     font-family: Asap;
     border: 1px solid #aaa;
     border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -o-border-radius: 5px;
     margin: 40px 0;
     box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
-    -moz-box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
-    -webkit-box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
-    -o-box-shadow: 1px 1px 2px #aaa, inset 0 0 10px 5px rgba(0, 0, 0, 0.03);
     height: 295px;
 }
 
@@ -83,7 +79,8 @@ header h2 {
 }
 
 #intro p {
-    font-size: 13.8pt;
+    font-size: 18px;
+    line-height: 24px;
     text-align: justify;
     margin: 20px 25px 20px 20px;
     color: #333;
@@ -103,13 +100,7 @@ a button {
     font-weight: bold;
     border: solid 1px #0169c9;
     border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -o-border-radius: 4px;
     box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
-    -moz-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
-    -webkit-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
-    -o-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(0, 51, 102, 0.02);
     color: #003366;
     text-shadow: 0 1px 1px #addbfd;
     background: url(../img/button-blue2.png) repeat-x;
@@ -123,15 +114,9 @@ a button {
     font-weight: bold;
     border: solid 1px #339900;
     border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -o-border-radius: 4px;
     color: #002b3d;
     text-shadow: 0 1px 1px #aeff86;
     box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
-    -moz-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
-    -webkit-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
-    -o-box-shadow: 0 0 1px 1px #ccc,inset 0 0 5px 5px rgba(1, 90, 1, 0.02);
     background: url(../img/button-green.png) repeat-x;
 
 }
@@ -140,7 +125,7 @@ a button {
 	position: relative;
 	text-align: left;
 	margin: 0 auto;
-	width: 790px;
+	width: 850px;
 	clear: both;
 }
 
@@ -149,35 +134,38 @@ article {
 	position: relative;
 	top: 0;
 	left: 0;
-	width: 790px;
+	width: 850px;
 }
 
 article.new-left {
 	position: absolute;
 	top: 0;
-	left: -790px;
+	left: -850px;
 }
 
 article.new-right {
 	position: absolute;
 	top: 0;
-	left: 790px;
+	left: 850px;
 }
 
 article h1 {
-	font-size: 28pt;
-	margin: 20px 0 4px 0;
+	font-size: 40px;
+	line-height: 46px;
+	margin: 30px 0 20px 0;
 	font-weight: normal;
+	text-align: center;
 }
 
 article h2 {
-	font-size: 22pt;
-	margin: 20px 0 4px 0;
+	font-size: 30px;
+	margin: 30px 0 20px 0;
 }
 
 article h3 {
-	font-size: 14pt;
-	margin: 20px 0 4px 0;
+	font-size: 20px;
+	margin: 30px 0 15px 0;
+	padding-bottom: 10px;
 	border-bottom: 1px solid silver;
 }
 
@@ -204,7 +192,8 @@ article p {
     margin-top: 20px;
 	margin-bottom: 30px;
 	height: 160px;
-	font-size: 13pt;
+	font-size: 18px;
+	line-height: 24px;
 	font-family: Asap, helvetica, Arial, sans-serif;
 }
 
@@ -215,15 +204,15 @@ article p {
 }
 
 .feature strong {
-	font-size: 140%;
+	font-size: 24px;
 }
 
 footer {
 	display: block;
 	clear: both;
 	display: block;
-	width: 790px;
-	margin: 60px auto;
+	width: 850px;
+	margin: 40px auto;
 	clear: both;
 	height: 100px;
 	text-align: left;
@@ -303,6 +292,7 @@ footer {
 	padding-top: 16px;
 	padding-bottom: 16px;
 	border-top: 1px solid #666;
+	color: #555;
 }
 
 var {
@@ -313,14 +303,10 @@ var {
 .cmd,.code {
 	color: #444;
 	background: #f4f4f4;
-	padding: 10px;
-	margin: 6px 0;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	-o-border-radius: 2px;
+	padding: 8px 10px;
+	margin: 12px 0;
+	border-radius: 4px;
 	font-family: monospace;
-	border: 2px solid #eee;
 }
 
 .note:before {
@@ -331,10 +317,7 @@ var {
 .note {
 	padding: 10px;
 	margin: 6px 0;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	-o-border-radius: 2px;
+	border-radius: 4px;
 	border: 2px solid #eee;
 }
 
