@@ -97,7 +97,6 @@ header h2 {
 #intro > div:last-child {
     width: 54%;
     box-sizing: border-box;
-    border-top: 1px solid #ddd;
     line-height: 24px;
     text-align: justify;
     padding: 1.2em;
@@ -400,15 +399,16 @@ var {
 	#intro {
 		flex-direction: column;
 	}
-	
-	#intro > div:first-child,
-	#intro > div:last-child {
-		width: 100%;
-	}
-	
+		
 	#intro div:first-child {
+		width: 100%;
 		border: none;
 		margin: 0 auto;
+	}
+	
+	#intro div:last-child {
+		width: 100%;
+	    border-top: 1px solid #ddd;
 	}
 	
 	.features > div > p {
