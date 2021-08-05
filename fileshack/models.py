@@ -42,8 +42,8 @@ class Store(Model):
     allow_watch = BooleanField(_("allow watch"), help_text=_('Allow users to subscribe to receive e-mail updates. Requires cron (see <a href="http://fileshack.sourceforge.net/doc/#store-watching">documentation</a>).'), default=False)
     watch_delay = PositiveIntegerField(_("watch delay"), help_text=_("Minimum delay between two notifications in minutes. Only applies when <strong>Allow watch</strong> is enabled."), default=360)
 
-    def __unicode__(self):
-        url = self.get_absolute_url()
+    def __str__(self):
+        url = urllib.parse.unquote(self.get_absolute_url())
         if url.startswith("/"):
             url = url[1:]
         return "default" if url == "" else url
@@ -138,7 +138,7 @@ class Item(Model):
             "uploaded": self.uploaded,
         }
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name()
 
     class Meta:
