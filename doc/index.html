@@ -6,23 +6,13 @@ layout: default
 <h2 id="installation">Installation</h2>
 
 <p>
-Fileshack can be hosted on your own server or on <a href="https://cloud.google.com/appengine/">Google AppEngine</a>.
-While the latter is better if you prefer hosting for free (up to <a href="https://cloud.google.com/appengine/quotas">a certain
-amount of traffic</a>), the former means you do not have to disclose your files to a third
-party.
-</p>
-
-<h3>Native installation</h3>
-<p>Fileshack is based on the web development framework <a href="https://www.djangoproject.com">Django</a>.
-In order to deploy fileshack on your server, you first need to have a working web server such as
-<a href="https://nginx.org/">nginx</a> or <a href="https://www.apache.org/">Apache</a>.
-Here, set up on these two servers is described. For installation on nginx,
-follow the sections <strong>Built-in server setup</strong>,
-<strong>nginx and gunicorn</strong> and <strong>Post-installation</strong>.
-For installation on Apache, follow
-the sections <strong>Built-in server setup</strong>,
-<strong>Apache and mod_wsgi</strong> and <strong>Post-installation</strong>.
-
+Fileshack can be hosted on your own server.
+Fileshack is based on the web development framework
+<a href="https://www.djangoproject.com">Django</a>.
+In order to deploy fileshack on your server, you first need to have a working web
+server such as <a href="https://nginx.org/">nginx</a>. For installation on nginx,
+follow the sections <strong>Built-in server setup</strong> and then
+<strong>nginx and gunicorn</strong>.
 <p>
 In the instructions below, substitute
 <var><em>/home/user/www/fs/</em></var> with your installation directory
@@ -34,9 +24,15 @@ server's IP address.
 <h4>Built-in server setup</h4>
 
 <ol>
-	<li>Install <strong>Python virtualenv</strong> from you distribution package repositories.</li>
 	<li>
-		Create a new virtualenv:
+		Install <strong>Python 3</strong> from you distribution package
+		repositories. On APT:
+		<div class="cmd">
+			apt install python3
+		</div>
+	</li>
+	<li>
+		Create a new Python virtual environment (venv):
 		<div class="cmd">
 			mkdir -p <em>/home/user/www</em><br />
 			cd <em>/home/user/www</em><br />
@@ -92,7 +88,7 @@ server's IP address.
 		</div>
 		The default store should be accessible at
 		<a href="http://localhost:8000">http://localhost:8000</a>.
-		If everything works fine, continue with setting up Apache.
+		If everything works fine, continue with setting up nginx.
 	</li>
 </ol>
 
@@ -102,15 +98,24 @@ This configuration below assumes installation on a Debian-derived Linux
 distribution with systemd.
 
 <ol>
-	<li>Install <strong>nginx</strong> and <strong>gunicorn</strong> from your distribution package repositories.</li>
 	<li>
-		Add the domain on which you want to host the fileshack to <var>ALLOWED_HOSTS</var> in the configuration file <var>fileshackproject/settings_local.py</var>:
+		Install <strong>nginx</strong> and <strong>gunicorn3</strong> from your
+		distribution package repositories. On APT:
+		<div class="cmd">
+			apt install nginx gunicorn3
+		</div>
+	</li>
+	<li>
+		Add the domain on which you want to host the fileshack to
+		<var>ALLOWED_HOSTS</var> in the configuration file
+		<var>fileshackproject/settings_local.py</var>:
 		<div class="cmd">
 			ALLOWED_HOSTS = ['<em>fileshack.example.org</em>']
 		</div>
 	</li>
 	<li>
-		Create a new gunicorn systemd service <var>/etc/systemd/system/gunicorn-fileshack.service</var>:
+		Create a new gunicorn systemd service
+		<var>/etc/systemd/system/gunicorn-fileshack.service</var>:
 		<div class="cmd">
 			[Unit]<br />
 			Description=gunicorn-fileshack<br />
@@ -141,7 +146,8 @@ distribution with systemd.
 		</div>
 	</li>
 	<li>
-		Create a new site in nginx configuration <var>/etc/nginx/sites-available/fileshack</var>:
+		Create a new site in nginx configuration
+		<var>/etc/nginx/sites-available/fileshack</var>:
 		<div class="cmd">
 			server {<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;listen 80;<br />
@@ -177,16 +183,44 @@ distribution with systemd.
 	</li>
 </ol>
 
+<p>
+Fileshack should now be accessible at
+<var>http://<em>fileshack.example.org</em></var>. You can manage stores in the
+administration interface at
+<var>http://<em>fileshack.example.org</em>/admin/</var>. It is highly recommended
+that you also set up an SSL certificate for the domain, such as with
+<a href="https://letsencrypt.org/">Let's Encrypt</a>, and set up an access code
+on the default store.
+</p>
+
+<p>
+Do not forget to set <var>DEBUG = False</var> in <var>settings_local.py</var>
+before going public. Otherwise, users are presented with ugly HTTP 404 and HTTP
+500 pages, potentially revealing sensitive information.
+</p>
+
+<p>
+If you encounter any problems, drop an e-mail to the mailing list at
+<a href="mailto:fileshack-general@lists.sourceforge.net">fileshack-general@lists.sourceforge.net</a>.
+</p>
+
+
+<!--
 <h4>Apache and mod_wsgi</h4>
 
 <ol>
-	<li>Install <strong>Apache</strong> and <strong>mod_wsgi</strong> from your
-	distribution package repositories.</li>
+	<li>
+		Install <strong>Apache 2</strong> and <strong>mod_wsgi (Python 3)</strong> from your
+		distribution package repositories. On APT:
+		<div class="cmd">
+			apt install apache2 libapache2-mod-wsgi-py3
+		</div>
+	</li>
 	<li>
 		Make sure Apache has a permission to write to <var>db</var>,
 		the database file <var>db/fileshack.sqlite</var> and <var>media</var>.
 		<div class="cmd">
-			sudo chown www-data db db/fileshack.sqlite media
+			chown www-data db db/fileshack.sqlite media
 		</div>
 		<p><var>media</var> is the directory where fileshack stores the uploaded files.
 		If you like, you can make it a symlink to a different directory on the
@@ -223,30 +257,7 @@ distribution with systemd.
 	</li>
 </ol>
 
-<h4>Post-installation</h4>
-
-<p>
-Fileshack should now be accessible at <var>http://<em>fileshack.example.org</em></var>.
-You can manage stores in the administration interface at
-<var>http://<em>fileshack.example.org</em>/admin/</var>.
-It is highly recommended that you also set up an SSL certificate for
-the domain, such as with
-<a href="https://letsencrypt.org/">Let's Encrypt</a>, and set up an
-access code on the default store.
-</p>
-
-<p>
-Do not forget to set <var>DEBUG = False</var> in
-<var>settings_local.py</var>
-before going public. Otherwise, users are presented with
-ugly HTTP 404 and HTTP 500 pages, potentially revealing sensitive
-information.
-</p>
-
-<p>
-If you encounter any problems, drop an e-mail to the mailing list at
-<a href="mailto:fileshack-general@lists.sourceforge.net">fileshack-general@lists.sourceforge.net</a>.
-</p>
+-->
 
 <h3 id="store-watching">Store Watching (optional)</h3>
 <p>Fileshack allows users to opt in to receive e-mail notifications when
@@ -314,11 +325,14 @@ curl -d secret=<em>yoursecret</em> http://<em>fileshack.example.org</em>/cron/
 properly — mail server settings EMAIL_*, FILESHACK_EMAIL_FROM and SECRET_KEY
 in <var>fileshackproject/settings_local.py</var>.
 Mail server settings are described in detail in the
-<a href="https://docs.djangoproject.com/en/3.1/ref/settings/">django documentation</a>.
+<a href="https://docs.djangoproject.com/en/3.1/ref/settings/">django
+documentation</a>.
 </p>
 
 <div class="note">
-You have reload Apache in order for the new settings to be applied.
+You have reload the gunicorn-fileshack service in order for the new settings to
+be applied:
+<div class="cmd">service gunicorn-fileshack restart</div>
 </div>
 
 <div class="note">If you do not set <var>SECRET_KEY</var>,
@@ -339,7 +353,12 @@ per 6-hour period to a particular e-mail address.
 This can be tuned by the <strong>Watch delay</strong>
 option.</p>
 
+<!--
 <h3>Deployment on Google AppEngine</h3>
+
+<div class="note">Deployment on Google AppEngine has not been tested recently
+and may no longer work. Local deployment on nginx is recommended.</div>
+
 <p>Google AppEngine is an application hosting service provided by Google.
 The good thing about AppEngine is that your application is hosted for free
 as long as you stay below rather high limits of bandwidth and storage
@@ -441,6 +460,7 @@ files are not supported. The demo on this site is hosted on Google AppEngine.</p
 		<a href="mailto:fileshack-general@lists.sourceforge.net">fileshack-general@lists.sourceforge.net</a>.
 	</li>
 </ol>
+-->
 
 <h2 id="compatibility">Compatibility</h2>
 <p>Fileshack is known to work with at least the following browsers:</p>
