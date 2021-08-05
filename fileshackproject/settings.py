@@ -146,6 +146,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Serve static and media files even when DEBUG == False.
 SERVE_STATIC = False
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # List of hosts which are allowed to run scheduled tasks.
 FILESHACK_CRON_HOSTS = ('localhost',)
 
