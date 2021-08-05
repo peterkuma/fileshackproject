@@ -146,7 +146,7 @@ var Item = new Class({
 	    this.xhr.upload.addEventListener('progress', function(e) {
 		if (!this_.size_total) this_.set('size_total', e.total);
 		if (!len) len = this_.size_total;
-		this_.set('size', offset + e.position/e.total*len);
+		this_.set('size', offset + e.loaded/e.total*len);
 	    }, false);
 	
 	    this.xhr.upload.addEventListener('load', function(e) {
