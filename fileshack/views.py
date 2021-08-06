@@ -517,7 +517,8 @@ def cron(request):
 
 
 def digest(request):
-    url_prefix = "http://" + get_current_site(request).domain
+    url_prefix = ("https://" if request.is_secure else "http://") + \
+        get_current_site(request).domain
     now = timezone.now()
 
     watchers = Watcher.objects.filter(user__last_notification=None)
