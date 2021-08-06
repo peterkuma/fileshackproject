@@ -152,12 +152,12 @@ class User(Model):
     last_notification = DateTimeField(_("last notification"), null=True, blank=True)
 
     def unsubscribe_hmac(self):
-        h = hmac.HMAC(settings.SECRET_KEY)
-        h.update("unsubscribe:"+self.email)
+        h = hmac.HMAC(settings.SECRET_KEY.encode('utf-8'))
+        h.update(b"unsubscribe:"+self.email.encode('utf-8'))
         return base64.urlsafe_b64encode(h.digest())
 
     def unsubscribe_url(self):
-        return reverse("fileshack:unsubscribe") + "?" + urllib.urlencode(
+        return reverse("fileshack:unsubscribe") + "?" + urllib.parse.urlencode(
             {"u": self.email, "hmac": self.unsubscribe_hmac()}
         )
 
