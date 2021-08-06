@@ -1,2 +1,1 @@
-Please visit http://fileshack.sourceforge.net for more information.
-
+Please visit https://fileshack.sourceforge.io for more information.
