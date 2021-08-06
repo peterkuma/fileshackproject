@@ -510,7 +510,7 @@ def cron(request):
 
     # digest.
     response = digest(request)
-    output += "digest: %s\n" % response.content
+    output += "digest: %s\n" % response.content.decode(response.charset)
     if response.status_code != 200: error = True
 
     return HttpResponseServerError(output) if error else HttpResponse(output)
