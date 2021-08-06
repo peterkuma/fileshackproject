@@ -576,7 +576,7 @@ def digest(request):
 @require_GET
 def unsubscribe(request):
     email = request.GET.get("u")
-    hmac = request.GET.get("hmac")
+    hmac = request.GET.get("hmac").encode("utf-8")
 
     try: u = User.objects.get(email=email)
     except User.DoesNotExist:
