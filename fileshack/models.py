@@ -43,13 +43,14 @@ class Store(Model):
     watch_delay = PositiveIntegerField(_("watch delay"), help_text=_("Minimum delay between two notifications in minutes. Only applies when <strong>Allow watch</strong> is enabled."), default=360)
 
     def __str__(self):
-        url = urllib.parse.unquote(self.get_absolute_url())
+        url = self.get_absolute_url()
         if url.startswith("/"):
             url = url[1:]
         return "default" if url == "" else url
 
     def get_absolute_url(self):
         url = reverse("fileshack:index", kwargs=dict(store_path=self.path))
+        url = urllib.parse.unquote(url)
         if url.endswith("//"): url = url[:-1] # Ugly hack.
         return url
 
