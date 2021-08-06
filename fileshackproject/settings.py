@@ -10,6 +10,8 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 MANAGERS = ADMINS
 
 DATABASES = {
