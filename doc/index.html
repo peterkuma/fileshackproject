@@ -160,6 +160,7 @@ distribution with systemd.
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_pass http://unix:<em>/home/user/www/fs/</em>fileshack.sock;<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_set_header Host $host;<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_set_header X-Forwarded-Proto $scheme;<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;}<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;location /static/ {<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alias <em>/home/user/www/fs/</em>fileshackproject/static/;<br />
@@ -260,7 +261,7 @@ If you encounter any problems, drop an e-mail to the mailing list at
 
 -->
 
-<h3 id="store-watching">Store Watching (optional)</h3>
+<h3 id="store-watching">Store watching (optional)</h3>
 <p>Fileshack allows users to opt in to receive e-mail notifications when
 new files are uploaded. When enabled, a <strong>Watch</strong> button
 is displayed next to the <strong>Logout</strong> button, allowing users
@@ -285,14 +286,14 @@ present with the shared secret <var>FILESHACK_CRON_SECRET</var>.</p>
 
 <p>On Linux and other unix-like systems, periodic requests to a URL can be
 accomplished by a scheduled command in the system daemon
-<a href="https://en.wikipedia.org/wiki/Cron">cron</a>.
+<a href="https://www.debian.org/doc/manuals/debian-handbook/sect.task-scheduling-cron-atd.en.html">cron</a>.
 In order to schedule such a request every 10 minutes,
 create a file <var>/etc/cron.d/fileshack</var>:
 
 <div class="code">
 # Run scheduled tasks of the web application fileshack.<br />
 #<br />
-*/10	 * * * * <em>user</em> python -c 'import sys, httplib; c=httplib.HTTPConnection("<em>fileshack.example.org</em>"); c.request("POST","/cron/","secret=<em>yoursecret</em>"); r=c.getresponse(); r.status==200 or sys.stdout.write(r.read())'
+*/10	 * * * * <em>user</em> python3 -c 'import sys; import urllib.request; f=urllib.request.urlopen("http://<em>fileshack.example.org</em>/cron/", b"secret=<em>yoursecret</em>"); f.status==200 or sys.stdout.buffer.write(f.read())'
 </div>
 
 <p>Replace <em>user</em> with your username, and
