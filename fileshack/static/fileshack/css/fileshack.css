@@ -61,9 +61,9 @@ form[action="logout/"] button:focus {
     background: url("../img/watch-dialog-top.png") no-repeat center top;
     height: 16px;
     width: 100%;
-    margin-bottom: -1px;
     z-index: 40;
     position: relative;
+    top: 1px;
 }
 
 #watch-dialog .dialog {
