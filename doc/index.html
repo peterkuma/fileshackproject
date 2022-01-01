@@ -127,7 +127,7 @@ distribution with systemd.
 			User=<em>user</em><br />
 			Group=<em>user</em><br />
 			Restart=always<br />
-			ExecStart=/usr/bin/gunicorn3 --workers=4 --log-file=<em>/home/user/www/fs/</em>gunicorn-fileshack.log --bind unix:<em>/home/user/www/fs/</em>fileshack.sock fileshackproject.wsgi<br />
+			ExecStart=/usr/bin/gunicorn3 --workers=4 --log-file=<em>/home/user/www/fs/</em>gunicorn-fileshack.log --bind unix:<em>/home/user/www/fs/</em>fileshack.sock --timeout 300 fileshackproject.wsgi<br />
 			ExecReload=/bin/kill -s HUP $MAINPID<br />
 			ExecStop=/bin/kill -s TERM $MAINPID<br />
 			WorkingDirectory=<em>/home/user/www/fs/fileshackproject/</em><br />
@@ -161,6 +161,7 @@ distribution with systemd.
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_set_header Host $host;<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_set_header X-Forwarded-Proto $scheme;<br />
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxy_read_timeout 300s;<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;}<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;location /static/ {<br />
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alias <em>/home/user/www/fs/</em>fileshackproject/static/;<br />
