@@ -22,7 +22,7 @@ from django.template import Context, loader
 from django.http import HttpResponse, HttpResponseNotFound, \
                         HttpResponseForbidden, HttpResponseRedirect, \
                         HttpResponseServerError, HttpResponseBadRequest, \
-                        HttpResponseNotAllowed
+                        HttpResponseNotAllowed, StreamingHttpResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.translation import gettext, gettext_lazy as _
@@ -32,7 +32,6 @@ from django.core.files.storage import default_storage
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from django.conf import settings
-from wsgiref.util import FileWrapper
 from django import forms
 from django.views.decorators.http import require_POST, require_GET
 from django.core.mail import send_mail
@@ -378,31 +377,34 @@ def update(request, store, since=None):
             item_ids=item_ids, items=items_simple))
     return HttpResponse(data)
 
-class ItemFileWrapper(FileWrapper):
-    def __init__(self, item, *args, **kwargs):
+class ItemFileWrapper():
+    def __init__(self, item, f,
+        throttle=1000, stale_limit=300000, chunk_size=64*1024):
         self._item = item
         self._counter = 0
         self._stale = 0
-        self._throttle = kwargs.get("throttle", 100)
-        self._stale_limit = kwargs.get("stale_limit", 10000)
-        return FileWrapper.__init__(self, *args, **kwargs)
+        self._throttle = throttle
+        self._stale_limit = stale_limit
+        self._chunk_size = chunk_size
+        self._f = f
+    def __iter__(self):
+        return self
     def __next__(self):
-        try:
-            data = FileWrapper.next(self)
-            self._counter += len(data)
+        if self._counter >= self._item.size_total:
+            raise StopIteration
+        while True:
+            data = self._f.read(self._chunk_size)
             if len(data) > 0:
+                self._counter += len(data)
                 self._stale = 0
-            return data
-        except StopIteration:
-            if self._counter >= self._item.size_total:
-                raise StopIteration
-            if self._stale_limit and self._stale >= self._stale_limit:
-                raise StopIteration
-            start = time.time()
-            time.sleep(self._throttle/1000)
-            end = time.time()
-            self._stale += (end - start)*1000
-            return ""
+                return data
+            else:
+                if self._stale_limit and self._stale >= self._stale_limit:
+                    raise StopIteration
+                start = time.time()
+                time.sleep(self._throttle/1000)
+                end = time.time()
+                self._stale += max(0, end - start)*1000
 
 @require_store
 @require_login
@@ -414,7 +416,7 @@ def download(request, store, item_id):
 
     f = default_storage.open(item.fileobject.path, "rb")
     wrapper = ItemFileWrapper(item, f)
-    response = HttpResponse(wrapper, content_type=mimetypes.guess_type(item.fileobject.name))
+    response = StreamingHttpResponse(wrapper, content_type=mimetypes.guess_type(item.fileobject.name))
     response["Content-Length"] = "%d" % item.size_total
     response["Content-Disposition"] = 'attachment; name="file"; filename="%s"' % urllib.parse.quote(item.name())
     return response
