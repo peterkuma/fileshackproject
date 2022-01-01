@@ -24,50 +24,50 @@ var Collection = new Class({
     Implements: Events,
     
     initialize: function() {
-	this.views = {};
+        this.views = {};
     },
     
     get: function(id) {
-	return this.views[id];
+        return this.views[id];
     },
     
     all: function() {
-	return this.views;
+        return this.views;
     },
     
     find: function(func) {
-	var view = null;
-	Object.each(this.views, function(v) {
-	    if (view) return; // Already found.
-	    if (func(v)) view = v;
-	});
-	return view;
+        var view = null;
+        Object.each(this.views, function(v) {
+            if (view) return; // Already found.
+            if (func(v)) view = v;
+        });
+        return view;
     },
 
     add: function(view) {
-	var this_ = this;
-	var id = view.model[view.model.pk];
-	if (this.views[id]) return;
-	this.views[id] = view;
-	view.model.addEvent('change', function() {
+        var this_ = this;
+        var id = view.model[view.model.pk];
+        if (this.views[id]) return;
+        this.views[id] = view;
+        view.model.addEvent('change', function() {
             if (id != view.model[view.model.pk]) {
                 this_.views[view.model[view.model.pk]] = view;
                 delete this_.views[id];
                 id = view.model.id;
             }
-	    this_.fireEvent('change', view);
+            this_.fireEvent('change', view);
         });
-	view.model.addEvent('remove', function() {
-	    this_.remove(view);
-	});
-	this.fireEvent('add', view);
+        view.model.addEvent('remove', function() {
+            this_.remove(view);
+        });
+        this.fireEvent('add', view);
     },
     
     remove: function(view) {
-	delete this.views[view.model[view.model.pk]];
+        delete this.views[view.model[view.model.pk]];
     },
     
     contains: function(id) {
-	return (id in this.views);
+        return (id in this.views);
     }
 });

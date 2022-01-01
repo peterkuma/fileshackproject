@@ -116,7 +116,7 @@ var FileShack = new Class({
     },
     
     update: function() {
-	var this_ = this;
+        var this_ = this;
         var xhr = new XMLHttpRequest();
         
         if (this.lastUpdate) xhr.open('GET', 'update/' + this.lastUpdate + '/');
@@ -211,20 +211,20 @@ var FileShack = new Class({
             item.onError({
                 label: ITEM_SIZE_LIMIT_ERROR_LABEL,
                 message: ITEM_SIZE_LIMIT_ERROR_MESSAGE
-	    });
+            });
             return null;
         }
         
-	if (typeof File != 'undefined' && data instanceof File &&
-	    typeof FormData != 'undefined' &&
-	    (data.slice || data.mozSlice || data.webkitSlice))
-	{
-	    item.model.upload(data);
-	} else if (typeof File != 'undefined' && data instanceof File && typeof FileReader != 'undefined') {
+        if (typeof File != 'undefined' && data instanceof File &&
+            typeof FormData != 'undefined' &&
+            (data.slice || data.mozSlice || data.webkitSlice))
+        {
+            item.model.upload(data);
+        } else if (typeof File != 'undefined' && data instanceof File && typeof FileReader != 'undefined') {
             var reader = new FileReader()
             reader.onload = function(e) { item.model.upload(e.target.result); };
             reader.readAsBinaryString(data);
-	} else if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement && typeof FormData != 'undefined') {
+        } else if (typeof HTMLFormElement != 'undefined' && data instanceof HTMLFormElement && typeof FormData != 'undefined') {
             item.model.upload(new FormData(data));
         } else if (typeof File != 'undefined' && data instanceof File && typeof FormData != 'undefined') {
             var formData = new FormData();
@@ -251,20 +251,20 @@ var FileShack = new Class({
                 iframe.onload = null;
                 iframe.src = iframe.src;
                 try {
-		    var response = JSON.decode(responseText);
-		} catch(e) {
-		    item.onError({
-			label: 'Upload failed',
-			message: 'The server responded with an invalid message',
-			details: responseText
-		    });
+                    var response = JSON.decode(responseText);
+                } catch(e) {
+                    item.onError({
+                        label: 'Upload failed',
+                        message: 'The server responded with an invalid message',
+                        details: responseText
+                    });
                     return;
-		}
+                }
                 item.model.update(response.item);
                 if (response.status != 'success') {
                     item.onError({
-			label: response.error_label,
-			message: response.error_message,
+                        label: response.error_label,
+                        message: response.error_message,
                         details: response.details
                     });
                     return;
@@ -331,20 +331,20 @@ var Watch = new Class({
             var watcher = new WatcherView(new Watcher({
                 email: this_.email.value,
             }));
-	    watcher.model.addEvent('save', function() {
-		this_.form.reset();
-		this_.submit.removeClass('active');
-		this_.error.hide();
-		this_.watchers.add(watcher);
-		this_.email.disabled = false;
-		this_.submit.disabled = false;
-	    });
-	    watcher.model.addEvent('error', function() {
-		this_.email.disabled = false;
-		this_.submit.disabled = false;		
-	    });
-	    this_.email.disabled = true;
-	    this_.submit.disabled = true;
+            watcher.model.addEvent('save', function() {
+                this_.form.reset();
+                this_.submit.removeClass('active');
+                this_.error.hide();
+                this_.watchers.add(watcher);
+                this_.email.disabled = false;
+                this_.submit.disabled = false;
+            });
+            watcher.model.addEvent('error', function() {
+                this_.email.disabled = false;
+                this_.submit.disabled = false;
+            });
+            this_.email.disabled = true;
+            this_.submit.disabled = true;
             watcher.model.save();
         });
     },

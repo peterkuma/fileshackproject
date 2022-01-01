@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-	<title>Fileshack</title>
+        <title>Fileshack</title>
     </head>
     <body>
-	<form name="form" method="POST" enctype="multipart/form-data">
-	    <input type="file" name="file" />
-	    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
-	</form>
+        <form name="form" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+        </form>
     </body>
 </html>

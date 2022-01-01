@@ -15,8 +15,8 @@ urlpatterns = []
 
 if settings.DEBUG or settings.SERVE_STATIC:
     urlpatterns += [
-	re_path(r'^static/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.STATIC_ROOT}),
-	re_path(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
+        re_path(r'^static/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.STATIC_ROOT}),
+        re_path(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
     ]
 
 urlpatterns += [

@@ -14,7 +14,7 @@
     <form method="post" id="accesscode-form">
         {% csrf_token %}
         <button id="ok" type="submit">{% trans "OK" %}</button>
-	<input id="accesscode" type="password" name="accesscode" value="{{ accesscode|escape }}" required="required" />
+        <input id="accesscode" type="password" name="accesscode" value="{{ accesscode|escape }}" required="required" />
     </form>
     {% if error_label %}
         <div id="error"><div class="label">{{ error_label }}</div><div class="message">{{ error_message }}</div></div>

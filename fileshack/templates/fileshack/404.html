@@ -7,27 +7,27 @@
 {% endblock %}
 {% block content %}
     <div id="error">
-	<div class="label">
-	    {% if stores_number > 0 %}
-		{% trans "There is no such page" %}
-	    {% else %}
-		{% trans "There is nothing at all!" %}
-	    {% endif %}
-	</div>
-	<div class="message">
-	    {% if store %}
-		{% blocktrans with url=store.get_absolute_url %}
-		    Are you looking for <a href="{{ url }}">this store</a>?
-		{% endblocktrans %}
-	    {% else %}
-		{% if stores_number > 0 %}
-		    {% trans "Have you typed the correct URL?" %}
-		{% else %}
-		    {% blocktrans with url=admin_url %}
-			Use the <a href="{{ url }}">admin interface</a> to add stores
-		    {% endblocktrans %}
-		{% endif %}
-	    {% endif %}
-	</div>
+        <div class="label">
+            {% if stores_number > 0 %}
+                {% trans "There is no such page" %}
+            {% else %}
+                {% trans "There is nothing at all!" %}
+            {% endif %}
+        </div>
+        <div class="message">
+            {% if store %}
+                {% blocktrans with url=store.get_absolute_url %}
+                    Are you looking for <a href="{{ url }}">this store</a>?
+                {% endblocktrans %}
+            {% else %}
+                {% if stores_number > 0 %}
+                    {% trans "Have you typed the correct URL?" %}
+                {% else %}
+                    {% blocktrans with url=admin_url %}
+                        Use the <a href="{{ url }}">admin interface</a> to add stores
+                    {% endblocktrans %}
+                {% endif %}
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

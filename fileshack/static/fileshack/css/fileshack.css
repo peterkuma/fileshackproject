@@ -128,7 +128,7 @@ form[action="logout/"] button:focus {
 }
 
 #watch-error a {
-    
+
 }
 
 #watch-error .details {
@@ -220,7 +220,7 @@ form[action="logout/"] button:focus {
 }
 
 .item.stale .box {
-    cursor: default;   
+    cursor: default;
 }
 
 .item .desc { display: none; }
