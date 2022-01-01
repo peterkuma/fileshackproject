@@ -1,5 +1,6 @@
 from django.urls import path
-from django.conf.urls import include, url
+from django.conf.urls import include
+from django.urls import re_path
 from django.contrib import admin
 from django.conf import settings
 import django.views.static
@@ -14,8 +15,8 @@ urlpatterns = []
 
 if settings.DEBUG or settings.SERVE_STATIC:
     urlpatterns += [
-	url(r'^static/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.STATIC_ROOT}),
-	url(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
+	re_path(r'^static/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.STATIC_ROOT}),
+	re_path(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
     ]
 
 urlpatterns += [
@@ -24,5 +25,5 @@ urlpatterns += [
     #url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
-    url(r'^', include(fileshack.urls)),
+    re_path(r'^', include(fileshack.urls)),
 ]

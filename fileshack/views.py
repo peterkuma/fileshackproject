@@ -25,8 +25,8 @@ from django.http import HttpResponse, HttpResponseNotFound, \
                         HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.translation import ugettext, ugettext_lazy as _
-from django.utils.translation import ungettext_lazy as ungettext
+from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import ngettext_lazy as ngettext
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.shortcuts import render, get_object_or_404
@@ -501,9 +501,9 @@ def cron(request):
             ok = True
             break
 
-    if not ok: return HttpResponseForbidden(ugettext("Permission denied\n"))
+    if not ok: return HttpResponseForbidden(gettext("Permission denied\n"))
 
-    output = ugettext("Cron started at %s\n" % \
+    output = gettext("Cron started at %s\n" % \
                       timezone.now().strftime("%H:%M %Z, %d %b %Y"))
 
     error = False
@@ -533,7 +533,7 @@ def digest(request):
         since = user.last_notification or w.created
         nitems = Item.objects.filter(store=w.store, created__gt=since).count()
         if nitems == 0: continue
-        text += ungettext(
+        text += ngettext(
             "A new item has been uploaded to %(store_url)s.\r\n\r\n",
             "%(count)d items have been uploaded to %(store_url)s.\r\n\r\n",
             nitems) %  {
@@ -546,13 +546,13 @@ def digest(request):
     output = ""
     error = False
     for (user, text) in messages.items():
-        text += ugettext("Fileshack\r\n")
+        text += gettext("Fileshack\r\n")
         if settings.SECRET_KEY:
-            text += ugettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
+            text += gettext("--\r\nTo UNSUBSCRIBE, go to %(url)s") % {
                 "url": url_prefix + user.unsubscribe_url()
             }
         try:
-            send_mail(ugettext("Fileshack Update"), text,
+            send_mail(gettext("Fileshack Update"), text,
                       settings.FILESHACK_EMAIL_FROM, [user.email])
             user.last_notification = now
             user.save()
@@ -566,7 +566,7 @@ def digest(request):
                 error = True
                 break # Serious error, does not make sense to continue.
 
-    output = ungettext(
+    output = ngettext(
         "A digest has been sent to %(count)d person.",
         "A digest has been sent to %(count)d people.",
         n) % { "count": n } + output
