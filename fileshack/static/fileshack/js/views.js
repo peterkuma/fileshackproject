@@ -32,7 +32,11 @@ var View = new Class({
             this_[attr] = this_.el.getElements('.'+attr)[0];
         });
         model.addEvent('change', function() { this_.render(); });
-        model.addEvent('remove', function() { this_.el.parentNode.removeChild(this_.el); } );
+        model.addEvent('remove', function() {
+            if(this_.el.parentNode) {
+                this_.el.parentNode.removeChild(this_.el);
+            }
+        });
         this.render();
     },
 
