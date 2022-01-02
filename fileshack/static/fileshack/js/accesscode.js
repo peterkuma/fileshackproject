@@ -1,7 +1,7 @@
 document.addEvent('domready', function() {
     input = $('accesscode');
     button = $('ok');
-    
+
     function update() {
         if (input.value != '') {
             input.addClass('active');

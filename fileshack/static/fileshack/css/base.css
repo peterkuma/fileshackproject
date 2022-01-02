@@ -55,14 +55,14 @@ button::-moz-focus-inner {
     border: none;
 }
 
-:invalid {  
-    box-shadow: none;  
-}  
-      
-:-moz-submit-invalid {  
-    box-shadow: none;  
-}  
-      
-:-moz-ui-invalid {  
-    box-shadow:none;  
-}  
+:invalid {
+    box-shadow: none;
+}
+
+:-moz-submit-invalid {
+    box-shadow: none;
+}
+
+:-moz-ui-invalid {
+    box-shadow:none;
+}

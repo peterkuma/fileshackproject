@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 Peter Kuma
-   
+
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,28 +22,28 @@
 
 var FileShack = new Class({
     Implements: Options,
-    
+
     options: {
         updateInterval: 2000
     },
-    
+
     initialize: function(options) {
         var this_ = this;
-        
+
         this.setOptions(options);
         this.lastUpdate = undefined;
-        
+
         this.items = new Collection();
         this.items.addEvent('add', function(view) {
             $('list').insertBefore(view.el, $('list').firstChild);
         });
-        
+
         var bootstrap = JSON.decode($('bootstrap').get('text'));
         this.bootstrap(bootstrap.items);
-        
+
         var dropbox = $('dropbox');
         var dropboxInput = $('dropbox-input');
-        
+
         // Drag & Drop.
         if (typeof dropbox.addEventListener != 'undefined' &&
             typeof dropbox.ondrop != 'undefined' &&
@@ -62,13 +62,13 @@ var FileShack = new Class({
             $('dropbox-text').setStyle('display', 'none');
             $('dropbox-text-nodragndrop').setStyle('display', 'block');
         }
-        
+
         var clickDelegated = false;
         dropboxInput.onclick = function(e) {
             clickDelegated = true;
             if (e && e.stopPropagation) e.stopPropagation();
         };
-        
+
         if (Browser.ie && Browser.version <= 7) {
             this.fallback();
         } else {
@@ -82,22 +82,22 @@ var FileShack = new Class({
                 }
             });
         }
-        
+
         dropboxInput.addEvent('change', function() {
             this_.upload(dropbox);
             dropbox.reset();
         });
-        
+
         //window.setInterval(function() { this_.update() }, this.options.updateInterval);
         //this.update();
-        
+
         if ($('watchbtn')) {
             // Watch dialog.
             watch = new Watch();
             watch.bootstrap(bootstrap.watchers);
         }
     },
-    
+
     bootstrap: function(items) {
         var this_ = this;
         Array.each(items, function(item) {
@@ -106,7 +106,7 @@ var FileShack = new Class({
             this_.items.add(view);
         });
     },
-    
+
     fallback: function() {
         var this_ = this;
         // Show the file upload input form.
@@ -114,20 +114,20 @@ var FileShack = new Class({
         $('dropbox-text-nodragndrop').setStyle('display', 'none');
         $('dropbox-file').setStyle('visibility', 'visible');
     },
-    
+
     update: function() {
         var this_ = this;
         var xhr = new XMLHttpRequest();
-        
+
         if (this.lastUpdate) xhr.open('GET', 'update/' + this.lastUpdate + '/');
         else xhr.open('GET', 'update/');
-        
+
         var this_ = this;
         xhr.onreadystatechange = function(e) {
             if (this.readyState == 4) {
                 json = JSON.decode(this.responseText);
                 this_.removeStaleItems(json.item_ids);
-                Array.each(json.items, function(item) {                    
+                Array.each(json.items, function(item) {
                     if (this_.items.get(item.id)) { // Existing item.
                         // Do not update pending items.
                         if (this_.items.get(item.id).model.type != 'pending')
@@ -143,7 +143,7 @@ var FileShack = new Class({
         };
         xhr.send();
     },
-    
+
     upload: function(data) {
         var this_ = this;
         // If input[type="file"].files is supported, upload per parts.
@@ -153,7 +153,7 @@ var FileShack = new Class({
             Array.each(data.file.files, function(file) { this_.upload(file); });
             return null;
         }
-        
+
         // Determine name and size of the file.
         if (typeof File != 'undefined' && data instanceof File) {
             // Older browsers.
@@ -168,7 +168,7 @@ var FileShack = new Class({
             var name = '';
             var size = 0;
         }
-        
+
         // Is there a stale item with the same size and name?
         var i = this.items.find(function(i) {
             if (!(i.model.type == 'stale' || i.model.type == 'pending' && i.isError()))
@@ -186,7 +186,7 @@ var FileShack = new Class({
             if (n == name) return true;
             return false;
         });
-        
+
         // If this is a File, ask the user about resume.
         if (i && typeof File != 'undefined' && data instanceof File) {
             var c = confirm('A stale file with the same name and size has been found.\nDo you want to resume uploading?');
@@ -206,7 +206,7 @@ var FileShack = new Class({
             }));
             this.items.add(item);
         }
-        
+
         if (ITEM_SIZE_LIMIT > 0 && size > ITEM_SIZE_LIMIT) {
             item.onError({
                 label: ITEM_SIZE_LIMIT_ERROR_LABEL,
@@ -214,7 +214,7 @@ var FileShack = new Class({
             });
             return null;
         }
-        
+
         if (typeof File != 'undefined' && data instanceof File &&
             typeof FormData != 'undefined' &&
             (data.slice || data.mozSlice || data.webkitSlice))
@@ -235,15 +235,15 @@ var FileShack = new Class({
         } else {
             data.submit();
         }
-        
+
         return item;
     },
-    
+
     uploadIFrame: function() {
         var this_ = this;
         var iframe = $('iframe');
         var form = iframe.contentDocument.forms[0];
-        
+
         form.file.onchange = function() {
             var item = this_.upload(form);
             iframe.onload = function() {
@@ -275,7 +275,7 @@ var FileShack = new Class({
         };
         form.file.click();
     },
-    
+
     removeStaleItems: function(validIds) {
         Object.each(this.items.all(), function(item) {
             if (item.model.type != 'pending' && !validIds.contains(item.model.id))
@@ -287,34 +287,34 @@ var FileShack = new Class({
 var Watch = new Class({
     initialize: function() {
         var this_ = this;
-        
+
         this.watchers = new Collection();
         this.watchers.addEvent('add', function(view) {
             $('watch-list').appendChild(view.el);
         });
-        
+
         this.watchbtn = $('watchbtn');
         this.dialog = $('watch-dialog');
         this.form = $$('#watch-dialog .new')[0];
         this.email = $$('#watch-dialog .new input[name="email"]')[0];
         this.submit = $$('#watch-dialog .new button[type="submit"]')[0];
         this.error = $('watch-error');
-        
+
         if (!this.form.checkValidity) {
             this.form.checkValidity = function() {
                 var pattern  = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
                 return this.email.value.match(pattern);
             }
         }
-        
+
         var fx = new Fx.Reveal(this.dialog, {
             transition: Fx.Transitions.Sine.easeOut,
             duration: 100
         });
-        
+
         window.addEvent('resize', function() { this_.positionDialog(); });
         this.positionDialog();
-        
+
         this.email.addEvent('change', function() { this_.render(); });
         this.email.addEvent('keyup', function() { this_.render(); });
         this.watchbtn.addEvent('click', function() {
@@ -348,7 +348,7 @@ var Watch = new Class({
             watcher.model.save();
         });
     },
-    
+
     positionDialog: function() {
         var display = this.dialog.getStyle('display');
         var visibility = this.dialog.getStyle('visibility');
@@ -362,12 +362,12 @@ var Watch = new Class({
         this.dialog.setStyle('display', display);
         this.dialog.setStyle('visibility', visibility);
     },
-    
+
     render: function() {
         if (this.form.checkValidity()) this.submit.addClass('active');
         else this.submit.removeClass('active');
     },
-    
+
     bootstrap: function(watchers) {
         var this_ = this;
         Array.each(watchers, function(watcher) {
