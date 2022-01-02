@@ -76,3 +76,16 @@ h1 {
     padding: 0 0 15px 30px;
 }
 
+@media (max-width: 820px) {
+    h1 {
+        margin-top: 50px;
+    }
+
+    #accesscode-form {
+        width: 285px;
+    }
+
+    #accesscode-form input[name="accesscode"] {
+        width: 185px;
+    }
+}

@@ -16,6 +16,9 @@ body {
     margin: 0 auto;
     text-align: left;
     width: 820px;
+    max-width: 100%;
+    min-width: 360px;
+    box-sizing: border-box;
     padding: 0 20px;
 }
 
@@ -203,8 +206,11 @@ form[action="logout/"] button:focus {
 #dropbox-file {
     visibility: hidden;
     position: absolute;
-    left: 250px;
     top: 0px;
+    left: 0px;
+    text-align: center;
+    width: 100%;
+    font-size: 12pt;
 }
 
 .box {
@@ -212,11 +218,13 @@ form[action="logout/"] button:focus {
     text-decoration: none;
     color: inherit;
     height: 80px;
-    width: 780px;
     padding: 18px 20px;
     margin: 10px auto;
-    border: 1px solid transparent;
-    background: url(../img/box.png) center center no-repeat;
+    border: 0.5px solid #888a85;
+    border-radius: 8px;
+    box-shadow: 1px 1px #d3d7cf;
+    position: relative;
+    background: url("../img/doc.png") 20px center/67px no-repeat;
 }
 
 .item.stale .box {
@@ -247,10 +255,10 @@ form[action="logout/"] button:focus {
 .item.stale .progressbar { display: block; }
 
 .box:hover,.box:focus,.item.selected .box,.unfinished-item.selected .box,.foreign-item.selected .box {
-    background: url(../img/box-selected.png) center center no-repeat;
+    background: url("../img/doc.png") 20px center/67px no-repeat, linear-gradient(#ffffff, #fafafa);
 }
 
-.box .name {
+.item .name {
     font-size: 18pt;
     margin-top: 5px;
     margin-left: 85px;
@@ -259,18 +267,12 @@ form[action="logout/"] button:focus {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 150%;
+    position: absolute;
+    width: calc(100% - 260px);
 }
 
-.item .name {
-    width: 550px;
-}
-
-.item.pending .name,.item.stale .name {
-    width: 380px;
-}
-
-.item.unfinished .name {
-    width: 480px;
+.item.pending .name,.item.stale .name,.item.unfinished .name {
+    width: calc(100% - 350px);
 }
 
 .item .progress_container {
@@ -287,23 +289,29 @@ form[action="logout/"] button:focus {
 }
 
 .item.pending .progressbar,.item.stale .progressbar {
-    width: 380px;
+    width: calc(100% - 350px);
     height: 25px;
-    margin-left: 90px;
-    margin-top: 10px;
+    margin-left: 85px;
+    margin-top: 50px;
+    position: absolute;
 }
 
 .item.unfinished .progressbar {
-    width: 480px;
+    width: calc(100% - 350px);
     height: 25px;
-    margin-left: 90px;
-    margin-top: 15px;
+    margin-left: 85px;
+    margin-top: 50px;
+    position: absolute;
 }
 
 .item .progress_size,.item .progress_size {
     font-size: 14pt;
     color: #555753;
     line-height: 120%;
+}
+
+.item.pending .progress_size,.item.stale .progress_size {
+    margin-right: -90px;
 }
 
 .item .buttons {
@@ -334,7 +342,9 @@ form[action="logout/"] button:focus {
 }
 
 .item .desc {
+    position: absolute;
     font-size: 12pt;
+    margin-top: 55px;
     margin-left: 85px;
     color: #555753;
     line-height: 120%;
@@ -447,4 +457,36 @@ form[action="logout/"] button:focus {
     -moz-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
     -o-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 820px) {
+    #container {
+        padding: 0 5px;
+    }
+
+    .box {
+        padding: 9px 10px;
+        background: none;
+    }
+
+    .box:hover,.box:focus,.item.selected .box,.unfinished-item.selected .box,.foreign-item.selected .box {
+        background: linear-gradient(#ffffff, #fafafa);
+    }
+
+    .item .name {
+        width: calc(100% - 150px);
+    }
+
+    .item.pending .name,.item.stale .name,.item.unfinished .name {
+        width: calc(100% - 240px);
+    }
+
+    .item .name,.item .desc {
+        margin-left: 0;
+    }
+
+    .item.pending .progressbar,.item.stale .progressbar,.item.unfinished .progressbar {
+        margin-left: 0;
+        width: calc(100% - 240px);
+    }
 }
