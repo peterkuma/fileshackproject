@@ -266,7 +266,7 @@ form[action="logout/"] button:focus {
 }
 
 .item.pending .name,.item.stale .name {
-    width: 400px;
+    width: 380px;
 }
 
 .item.unfinished .name {
@@ -275,7 +275,7 @@ form[action="logout/"] button:focus {
 
 .item .progress_container {
     float: right;
-    width: 180px;
+    width: 200px;
     height: 100px;
     text-align: right;
 }
@@ -287,7 +287,7 @@ form[action="logout/"] button:focus {
 }
 
 .item.pending .progressbar,.item.stale .progressbar {
-    width: 400px;
+    width: 380px;
     height: 25px;
     margin-left: 90px;
     margin-top: 10px;
